@@ -7,7 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
 import { StatsCardComponent } from '../../../shared/components/stats-card/stats-card.component';
 import { UnderConstructionComponent } from '../../../shared/components/under-construction/under-construction.component';
-import { WorkOrderService } from '../../../shared/services/work-order.service';
+import { WorkOrderService } from '../../../domains/work-order/services/work-order.service';
 import { ActivityLogService, ActivityLog } from '../../../shared/services/activity-log.service';
 
 @Component({
@@ -29,48 +29,48 @@ import { ActivityLogService, ActivityLog } from '../../../shared/services/activi
 export class OverviewComponent implements OnInit {
   // Stats data
   statsCards = [
-    { 
-      title: 'Total Work Orders', 
-      value: 125, 
-      icon: 'description', 
-      cardColor: 'primary' as const, 
-      trend: 12, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Total Work Orders',
+      value: 125,
+      icon: 'description',
+      cardColor: 'primary' as const,
+      trend: 12,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Active Work Orders', 
-      value: 89, 
-      icon: 'fact_check', 
-      cardColor: 'success' as const, 
-      trend: 8, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Active Work Orders',
+      value: 89,
+      icon: 'fact_check',
+      cardColor: 'success' as const,
+      trend: 8,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Pending Work Orders', 
-      value: 15, 
-      icon: 'schedule', 
-      cardColor: 'warning' as const, 
-      trend: -5, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Pending Work Orders',
+      value: 15,
+      icon: 'schedule',
+      cardColor: 'warning' as const,
+      trend: -5,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Overdue', 
-      value: 3, 
-      icon: 'warning', 
-      cardColor: 'error' as const, 
-      trend: -2, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Overdue',
+      value: 3,
+      icon: 'warning',
+      cardColor: 'error' as const,
+      trend: -2,
+      trendLabel: 'since last month'
     }
   ];
 
   // Recent activities data
   recentActivities: ActivityLog[] = [];
-  
+
   constructor(
     private workOrderService: WorkOrderService,
     private activityLogService: ActivityLogService
   ) {}
-  
+
   ngOnInit(): void {
     this.loadRecentActivities();
   }
@@ -79,7 +79,7 @@ export class OverviewComponent implements OnInit {
     // Filter activity logs from the last 12 hours
     const twelveHoursAgo = new Date();
     twelveHoursAgo.setHours(twelveHoursAgo.getHours() - 12);
-    
+
     this.activityLogService.getAllActivityLogs().subscribe(
       (logs) => {
         // Filter logs that occurred in the last 12 hours
@@ -95,7 +95,7 @@ export class OverviewComponent implements OnInit {
       }
     );
   }
-  
+
   /**
    * Get the appropriate icon for an activity based on its action
    */
@@ -115,7 +115,7 @@ export class OverviewComponent implements OnInit {
         return 'notifications';
     }
   }
-  
+
   /**
    * Get the appropriate color class for an activity based on its action
    */

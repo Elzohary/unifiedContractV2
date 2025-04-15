@@ -1,5 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
-@import './styles/material-overrides';
+@use 'sass:map';
+@use '@angular/material' as mat;
+@use './_theme-colors' as theme;
+
+// Include core Material styles (only once)
+@include mat.core();
+
+// Helper function to get color from palette
+@function get-color-from-palette($palette, $hue: 500) {
+  @return map.get($palette, $hue);
+}
 
 /* CSS Variables for Border Radius */
 :root {
@@ -29,47 +39,48 @@ body {
 
 /* Light theme styles */
 body.light-theme {
-  background-color: #fafafa;
-  color: rgba(0, 0, 0, 0.87);
+  @include theme.high-contrast-overrides(light);
+  background-color: get-color-from-palette(theme.$primary-palette, 95);
+  color: get-color-from-palette(theme.$primary-palette, 10);
 
   /* Theme colors for light mode */
-  --dashboard-bg: #f5f5f5;
-  --card-bg: #ffffff;
-  --card-header-bg: #fafafa;
-  --card-border: #e0e0e0;
-  --text-primary: rgba(0, 0, 0, 0.87);
-  --text-secondary: rgba(0, 0, 0, 0.54);
-  --icon-primary: #1976d2;
-  --icon-accent: #ff9800;
-  --icon-success: #4caf50;
-  --icon-warning: #ff9800;
-  --icon-danger: #f44336;
-  --stat-trend-up: #4caf50;
-  --stat-trend-down: #f44336;
-  --btn-primary: #1976d2;
+  --dashboard-bg: get-color-from-palette(theme.$primary-palette, 98);
+  --card-bg: get-color-from-palette(theme.$primary-palette, 99);
+  --card-header-bg: get-color-from-palette(theme.$primary-palette, 95);
+  --card-border: get-color-from-palette(theme.$primary-palette, 80);
+  --text-primary: get-color-from-palette(theme.$primary-palette, 10);
+  --text-secondary: get-color-from-palette(theme.$primary-palette, 30);
+  --icon-primary: get-color-from-palette(theme.$primary-palette, 40);
+  --icon-accent: get-color-from-palette(theme.$tertiary-palette, 40);
+  --icon-success: get-color-from-palette(theme.$primary-palette, 40);
+  --icon-warning: get-color-from-palette(theme.$tertiary-palette, 40);
+  --icon-danger: get-color-from-palette(theme.$error-palette, 40);
+  --stat-trend-up: get-color-from-palette(theme.$primary-palette, 40);
+  --stat-trend-down: get-color-from-palette(theme.$error-palette, 40);
+  --btn-primary: get-color-from-palette(theme.$primary-palette, 40);
 }
 
 /* Dark theme styles */
 body.dark-theme {
-  background-color: #303030;
-  color: #ffffff;
+  @include theme.high-contrast-overrides(dark);
+  background-color: get-color-from-palette(theme.$primary-palette, 10);
+  color: get-color-from-palette(theme.$primary-palette, 90);
 
   /* Theme colors for dark mode */
-  --dashboard-bg: #0f0f1a00;
-  --card-bg: #39393b;
-  --card-header-bg: #39393b;
-  --card-border: #39393b;
-  --text-primary: #ffffff;
-  --text-secondary: #d1d1dd;
-  --icon-primary: #3699ff;
-  --icon-accent: #ff9f43;
-  --icon-success: #65dab7;
-  --icon-warning: #ffa800;
-  --icon-danger: #f64e60;
-  --stat-trend-up: #8ce4c9;
-  --stat-trend-down: #e48c8c;
-  --card-shadow: rgba(0, 0, 0, 0.3);
-  --btn-primary: #3699ff;
+  --dashboard-bg: get-color-from-palette(theme.$primary-palette, 20);
+  --card-bg: get-color-from-palette(theme.$primary-palette, 20);
+  --card-header-bg: get-color-from-palette(theme.$primary-palette, 10);
+  --card-border: get-color-from-palette(theme.$primary-palette, 30);
+  --text-primary: get-color-from-palette(theme.$primary-palette, 90);
+  --text-secondary: get-color-from-palette(theme.$primary-palette, 70);
+  --icon-primary: get-color-from-palette(theme.$primary-palette, 80);
+  --icon-accent: get-color-from-palette(theme.$tertiary-palette, 80);
+  --icon-success: get-color-from-palette(theme.$primary-palette, 80);
+  --icon-warning: get-color-from-palette(theme.$tertiary-palette, 80);
+  --icon-danger: get-color-from-palette(theme.$error-palette, 80);
+  --stat-trend-up: get-color-from-palette(theme.$primary-palette, 80);
+  --stat-trend-down: get-color-from-palette(theme.$error-palette, 80);
+  --btn-primary: get-color-from-palette(theme.$primary-palette, 80);
 }
 
 /* Fix for Angular Material overlay issues */

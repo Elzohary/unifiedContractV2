@@ -1,7 +1,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatTableModule } from '@angular/material/table';
-import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatSortModule } from '@angular/material/sort';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,9 +16,9 @@ import { MatChipsModule } from '@angular/material/chips';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, forkJoin, finalize } from 'rxjs';
-import { WorkOrderRemark, WorkOrder, User } from '../../../../../shared/models/work-order.model';
+import { WorkOrderRemark, WorkOrder, User } from '../../../../../domains/work-order/models/work-order.model';
 import { RemarkService } from '../../../../../shared/services/remark.service';
-import { WorkOrderService } from '../../../../../shared/services/work-order.service';
+import { WorkOrderService } from '../../../../../domains/work-order/services/work-order.service';
 import { TempUserService as UserService } from '../../../../../shared/services/temp-user.service';
 import { TempNotificationService as NotificationService } from '../../../../../shared/services/temp-notification.service';
 import { RemarkDialogComponent } from '../remark-dialog/remark-dialog.component';
@@ -58,16 +58,16 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
   users: User[] = [];
   loading = true;
   error: string | null = null;
-  
+
   // Pagination
   pageSize = 10;
   pageIndex = 0;
-  
+
   // Filtering
   filterForm: FormGroup;
-  
+
   private destroy$ = new Subject<void>();
-  
+
   constructor(
     private remarkService: RemarkService,
     private workOrderService: WorkOrderService,
@@ -83,10 +83,10 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
       sortBy: ['createdDate']
     });
   }
-  
+
   ngOnInit(): void {
     this.loadData();
-    
+
     // Subscribe to filter changes
     this.filterForm.valueChanges
       .pipe(takeUntil(this.destroy$))
@@ -94,20 +94,20 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         this.applyFilters();
       });
   }
-  
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
-  
+
   loadData(): void {
     this.loading = true;
     this.error = null;
-    
+
     // Use forkJoin to load all required data in parallel
     forkJoin({
       remarks: this.remarkService.getAllRemarks(),
-      workOrders: this.workOrderService.getWorkOrders(),
+      workOrders: this.workOrderService.getAllWorkOrders(),
       users: this.userService.getUsers()
     })
     .pipe(takeUntil(this.destroy$))
@@ -126,33 +126,33 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
       }
     });
   }
-  
+
   loadRemarks(): void {
     this.loadData();
   }
-  
+
   applyFilters(): void {
     const { search, type, sortBy } = this.filterForm.value;
-    
+
     // Apply search filter
     let filtered = this.remarks;
     if (search) {
       const searchLower = search.toLowerCase();
-      filtered = filtered.filter(remark => 
+      filtered = filtered.filter(remark =>
         remark.content.toLowerCase().includes(searchLower) ||
         remark.createdBy.toLowerCase().includes(searchLower)
       );
     }
-    
+
     // Apply type filter
     if (type) {
       filtered = filtered.filter(remark => remark.type === type);
     }
-    
+
     // Apply sorting
     const sortField = sortBy.startsWith('-') ? sortBy.substring(1) : sortBy;
     const sortDirection = sortBy.startsWith('-') ? -1 : 1;
-    
+
     filtered = [...filtered].sort((a, b) => {
       if (sortField === 'createdDate') {
         return sortDirection * (new Date(b.createdDate).getTime() - new Date(a.createdDate).getTime());
@@ -165,23 +165,23 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         return 0;
       }
     });
-    
+
     this.filteredRemarks = filtered;
     this.updatePaginatedRemarks();
   }
-  
+
   updatePaginatedRemarks(): void {
     const startIndex = this.pageIndex * this.pageSize;
     const endIndex = startIndex + this.pageSize;
     this.paginatedRemarks = this.filteredRemarks.slice(startIndex, endIndex);
   }
-  
+
   onPageChange(event: PageEvent): void {
     this.pageSize = event.pageSize;
     this.pageIndex = event.pageIndex;
     this.updatePaginatedRemarks();
   }
-  
+
   formatDate(dateString: string): string {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -191,12 +191,12 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
       minute: '2-digit'
     });
   }
-  
+
   getWorkOrderNumber(workOrderId: string): string {
     const workOrder = this.workOrders.find(wo => wo.id === workOrderId);
-    return workOrder ? workOrder.orderNumber : 'N/A';
+    return workOrder ? workOrder.details.workOrderNumber : 'N/A';
   }
-  
+
   getRemarkIcon(type: string): string {
     switch (type) {
       case 'general':
@@ -217,56 +217,50 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         return 'comment';
     }
   }
-  
+
   navigateToWorkOrder(workOrderId: string): void {
     this.router.navigate(['/work-orders/details', workOrderId]);
   }
-  
+
   openAddRemarkDialog(): void {
     const dialogRef = this.dialog.open(RemarkDialogComponent, {
       width: '600px',
-      data: { 
+      data: {
         title: 'Add New Remark',
         workOrders: this.workOrders,
         users: this.users
       }
     });
-    
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Extract sendNotifications flag from the result
-        const sendNotifications = !!result.sendNotifications;
-        // Create a new object without sendNotifications property
-        const { sendNotifications: _, ...remarkData } = result;
-        
-        this.addRemark(remarkData, sendNotifications);
+        // Extract sendNotifications flag and remove it from the data
+        const { sendNotifications, ...remarkData } = result;
+        this.addRemark(remarkData, !!sendNotifications);
       }
     });
   }
-  
+
   editRemark(remark: WorkOrderRemark): void {
     const dialogRef = this.dialog.open(RemarkDialogComponent, {
       width: '600px',
-      data: { 
+      data: {
         title: 'Edit Remark',
         remark: remark,
         workOrders: this.workOrders,
         users: this.users
       }
     });
-    
+
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        // Extract sendNotifications flag from the result
-        const sendNotifications = !!result.sendNotifications;
-        // Create a new object without sendNotifications property
-        const { sendNotifications: _, ...remarkData } = result;
-        
-        this.updateRemark(remark.id, remarkData, sendNotifications);
+        // Extract sendNotifications flag and remove it from the data
+        const { sendNotifications, ...remarkData } = result;
+        this.updateRemark(remark.id, remarkData, !!sendNotifications);
       }
     });
   }
-  
+
   addRemark(remarkData: Partial<WorkOrderRemark>, sendNotifications: boolean): void {
     this.remarkService.addRemark(remarkData)
       .pipe(takeUntil(this.destroy$))
@@ -284,11 +278,11 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         }
       });
   }
-  
+
   updateRemark(id: string, remarkData: Partial<WorkOrderRemark>, sendNotifications: boolean): void {
     // Show loading state
     this.loading = true;
-    
+
     this.remarkService.updateRemark(id, remarkData)
       .pipe(
         takeUntil(this.destroy$),
@@ -302,10 +296,10 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
           if (sendNotifications && remarkData.peopleInvolved && remarkData.peopleInvolved.length > 0) {
             this.sendNotifications(updatedRemark, 'updated');
           }
-          
+
           // Reload remarks to ensure we have the latest state
           this.loadRemarks();
-          
+
           // Show success message
           this.notificationService.showSuccess('Remark updated successfully');
         },
@@ -315,7 +309,7 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         }
       });
   }
-  
+
   deleteRemark(remark: WorkOrderRemark): void {
     if (confirm(`Are you sure you want to delete this remark?`)) {
       // Show loading state
@@ -323,7 +317,7 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
       if (loadingSection) {
         loadingSection.classList.add('loading-state');
       }
-      
+
       // Use the IDs as strings to ensure consistent handling
       this.remarkService.deleteRemark(remark.workOrderId, remark.id)
         .pipe(
@@ -348,17 +342,17 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         });
     }
   }
-  
+
   // New method to send notifications
   private sendNotifications(remark: WorkOrderRemark, action: 'added' | 'updated'): void {
     if (!remark.peopleInvolved || remark.peopleInvolved.length === 0) {
       return;
     }
-    
+
     // Get the work order number for the notification message
     const workOrder = this.workOrders.find(wo => wo.id === remark.workOrderId);
-    const workOrderNumber = workOrder ? workOrder.orderNumber : remark.workOrderId;
-    
+    const workOrderNumber = workOrder ? workOrder.details.workOrderNumber : remark.workOrderId;
+
     // Prepare notification data
     const notificationData = {
       title: `Work Order Remark ${action}`,
@@ -368,7 +362,7 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
       workOrderId: remark.workOrderId,
       actionUrl: `/work-orders/details/${remark.workOrderId}`
     };
-    
+
     // Send notifications to all involved people
     this.notificationService.sendBulkNotifications(notificationData)
       .pipe(takeUntil(this.destroy$))
@@ -377,4 +371,4 @@ export class AllRemarksComponent implements OnInit, OnDestroy {
         error: (error: Error) => console.error('Error sending notifications:', error)
       });
   }
-} 
+}

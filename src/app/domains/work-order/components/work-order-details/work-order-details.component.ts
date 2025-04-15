@@ -12,7 +12,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { WorkOrderService } from '../../../../shared/services/work-order.service';
+import { WorkOrderService } from '../../services/work-order.service';
 import {
   WorkOrder,
   WorkOrderStatus,
@@ -124,6 +124,9 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
   activeTab = 'overview';
 
   private expensesChart: Chart | null = null;
+
+  // Expose the enum to the template
+  WorkOrderStatus = WorkOrderStatus;
 
   constructor(
     private route: ActivatedRoute,
@@ -633,7 +636,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   // Status update methods
-  updateStatus(newStatus: string): void {
+  updateStatus(newStatus: WorkOrderStatus): void {
     if (this.workOrder) {
       this.workOrderService.updateWorkOrderStatus(this.workOrder.id, newStatus).pipe(
         takeUntil(this.destroy$)
@@ -859,7 +862,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.workOrder && this.workOrder.tasks) {
         // Call service to delete the task
-        this.taskService.deleteTask(Number(taskToDelete.id))
+        this.taskService.deleteTask(taskToDelete.id)
           .pipe(
             takeUntil(this.destroy$),
             // eslint-disable-next-line @typescript-eslint/no-unused-vars

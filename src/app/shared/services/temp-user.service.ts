@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, catchError } from 'rxjs/operators';
-import { User } from '../models/work-order.model';
+import { User } from '../../domains/user/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -39,8 +39,6 @@ export class TempUserService {
     }
   ];
 
-  constructor() { }
-
   /**
    * Get all users
    */
@@ -59,11 +57,11 @@ export class TempUserService {
    */
   getUserById(userId: string): Observable<User | null> {
     const user = this.mockUsers.find(u => u.id === userId);
-    
+
     if (!user) {
       return of(null).pipe(delay(300));
     }
-    
+
     return of(user).pipe(
       delay(300),
       catchError(error => {
@@ -78,7 +76,7 @@ export class TempUserService {
    */
   getUsersByIds(userIds: string[]): Observable<User[]> {
     const users = this.mockUsers.filter(u => userIds.includes(u.id));
-    
+
     return of(users).pipe(
       delay(300),
       catchError(error => {
@@ -87,4 +85,4 @@ export class TempUserService {
       })
     );
   }
-} 
+}

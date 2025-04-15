@@ -13,11 +13,11 @@ import { PageHeaderAction, PageHeaderConfig } from './models/page-header.model';
     MatIconModule
   ],
   templateUrl: './page-header.component.html',
-  styleUrl: './page-header.component.scss'
+  styleUrls: ['./page-header.component.scss']
 })
 export class PageHeaderComponent {
-  @Input() title: string = '';
-  @Input() subtitle: string = '';
+  @Input() title = '';
+  @Input() subtitle = '';
   @Input() actions: PageHeaderAction[] = [];
 
   /**

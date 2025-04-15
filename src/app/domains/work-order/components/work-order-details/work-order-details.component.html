@@ -99,7 +99,7 @@
                       <span class="info-value">{{ workOrder.details.location || 'Not specified' }}</span>
                     </div>
 
-                    
+
                     <div class="info-item">
                       <span class="info-label">Created By</span>
                       <span class="info-value">{{ workOrder.details.createdBy || 'System' }}</span>
@@ -853,12 +853,12 @@
           </mat-card-header>
           <mat-card-content>
             <div class="quick-actions-grid">
-              <button mat-stroked-button class="quick-action-button" (click)="updateStatus('in-progress')" [disabled]="workOrder.details.status === 'in-progress'">
+              <button mat-stroked-button class="quick-action-button" (click)="updateStatus(WorkOrderStatus.InProgress)" [disabled]="workOrder.details.status === WorkOrderStatus.InProgress">
                 <mat-icon>update</mat-icon>
                 <span>Update Status</span>
               </button>
 
-              <button mat-stroked-button class="quick-action-button" (click)="updateStatus('completed')" [disabled]="workOrder.details.status === 'completed'">
+              <button mat-stroked-button class="quick-action-button" (click)="updateStatus(WorkOrderStatus.Completed)" [disabled]="workOrder.details.status === WorkOrderStatus.Completed">
                 <mat-icon>assignment_turned_in</mat-icon>
                 <span>Complete</span>
               </button>

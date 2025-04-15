@@ -4,8 +4,10 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
+import { SharedModule } from '../../../../shared/shared.module';
 import { StatsCardComponent } from '../../../../shared/components/stats-card/stats-card.component';
 import { UnderConstructionComponent } from '../../../../shared/components/under-construction/under-construction.component';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 @Component({
   selector: 'app-dashboard-analytics',
@@ -16,9 +18,11 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
     MatButtonModule,
     MatIconModule,
     MatGridListModule,
+    SharedModule,
     StatsCardComponent,
     UnderConstructionComponent
   ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   template: `
     <div class="dashboard-container">
       <!-- Page Header -->
@@ -35,7 +39,7 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
       <!-- Stats Cards Row -->
       <div class="stats-cards-grid mb-4">
         <div class="stats-card-wrapper" *ngFor="let card of statsCards">
-          <app-stats-card 
+          <app-stats-card
             [title]="card.title"
             [value]="card.value"
             [icon]="card.icon"
@@ -63,8 +67,8 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
             </mat-card-header>
             <mat-card-content>
               <div class="chart-placeholder">
-                <app-under-construction 
-                  title="Chart Coming Soon" 
+                <app-under-construction
+                  title="Chart Coming Soon"
                   message="The analytics chart is currently under development and will be available soon.">
                 </app-under-construction>
               </div>
@@ -81,8 +85,8 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
             </mat-card-header>
             <mat-card-content>
               <div class="work-orders-table-placeholder">
-                <app-under-construction 
-                  title="Work Orders Table Coming Soon" 
+                <app-under-construction
+                  title="Work Orders Table Coming Soon"
                   message="The work orders table is currently under development and will be available soon.">
                 </app-under-construction>
               </div>
@@ -108,7 +112,7 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
                 <div class="activity-content">
                   <div class="activity-title">{{ activity.description }}</div>
                   <div class="activity-meta">
-                    <span class="activity-user">{{ activity.userName }}</span> • 
+                    <span class="activity-user">{{ activity.userName }}</span> •
                     <span class="activity-time">{{ activity.timestamp | date:'short' }}</span>
                   </div>
                 </div>
@@ -164,7 +168,7 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
       display: grid;
       grid-template-columns: 1fr;
       gap: 24px;
-      
+
       @media (min-width: 992px) {
         grid-template-columns: 2fr 1fr;
       }
@@ -344,48 +348,53 @@ import { UnderConstructionComponent } from '../../../../shared/components/under-
 export class DashboardAnalyticsComponent implements OnInit {
   // Stats data
   statsCards = [
-    { 
-      title: 'Total Work Orders', 
-      value: 125, 
-      icon: 'description', 
-      cardColor: 'primary' as const, 
-      trend: 12, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Total Work Orders',
+      value: 125,
+      icon: 'description',
+      cardColor: 'primary' as const,
+      trend: 12,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Active Work Orders', 
-      value: 89, 
-      icon: 'fact_check', 
-      cardColor: 'success' as const, 
-      trend: 8, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Active Work Orders',
+      value: 89,
+      icon: 'fact_check',
+      cardColor: 'success' as const,
+      trend: 8,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Pending Work Orders', 
-      value: 15, 
-      icon: 'schedule', 
-      cardColor: 'warning' as const, 
-      trend: -5, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Pending Work Orders',
+      value: 15,
+      icon: 'schedule',
+      cardColor: 'warning' as const,
+      trend: -5,
+      trendLabel: 'since last month'
     },
-    { 
-      title: 'Overdue', 
-      value: 3, 
-      icon: 'warning', 
-      cardColor: 'error' as const, 
-      trend: -2, 
-      trendLabel: 'since last month' 
+    {
+      title: 'Overdue',
+      value: 3,
+      icon: 'warning',
+      cardColor: 'error' as const,
+      trend: -2,
+      trendLabel: 'since last month'
     }
   ];
 
   // Recent activities data
-  recentActivities: any[] = [];
-  
+  recentActivities: {
+    action: string;
+    description: string;
+    userName: string;
+    timestamp: Date;
+  }[] = [];
+
   ngOnInit(): void {
     // Initialize with empty activities
     this.recentActivities = [];
   }
-  
+
   /**
    * Get the appropriate icon for an activity based on its action
    */
@@ -405,7 +414,7 @@ export class DashboardAnalyticsComponent implements OnInit {
         return 'notifications';
     }
   }
-  
+
   /**
    * Get the appropriate color class for an activity based on its action
    */
@@ -425,4 +434,4 @@ export class DashboardAnalyticsComponent implements OnInit {
         return 'icon-default';
     }
   }
-} 
+}

@@ -35,6 +35,7 @@ export interface Permit {
 export interface Manpower {
   id: string;
   badgeNumber: string;
+  name: string;
   user?: User;
   role?: string;
   hoursAssigned: number;

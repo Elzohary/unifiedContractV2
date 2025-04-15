@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError, timer } from 'rxjs';
-import { map, catchError, finalize, switchMap, tap, mergeMap, delay } from 'rxjs/operators';
+import { map, catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { StateService } from '../../../core/services/state.service';
 import { ActivityLogService } from '../../../shared/services/activity-log.service';
@@ -9,17 +9,7 @@ import {
   WorkOrderStatus,
   WorkOrderPriority,
   WorkOrderRemark,
-  Task,
-  WorkOrderIssue,
-  workOrderDetail,
-  workOrderItem,
-  Material,
-  WorkOrderAction,
-  WorkOrderPhoto,
-  WorkOrderForm,
-  WorkOrderExpense,
-  WorkOrderInvoice,
-  ActionItem
+  Task
 } from '../models/work-order.model';
 
 export interface WorkOrderStatusResponse {
@@ -36,6 +26,13 @@ interface StatusTransitionHistory {
   changedBy: string;
   changedDate: string;
   reason?: string;
+}
+
+interface RemarkData {
+  content: string;
+  createdBy?: string;
+  type?: 'general' | 'technical' | 'safety' | 'quality';
+  peopleInvolved?: string[];
 }
 
 @Injectable({
@@ -123,7 +120,7 @@ export class WorkOrderService {
     if (this.statusesCache$.value.length > 0) {
       return this.statusesCache$.asObservable();
     }
-    
+
     return this.apiService.get<WorkOrderStatusResponse[]>(this.statusEndpoint).pipe(
       map(response => response.data),
       tap(statuses => this.statusesCache$.next(statuses)),
@@ -154,16 +151,6 @@ export class WorkOrderService {
           ));
         }
 
-        const historyEntry: StatusTransitionHistory = {
-          id: `st${Date.now()}`,
-          workOrderId: id,
-          fromStatus: workOrder.details.status,
-          toStatus: newStatus,
-          changedBy: 'System',
-          changedDate: new Date().toISOString(),
-          reason
-        };
-
         this.activityLogService.logActivity({
           action: 'update',
           description: `Status changed from ${this.getStatusDisplayName(workOrder.details.status)} to ${this.getStatusDisplayName(newStatus)}${reason ? ` - Reason: ${reason}` : ''}`,
@@ -174,7 +161,7 @@ export class WorkOrderService {
           systemGenerated: true
         });
 
-        return this.updateWorkOrder(id, { 
+        return this.updateWorkOrder(id, {
           details: {
             ...workOrder.details,
             status: newStatus
@@ -324,7 +311,7 @@ export class WorkOrderService {
     console.log(`Updating work order ${id} priority to ${priority}`);
     return this.getWorkOrderById(id).pipe(
       switchMap(workOrder => {
-        return this.updateWorkOrder(id, { 
+        return this.updateWorkOrder(id, {
           details: {
             ...workOrder.details,
             priority
@@ -524,12 +511,4 @@ export class WorkOrderService {
 
     return this.simulateNetwork(workOrder);
   }
-}
-
-// Define RemarkData interface for type safety
-interface RemarkData {
-  content: string;
-  createdBy?: string;
-  type?: 'general' | 'technical' | 'safety' | 'quality';
-  peopleInvolved?: string[];
 }

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError, of, BehaviorSubject } from 'rxjs';
-import { catchError, map, delay, tap } from 'rxjs/operators';
-import { Task } from '../models/work-order.model';
+import { delay } from 'rxjs/operators';
+import { Task } from '../../domains/work-order/models/work-order.model';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -11,16 +11,17 @@ import { environment } from '../../../environments/environment';
 export class TaskService {
   private apiUrl = environment.apiUrl;
   private tasksSubject = new BehaviorSubject<Task[]>([]);
-  
+
   // For mock implementation
   private mockTasks: Task[] = [
     {
-      id: 1,
+      id: '1',
       title: 'Inspect electrical system',
       description: 'Check for any faulty wiring or components',
-      assignedTo: 'John Doe',
-      dueDate: new Date('2023-12-15'),
-      startDate: new Date('2023-12-10'),
+      manpower: [{id: '1', name: 'John Doe', role: 'Electrician', hoursAssigned: 10, startDate: '2023-12-10', badgeNumber: '1234567890'}],
+      equipment: [{id: '1', name: 'Electrical Tester', type: 'Tester', quantity: 1, assignedFrom: new Date(), status: 'available'}],
+      dueDate: '2023-12-15',
+      startDate: '2023-12-10',
       priority: 'high',
       status: 'in-progress',
       completed: false,
@@ -29,12 +30,13 @@ export class TaskService {
       createdAt: new Date('2023-12-05')
     },
     {
-      id: 2,
+      id: '2',
       title: 'Replace broken parts',
       description: 'Order and install replacement parts',
-      assignedTo: 'Jane Smith',
-      dueDate: new Date('2023-12-20'),
-      startDate: new Date('2023-12-16'),
+      manpower: [{id: '2', name: 'Jane Smith', role: 'Electrician', hoursAssigned: 10, startDate: '2023-12-10', badgeNumber: '1234567890'}],
+      equipment: [{id: '2', name: 'Electrical Tester', type: 'Tester', quantity: 1, assignedFrom: new Date(), status: 'available'}],
+      dueDate: '2023-12-20',
+      startDate: '2023-12-16',
       priority: 'medium',
       status: 'pending',
       completed: false,
@@ -57,12 +59,12 @@ export class TaskService {
     // In production, use this:
     // return this.http.get<Task[]>(`${this.apiUrl}/work-orders/${workOrderId}/tasks`)
     //   .pipe(catchError(this.handleError));
-    
+
     // Mock implementation:
     return of(this.mockTasks.filter(task => task.workOrderId === workOrderId))
       .pipe(delay(300));
   }
-  
+
   /**
    * Update a task's status or other properties
    * @param task The task with updated properties
@@ -72,7 +74,7 @@ export class TaskService {
     // In production, use this:
     // return this.http.put<Task>(`${this.apiUrl}/tasks/${task.id}`, task)
     //   .pipe(catchError(this.handleError));
-    
+
     // Mock implementation:
     const index = this.mockTasks.findIndex(t => t.id === task.id);
     if (index !== -1) {
@@ -82,7 +84,7 @@ export class TaskService {
     }
     return throwError(() => new Error('Task not found'));
   }
-  
+
   /**
    * Create a new task
    * @param task The task to create
@@ -92,9 +94,9 @@ export class TaskService {
     // In production, use this:
     // return this.http.post<Task>(`${this.apiUrl}/tasks`, task)
     //   .pipe(catchError(this.handleError));
-    
+
     // Mock implementation:
-    const newId = Math.max(...this.mockTasks.map(t => Number(t.id)), 0) + 1;
+    const newId = (Math.max(...this.mockTasks.map(t => Number(t.id)), 0) + 1).toString();
     const newTask: Task = {
       ...task,
       id: newId,
@@ -102,32 +104,32 @@ export class TaskService {
       status: task.status || 'pending',
       completed: false
     };
-    
+
     this.mockTasks.push(newTask);
     this.tasksSubject.next([...this.mockTasks]);
     return of(newTask).pipe(delay(300));
   }
-  
+
   /**
    * Delete a task
    * @param taskId The ID of the task to delete
    * @returns An observable of the API response
    */
-  deleteTask(taskId: number): Observable<any> {
+  deleteTask(taskId: string | number): Observable<{ success: boolean }> {
     // In production, use this:
     // return this.http.delete(`${this.apiUrl}/tasks/${taskId}`)
     //   .pipe(catchError(this.handleError));
-    
+
     // Mock implementation:
-    const index = this.mockTasks.findIndex(t => t.id === taskId);
+    const index = this.mockTasks.findIndex(task => task.id === taskId);
     if (index !== -1) {
       this.mockTasks.splice(index, 1);
       this.tasksSubject.next([...this.mockTasks]);
-      return of({ success: true }).pipe(delay(300));
+      return of({ success: true }).pipe(delay(500));
     }
-    return throwError(() => new Error('Task not found'));
+    return of({ success: false }).pipe(delay(500));
   }
-  
+
   /**
    * Handle HTTP errors
    * @param error The HTTP error response
@@ -135,7 +137,7 @@ export class TaskService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -143,8 +145,8 @@ export class TaskService {
       // Server-side error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
-    
+
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
-} 
+}

@@ -1,8 +1,8 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError, timer, switchMap } from 'rxjs';
+import { Injectable, Inject } from '@angular/core';
+import { BehaviorSubject, Observable, of, throwError, timer } from 'rxjs';
 import { catchError, delay, map, mergeMap, tap } from 'rxjs/operators';
-import { WorkOrderRemark } from '../models/work-order.model';
-import { WorkOrderService } from './work-order.service';
+import { WorkOrderRemark } from '../../domains/work-order/models/work-order.model';
+import { WorkOrderService } from '../../domains/work-order/services/work-order.service';
 import { ActivityLogService } from './activity-log.service';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { environment } from '../../../environments/environment';
@@ -74,7 +74,7 @@ export class RemarkService {
   private apiUrl = environment.apiUrl;
 
   constructor(
-    private workOrderService: WorkOrderService,
+    @Inject(WorkOrderService) private workOrderService: WorkOrderService,
     private activityLogService: ActivityLogService,
     private http: HttpClient
   ) {
@@ -90,12 +90,12 @@ export class RemarkService {
         mergeMap(() => throwError(() => new Error('Network error - simulated failure')))
       );
     }
-    
+
     // If network delay is 0, don't use delay operator
     if (this.networkDelay === 0) {
       return of(data);
     }
-    
+
     // Simulate network delay
     return of(data).pipe(delay(this.networkDelay));
   }
@@ -115,12 +115,12 @@ export class RemarkService {
   getRemarkById(id: string): Observable<WorkOrderRemark> {
     console.log(`Fetching remark with ID: ${id}`);
     const remark = this.remarksSubject.value.find(r => r.id === id);
-    
+
     if (!remark) {
       console.warn(`Remark with ID ${id} not found`);
       return throwError(() => new Error(`Remark with ID ${id} not found`));
     }
-    
+
     return this.simulateNetwork(remark).pipe(
       catchError(error => {
         console.error(`Error fetching remark with ID ${id}:`, error);
@@ -133,10 +133,10 @@ export class RemarkService {
   getRemarksByWorkOrderId(workOrderId: string): Observable<WorkOrderRemark[]> {
     console.log(`Fetching remarks for work order ID: ${workOrderId}`);
     // Check if work order exists
-    if (!this.workOrderService.isValidWorkOrderId(workOrderId)) {
+    if (!this.workOrderService.getWorkOrderById(workOrderId)) {
       return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
     }
-    
+
     const filteredRemarks = this.remarksSubject.value.filter(r => r.workOrderId === workOrderId);
     return this.simulateNetwork(filteredRemarks).pipe(
       catchError(error => {
@@ -149,49 +149,48 @@ export class RemarkService {
   // Add a new remark
   addRemark(remark: Partial<WorkOrderRemark>): Observable<WorkOrderRemark> {
     console.log('Adding new remark:', remark);
-    
+
     if (!remark.workOrderId) {
       return throwError(() => new Error('Work order ID is required'));
     }
-    
+
     // Check if work order exists
-    if (!this.workOrderService.isValidWorkOrderId(remark.workOrderId)) {
+    if (!this.workOrderService.getWorkOrderById(remark.workOrderId)) {
       return throwError(() => new Error(`Work order with ID ${remark.workOrderId} not found`));
     }
-    
+
     const newRemark: WorkOrderRemark = {
       id: `rem${Date.now()}`, // Generate a unique ID based on timestamp
       content: remark.content || '',
       createdDate: new Date().toISOString(),
       createdBy: remark.createdBy || 'Unknown User',
-      type: remark.type || 'general',
+      type: (remark.type as 'general' | 'technical' | 'safety' | 'quality') || 'general',
       workOrderId: remark.workOrderId,
       peopleInvolved: remark.peopleInvolved || []
     };
-    
+
     try {
       // First update the local mock data
       const updatedRemarks = [...this.remarksSubject.value, newRemark];
       this.remarksSubject.next(updatedRemarks);
-      
+
       // Instead of calling updateWorkOrder, use the addRemarkToWorkOrder method
       // This ensures consistent handling in both the RemarkService and WorkOrderService
       return this.workOrderService.addRemarkToWorkOrder(remark.workOrderId, {
         content: newRemark.content,
-        type: newRemark.type,
+        type: newRemark.type as 'general' | 'technical' | 'safety' | 'quality',
         createdBy: newRemark.createdBy,
-        peopleInvolved: newRemark.peopleInvolved,
-        userId: 'user1', // Using mock user ID for now
+        peopleInvolved: newRemark.peopleInvolved
       }).pipe(
         // Map the workOrder response to just return the new remark
         map(() => newRemark),
         catchError(error => {
           console.error('Error adding remark via WorkOrderService:', error);
-          
+
           // Roll back our local state in case of error
           const rollbackRemarks = this.remarksSubject.value.filter(r => r.id !== newRemark.id);
           this.remarksSubject.next(rollbackRemarks);
-          
+
           return throwError(() => new Error('Failed to add remark'));
         })
       );
@@ -206,7 +205,7 @@ export class RemarkService {
     console.log(`Updating remark ${id} with data:`, remarkData);
     const remarks = this.remarksSubject.value;
     const remarkIndex = remarks.findIndex(r => r.id === id);
-    
+
     if (remarkIndex === -1) {
       return throwError(() => new Error(`Remark with ID ${id} not found`));
     }
@@ -214,36 +213,37 @@ export class RemarkService {
     try {
       // Get original remark
       const originalRemark = remarks[remarkIndex];
-      
+
       // Create updated remark preserving original properties if not in remarkData
       const updatedRemark: WorkOrderRemark = {
         ...originalRemark,
         ...remarkData,
         // Ensure we don't lose the workOrderId
-        workOrderId: originalRemark.workOrderId
+        workOrderId: originalRemark.workOrderId,
+        // Ensure type is valid
+        type: (remarkData.type as 'general' | 'technical' | 'safety' | 'quality') || originalRemark.type
       };
 
       // Update our local remarks array
       remarks[remarkIndex] = updatedRemark;
       this.remarksSubject.next([...remarks]);
-      
+
       // Use the WorkOrderService's updateRemark method directly
       return this.workOrderService.updateRemark(updatedRemark.workOrderId, id, {
         content: updatedRemark.content,
-        type: updatedRemark.type,
+        type: updatedRemark.type as 'general' | 'technical' | 'safety' | 'quality',
         peopleInvolved: updatedRemark.peopleInvolved,
-        userId: 'user1', // Using mock user ID for now
-        updatedBy: updatedRemark.createdBy
+        createdBy: updatedRemark.createdBy
       }).pipe(
         // Map the workOrder response to just return the updated remark
         map(() => updatedRemark),
         catchError(error => {
           console.error('Error updating remark via WorkOrderService:', error);
-          
+
           // Roll back our local state in case of error
           remarks[remarkIndex] = originalRemark;
           this.remarksSubject.next([...remarks]);
-          
+
           return throwError(() => new Error('Failed to update remark'));
         })
       );
@@ -259,21 +259,21 @@ export class RemarkService {
    * @param remarkId The ID of the remark to delete
    * @returns An observable of the API response
    */
-  deleteRemark(workOrderId: number | string, remarkId: number | string): Observable<any> {
+  deleteRemark(workOrderId: number | string, remarkId: number | string): Observable<{ success: boolean }> {
     console.log(`Deleting remark ${remarkId} from work order ${workOrderId}`);
-    
+
     // Convert parameters to strings for consistency with both mock data and API
     const workOrderIdStr = workOrderId.toString();
     const remarkIdStr = remarkId.toString();
-    
+
     // Update local state first - find and remove the remark
     const remarks = this.remarksSubject.value;
     console.log(`Current remarks: ${remarks.length}`, remarks);
-    
+
     // Save the removed remark for potential rollback
     const removedRemark = remarks.find(r => r.id === remarkIdStr);
     console.log(`Remark to delete:`, removedRemark);
-    
+
     if (!removedRemark) {
       console.error(`Remark with ID ${remarkIdStr} not found in RemarkService`);
       return throwError(() => new Error(`Remark with ID ${remarkIdStr} not found`));
@@ -282,38 +282,38 @@ export class RemarkService {
     // Filter out the remark to delete from local state
     const filteredRemarks = remarks.filter(r => r.id !== remarkIdStr);
     console.log(`Filtered remarks: ${filteredRemarks.length}`, filteredRemarks);
-    
+
     // Update local state immediately
     this.remarksSubject.next(filteredRemarks);
-    
+
     // Call the work order service's deleteRemark method
     console.log(`Calling WorkOrderService.deleteRemark(${workOrderIdStr}, ${remarkIdStr})`);
     return this.workOrderService.deleteRemark(workOrderIdStr, remarkIdStr).pipe(
       tap(result => console.log('Delete remark result:', result)),
-      // Map to empty object to simulate REST API
-      map(() => ({})),
+      // Map to success response
+      map(() => ({ success: true })),
       catchError(error => {
         console.error('Error deleting remark:', error);
-        
+
         // Log more details about the error
         if (error instanceof Error) {
           console.error(`Error name: ${error.name}, message: ${error.message}`);
           console.error(`Stack: ${error.stack}`);
         }
-        
+
         // Handle specific error case: if remark not found in WorkOrderService
         // but successfully removed from RemarkService, consider it a success
         if (error.message && (
-            error.message.includes("not found in work order") || 
+            error.message.includes("not found in work order") ||
             error.message.includes("No remarks found")
         )) {
           console.log("Remark was successfully deleted from RemarkService but not found in WorkOrderService - considering operation successful");
-          return of({});
+          return of({ success: true });
         }
-        
+
         // Otherwise rollback the local state in case of error
         this.remarksSubject.next(remarks);
-        
+
         return throwError(() => new Error('Failed to delete remark: ' + (error.message || 'Unknown error')));
       })
     );
@@ -326,7 +326,7 @@ export class RemarkService {
    */
   private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An unknown error occurred';
-    
+
     if (error.error instanceof ErrorEvent) {
       // Client-side error
       errorMessage = `Error: ${error.error.message}`;
@@ -334,8 +334,8 @@ export class RemarkService {
       // Server-side error
       errorMessage = `Error Code: ${error.status}\nMessage: ${error.message}`;
     }
-    
+
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
   }
-} 
+}

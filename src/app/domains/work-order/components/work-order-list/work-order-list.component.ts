@@ -11,9 +11,9 @@ import { MatInputModule } from '@angular/material/input';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Router } from '@angular/router';
-import { WorkOrderService } from '../../../../shared/services/work-order.service';
-import { WorkOrder, WorkOrderStatus } from '../../../../shared/models/work-order.model';
-import { finalize, catchError } from 'rxjs/operators';
+import { WorkOrderService } from '../../services/work-order.service';
+import { WorkOrder } from '../../models/work-order.model';
+import { finalize, catchError, map } from 'rxjs/operators';
 import { of } from 'rxjs';
 import { PageHeaderComponent, PageHeaderAction } from '../../../../shared/components/page-header';
 import { DataTableCardComponent, DataTableColumn, DataTableFilter, DataTableAction } from '../../../../shared/components/data-table-card';
@@ -113,14 +113,14 @@ export class WorkOrderListComponent implements OnInit {
     this.loading = true;
     this.loadingError = false;
 
-    let request = this.workOrderService.getWorkOrders();
-
-    if (status) {
-      request = this.workOrderService.getWorkOrdersByStatus(status as WorkOrderStatus);
-    }
-
-    request
+    this.workOrderService.getAllWorkOrders()
       .pipe(
+        map(workOrders => {
+          if (status) {
+            return workOrders.filter(wo => wo.details.status === status);
+          }
+          return workOrders;
+        }),
         finalize(() => {
           this.loading = false;
         }),
@@ -180,7 +180,7 @@ export class WorkOrderListComponent implements OnInit {
   }
 
   getClientName(workOrder: WorkOrder): string {
-    return workOrder.client?.name || 'Not Assigned';
+    return workOrder.details.client || 'Not Assigned';
   }
 
   getPriorityClass(priority: string): string {

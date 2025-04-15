@@ -1,5 +1,3 @@
-import { User as WorkOrderUser } from './work-order.model';
-
 export interface Employee {
   id: string;
   name: string;
@@ -206,8 +204,8 @@ export interface EmployeeChange {
   id: string;
   employeeId: string;
   field: string;
-  oldValue: any;
-  newValue: any;
+  oldValue: Employee[keyof Employee] | null;
+  newValue: Employee[keyof Employee] | null;
   changedBy: Employee;
   changeDate: Date;
   reason?: string;
@@ -235,4 +233,4 @@ export interface EmployeeUser {
   name: string;
   email: string;
   role?: string;
-} 
+}

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { delay, catchError } from 'rxjs/operators';
-import { User } from '../models/work-order.model';
+import { User } from '../../domains/user/models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -68,9 +68,7 @@ export class UserService {
   ];
 
   // Current logged-in user - in a real app this would come from an auth service
-  private currentUserId: string = 'user1'; // Default to a mock user for development
-
-  constructor() { }
+  private currentUserId = 'user1'; // Default to a mock user for development
 
   /**
    * Get the ID of the currently logged-in user
@@ -119,11 +117,11 @@ export class UserService {
    */
   getUserById(userId: string): Observable<User | null> {
     const user = this.mockUsers.find(u => u.id === userId);
-    
+
     if (!user) {
       return of(null).pipe(delay(300));
     }
-    
+
     return of(user).pipe(
       delay(300),
       catchError(error => {
@@ -138,7 +136,7 @@ export class UserService {
    */
   getUsersByRole(role: string): Observable<User[]> {
     const users = this.mockUsers.filter(u => u.role === role);
-    
+
     return of(users).pipe(
       delay(300),
       catchError(error => {
@@ -155,13 +153,13 @@ export class UserService {
     if (!query || query.trim() === '') {
       return of(this.mockUsers).pipe(delay(300));
     }
-    
+
     const queryLower = query.toLowerCase().trim();
-    const filteredUsers = this.mockUsers.filter(user => 
-      user.name.toLowerCase().includes(queryLower) || 
+    const filteredUsers = this.mockUsers.filter(user =>
+      user.name.toLowerCase().includes(queryLower) ||
       user.email.toLowerCase().includes(queryLower)
     );
-    
+
     return of(filteredUsers).pipe(delay(300));
   }
 
@@ -170,7 +168,7 @@ export class UserService {
    */
   getUsersByIds(userIds: string[]): Observable<User[]> {
     const users = this.mockUsers.filter(u => userIds.includes(u.id));
-    
+
     return of(users).pipe(
       delay(300),
       catchError(error => {
@@ -179,4 +177,4 @@ export class UserService {
       })
     );
   }
-} 
+}
