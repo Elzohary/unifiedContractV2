@@ -1,0 +1,16 @@
+<div class="stats-card" [ngClass]="'stats-card-' + cardColor">
+  <div class="stats-card-icon">
+    <mat-icon>{{ icon }}</mat-icon>
+  </div>
+  <div class="stats-card-content">
+    <h3 class="stats-card-value">{{ valuePrefix }}{{ value }}{{ valueSuffix }}</h3>
+    <p class="stats-card-label">{{ title }}</p>
+    <div class="stats-card-trend" *ngIf="trend !== 0">
+      <span [ngClass]="{'text-success': trend > 0, 'text-error': trend < 0}">
+        <mat-icon>{{ trend > 0 ? 'arrow_upward' : 'arrow_downward' }}</mat-icon>
+        {{ trend > 0 ? '+' : '' }}{{ trend }}%
+      </span>
+      <span class="trend-label">{{ trendLabel }}</span>
+    </div>
+  </div>
+</div>

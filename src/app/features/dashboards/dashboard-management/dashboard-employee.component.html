@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+  <mat-sidenav-container class="sidenav-container">
+    <!-- Side Navigation -->
+    <mat-sidenav #sidenav [mode]="isMobile() ? 'over' : 'side'" 
+                 [opened]="!isMobile() && isDrawerOpen()" 
+                 [fixedInViewport]="true" 
+                 class="app-sidenav">
+      <div class="sidenav-header">
+        <div class="logo-container">
+          <img src="assets/logo.png" alt="Logo" class="logo-img" />
+          <h2 class="app-title">Contract Management</h2>
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <app-side-menu-content></app-side-menu-content>
+    </mat-sidenav>
+
+    <!-- Main Content -->
+    <mat-sidenav-content class="main-content">
+      <!-- Toolbar -->
+      <mat-toolbar color="primary" class="app-toolbar">
+        <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle menu">
+          <mat-icon>menu</mat-icon>
+        </button>
+        <span class="toolbar-spacer"></span>
+        <app-header-dashboard-management></app-header-dashboard-management>
+      </mat-toolbar>
+
+      <!-- Page Content -->
+      <div class="page-content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>

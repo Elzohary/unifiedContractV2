@@ -1,0 +1,124 @@
+<!-- Main container -->
+<div class="all-remarks-container">
+  <!-- Page header -->
+  <div class="page-header">
+    <h1>All Remarks</h1>
+    <div class="header-actions">
+      <button mat-raised-button color="primary" (click)="openAddRemarkDialog()">
+        <mat-icon>add</mat-icon>
+        Add Remark
+      </button>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="filters-container">
+    <form [formGroup]="filterForm" class="filter-form">
+      <mat-form-field appearance="outline">
+        <mat-label>Search</mat-label>
+        <input matInput formControlName="search" placeholder="Search remarks...">
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Type</mat-label>
+        <mat-select formControlName="type">
+          <mat-option value="">All Types</mat-option>
+          <mat-option value="general">General</mat-option>
+          <mat-option value="technical">Technical</mat-option>
+          <mat-option value="safety">Safety</mat-option>
+          <mat-option value="quality">Quality</mat-option>
+          <mat-option value="client">Client</mat-option>
+          <mat-option value="internal">Internal</mat-option>
+          <mat-option value="feedback">Feedback</mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Sort By</mat-label>
+        <mat-select formControlName="sortBy">
+          <mat-option value="createdDate">Date Created</mat-option>
+          <mat-option value="type">Type</mat-option>
+          <mat-option value="createdBy">Author</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </form>
+  </div>
+
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="50"></mat-spinner>
+    <p>Loading remarks...</p>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-stroked-button color="primary" (click)="loadData()">
+      <mat-icon>refresh</mat-icon>
+      Try Again
+    </button>
+  </div>
+
+  <!-- No data state -->
+  <div *ngIf="!loading && !error && filteredRemarks.length === 0" class="no-data-container">
+    <mat-icon>comment</mat-icon>
+    <p>No remarks found</p>
+    <button mat-stroked-button color="primary" (click)="openAddRemarkDialog()">
+      <mat-icon>add</mat-icon>
+      Add First Remark
+    </button>
+  </div>
+
+  <!-- Remarks list -->
+  <div *ngIf="!loading && !error && filteredRemarks.length > 0" class="remarks-list">
+    <mat-card *ngFor="let remark of paginatedRemarks" class="remark-card">
+      <div class="remark-header">
+        <div class="remark-type" [ngClass]="'type-' + remark.type">
+          <mat-icon>{{ getRemarkIcon(remark.type) }}</mat-icon>
+          <span>{{ remark.type | titlecase }}</span>
+        </div>
+        <div class="remark-actions">
+          <button mat-icon-button color="primary" matTooltip="Edit" (click)="editRemark(remark)">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteRemark(remark)">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <div class="remark-content">
+        {{ remark.content }}
+      </div>
+
+      <div class="remark-footer">
+        <div class="created-by">
+          <mat-icon>person</mat-icon>
+          <span>{{ remark.createdBy }}</span>
+        </div>
+        <div class="created-date">
+          <mat-icon>schedule</mat-icon>
+          <span>{{ formatDate(remark.createdDate) }}</span>
+        </div>
+        <div class="work-order">
+          <button mat-stroked-button (click)="navigateToWorkOrder(remark.workOrderId)">
+            <mat-icon>description</mat-icon>
+            <span>Work Order #{{ getWorkOrderNumber(remark.workOrderId) }}</span>
+          </button>
+        </div>
+      </div>
+    </mat-card>
+
+    <!-- Pagination -->
+    <mat-paginator
+      [length]="filteredRemarks.length"
+      [pageSize]="pageSize"
+      [pageSizeOptions]="[5, 10, 25, 100]"
+      (page)="onPageChange($event)"
+      showFirstLastButtons
+      aria-label="Select page of remarks">
+    </mat-paginator>
+  </div>
+</div> 

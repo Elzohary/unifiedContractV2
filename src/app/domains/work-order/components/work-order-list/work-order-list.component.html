@@ -1,0 +1,44 @@
+<div class="work-order-list-container">
+
+  <app-page-header [title]="pageTitle" [actions]="headerActions" (actionClick)="onHeaderAction($event)">
+  </app-page-header>
+
+  <!-- New Data Table Card Implementation -->
+
+
+    <!-- Use the reusable data-table-card component -->
+    <app-data-table-card
+      [data]="dataSource.data"
+      [columns]="tableColumns"
+      [filters]="tableFilters"
+      [actions]="tableActions"
+      [loading]="loading"
+      [error]="loadingError"
+      [selectedFilterIndex]="selectedStatusTab"
+      (filterChange)="onDataTableFilterChange($event)"
+      (rowAction)="onDataTableRowAction($event)"
+      (rowClick)="viewWorkOrder($event.id)"
+      (stateAction)="handleStateAction($event)">
+
+      <!-- Custom cell templates -->
+      <ng-template #priorityCell let-item>
+        <span class="priority-chip" [ngClass]="getPriorityClass(item.priority)">
+          {{item.priority | titlecase}}
+        </span>
+      </ng-template>
+
+      <ng-template #statusCell let-item>
+        <span class="status-chip" [ngClass]="getStatusClass(item.status)">
+          {{item.status | titlecase}}
+        </span>
+      </ng-template>
+
+      <ng-template #completionCell let-item>
+        <div class="progress-container">
+          <div class="progress-bar" [style.width.%]="item.completionPercentage"></div>
+          <span class="progress-text">{{item.completionPercentage}}%</span>
+        </div>
+      </ng-template>
+    </app-data-table-card>
+
+

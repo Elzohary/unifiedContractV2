@@ -1,0 +1,431 @@
+<div class="employee-detail-container">
+  <!-- Loading Spinner -->
+  <div class="loading-container" *ngIf="isLoading">
+    <mat-spinner diameter="40"></mat-spinner>
+    <p>Loading employee data...</p>
+  </div>
+  
+  <div class="employee-content" *ngIf="!isLoading && employee">
+    <!-- Header Section -->
+    <div class="employee-header">
+      <button mat-icon-button class="back-button" routerLink="/hr/employees">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      
+      <div class="header-content">
+        <div class="employee-avatar">
+          <img *ngIf="employee.photo" [src]="employee.photo" alt="Employee photo">
+          <mat-icon *ngIf="!employee.photo" class="avatar-icon">person</mat-icon>
+        </div>
+        
+        <div class="employee-info">
+          <h1>{{ employee.name }}</h1>
+          <div class="employee-job-info">
+            <span class="job-title">{{ employee.jobTitle }}</span>
+            <span class="badge-number">Badge #{{ employee.badgeNumber }}</span>
+          </div>
+          
+          <div class="employee-quick-info">
+            <div class="info-item">
+              <mat-icon>location_on</mat-icon>
+              <span>{{ employee.workLocation }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>flag</mat-icon>
+              <span>{{ employee.nationality }}</span>
+            </div>
+            <div class="info-item">
+              <mat-icon>calendar_today</mat-icon>
+              <span>Joined {{ formatDate(employee.joinDate) }} ({{ getTenureYears(employee.joinDate) }} years)</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <button mat-raised-button color="primary" (click)="editEmployee()">
+            <mat-icon>edit</mat-icon> Edit
+          </button>
+          <button mat-icon-button [matMenuTriggerFor]="actionsMenu">
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #actionsMenu="matMenu">
+            <button mat-menu-item (click)="viewRequests()">
+              <mat-icon>assignment</mat-icon>
+              <span>View Requests</span>
+            </button>
+            <button mat-menu-item (click)="viewAttendance()">
+              <mat-icon>access_time</mat-icon>
+              <span>Attendance Records</span>
+            </button>
+            <button mat-menu-item (click)="viewWarnings()">
+              <mat-icon>warning</mat-icon>
+              <span>View Warnings</span>
+            </button>
+            <button mat-menu-item (click)="issueWarning()">
+              <mat-icon>add_alert</mat-icon>
+              <span>Issue Warning</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Work Performance Section -->
+    <div class="performance-section">
+      <mat-card>
+        <mat-card-content>
+          <div class="performance-metrics">
+            <div class="metric">
+              <h3>Work Time Ratio</h3>
+              <div class="progress-container">
+                <mat-progress-bar mode="determinate" [value]="employee.workTimeRatio"></mat-progress-bar>
+                <span>{{ employee.workTimeRatio }}%</span>
+              </div>
+            </div>
+            
+            <div class="metric">
+              <h3>Monthly Hours</h3>
+              <div class="value">{{ employee.monthlyHours }}</div>
+            </div>
+            
+            <div class="metric">
+              <h3>Avg Late</h3>
+              <div class="value">{{ employee.avgLateMinutes }} min</div>
+            </div>
+            
+            <div class="metric">
+              <h3>Sick Leave</h3>
+              <div class="value">{{ employee.sickLeaveCounter }}</div>
+            </div>
+            
+            <div class="metric">
+              <h3>Vacation Days Left</h3>
+              <div class="value">{{ employee.offDays }}</div>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+    
+    <!-- Detailed Tabs Section -->
+    <mat-card class="details-card">
+      <mat-card-content>
+        <mat-tab-group [(selectedIndex)]="selectedTabIndex">
+          <!-- Personal Details Tab -->
+          <mat-tab label="Personal Details">
+            <div class="tab-content">
+              <div class="detail-section">
+                <h3>Personal Information</h3>
+                <div class="detail-list">
+                  <div class="detail-item">
+                    <span class="label">Full Name</span>
+                    <span class="value">{{ employee.name }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Age</span>
+                    <span class="value">{{ employee.age }} years</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Nationality</span>
+                    <span class="value">{{ employee.nationality }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Iqama Number</span>
+                    <span class="value">{{ employee.iqamaNumber }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Home Address</span>
+                    <span class="value">{{ employee.homeAddress }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Home Type</span>
+                    <span class="value capitalize">{{ employee.homeType }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="detail-section">
+                <h3>Contact Information</h3>
+                <div class="detail-list">
+                  <div class="detail-item">
+                    <span class="label">Company Phone</span>
+                    <span class="value">{{ employee.companyPhone }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Personal Phone</span>
+                    <span class="value">{{ employee.personalPhone }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Email</span>
+                    <span class="value">{{ employee.user.email }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="detail-section">
+                <h3>Employment Information</h3>
+                <div class="detail-list">
+                  <div class="detail-item">
+                    <span class="label">Job Title</span>
+                    <span class="value">{{ employee.jobTitle }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Badge Number</span>
+                    <span class="value">{{ employee.badgeNumber }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Work Location</span>
+                    <span class="value">{{ employee.workLocation }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Join Date</span>
+                    <span class="value">{{ formatDate(employee.joinDate) }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Current Project</span>
+                    <span class="value">{{ employee.currentProject || 'Not assigned' }}</span>
+                  </div>
+                  <div class="detail-item">
+                    <span class="label">Direct Manager</span>
+                    <span class="value">{{ employee.directManager?.name || 'None' }}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="detail-section">
+                <h3>Managed Employees</h3>
+                <div class="managed-employees" *ngIf="employee.managedEmployees && employee.managedEmployees.length > 0">
+                  <div class="managed-employee" *ngFor="let managed of employee.managedEmployees">
+                    <a [routerLink]="['/hr/employees', managed.id]">
+                      <div class="employee-chip">
+                        <img [src]="managed.photo || 'assets/images/default-avatar.png'" alt="Employee photo">
+                        <span>{{ managed.name }}</span>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+                <div *ngIf="!employee.managedEmployees || employee.managedEmployees.length === 0" class="no-data">
+                  No managed employees
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+          
+          <!-- Attendance Tab -->
+          <mat-tab label="Attendance">
+            <div class="tab-content">
+              <h3>Recent Attendance</h3>
+              
+              <div class="table-responsive">
+                <table mat-table [dataSource]="recentAttendance">
+                  <!-- Date Column -->
+                  <ng-container matColumnDef="date">
+                    <th mat-header-cell *matHeaderCellDef>Date</th>
+                    <td mat-cell *matCellDef="let record">{{ formatDate(record.date) }}</td>
+                  </ng-container>
+                  
+                  <!-- Check In Column -->
+                  <ng-container matColumnDef="checkIn">
+                    <th mat-header-cell *matHeaderCellDef>Check In</th>
+                    <td mat-cell *matCellDef="let record">{{ formatTime(record.checkIn) }}</td>
+                  </ng-container>
+                  
+                  <!-- Check Out Column -->
+                  <ng-container matColumnDef="checkOut">
+                    <th mat-header-cell *matHeaderCellDef>Check Out</th>
+                    <td mat-cell *matCellDef="let record">{{ formatTime(record.checkOut) }}</td>
+                  </ng-container>
+                  
+                  <!-- Status Column -->
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let record">
+                      <span class="status-badge" [ngClass]="record.status">
+                        {{ record.status }}
+                      </span>
+                    </td>
+                  </ng-container>
+                  
+                  <!-- Work Hours Column -->
+                  <ng-container matColumnDef="workHours">
+                    <th mat-header-cell *matHeaderCellDef>Work Hours</th>
+                    <td mat-cell *matCellDef="let record">{{ record.workHours || 'N/A' }}</td>
+                  </ng-container>
+                  
+                  <tr mat-header-row *matHeaderRowDef="attendanceColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: attendanceColumns;"></tr>
+                </table>
+              </div>
+              
+              <div *ngIf="recentAttendance.length === 0" class="no-data">
+                No attendance records found
+              </div>
+              
+              <div class="view-all-link">
+                <a mat-button color="primary" (click)="viewAttendance()">View All Records</a>
+              </div>
+            </div>
+          </mat-tab>
+          
+          <!-- Certificates Tab -->
+          <mat-tab label="Certificates">
+            <div class="tab-content">
+              <h3>Certificates & Qualifications</h3>
+              
+              <div class="table-responsive">
+                <table mat-table [dataSource]="certificates">
+                  <!-- Name Column -->
+                  <ng-container matColumnDef="name">
+                    <th mat-header-cell *matHeaderCellDef>Certificate</th>
+                    <td mat-cell *matCellDef="let cert">{{ cert.name }}</td>
+                  </ng-container>
+                  
+                  <!-- Issuer Column -->
+                  <ng-container matColumnDef="issuer">
+                    <th mat-header-cell *matHeaderCellDef>Issuer</th>
+                    <td mat-cell *matCellDef="let cert">{{ cert.issuer }}</td>
+                  </ng-container>
+                  
+                  <!-- Issue Date Column -->
+                  <ng-container matColumnDef="issueDate">
+                    <th mat-header-cell *matHeaderCellDef>Issue Date</th>
+                    <td mat-cell *matCellDef="let cert">{{ formatDate(cert.issueDate) }}</td>
+                  </ng-container>
+                  
+                  <!-- Expiry Date Column -->
+                  <ng-container matColumnDef="expiryDate">
+                    <th mat-header-cell *matHeaderCellDef>Expiry Date</th>
+                    <td mat-cell *matCellDef="let cert">{{ formatDate(cert.expiryDate) }}</td>
+                  </ng-container>
+                  
+                  <!-- Verified Column -->
+                  <ng-container matColumnDef="verified">
+                    <th mat-header-cell *matHeaderCellDef>Verified</th>
+                    <td mat-cell *matCellDef="let cert">
+                      <mat-icon color="primary" *ngIf="cert.verified">check_circle</mat-icon>
+                      <mat-icon color="warn" *ngIf="!cert.verified">cancel</mat-icon>
+                    </td>
+                  </ng-container>
+                  
+                  <tr mat-header-row *matHeaderRowDef="certificateColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: certificateColumns;"></tr>
+                </table>
+              </div>
+              
+              <div *ngIf="certificates.length === 0" class="no-data">
+                No certificates found
+              </div>
+            </div>
+          </mat-tab>
+          
+          <!-- Requests Tab -->
+          <mat-tab label="Requests">
+            <div class="tab-content">
+              <h3>Recent Requests</h3>
+              
+              <div class="table-responsive">
+                <table mat-table [dataSource]="requests">
+                  <!-- Type Column -->
+                  <ng-container matColumnDef="type">
+                    <th mat-header-cell *matHeaderCellDef>Type</th>
+                    <td mat-cell *matCellDef="let request">
+                      <span class="request-type">{{ request.type }}</span>
+                    </td>
+                  </ng-container>
+                  
+                  <!-- Title Column -->
+                  <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef>Title</th>
+                    <td mat-cell *matCellDef="let request">{{ request.title }}</td>
+                  </ng-container>
+                  
+                  <!-- Request Date Column -->
+                  <ng-container matColumnDef="requestDate">
+                    <th mat-header-cell *matHeaderCellDef>Request Date</th>
+                    <td mat-cell *matCellDef="let request">{{ formatDate(request.requestDate) }}</td>
+                  </ng-container>
+                  
+                  <!-- Status Column -->
+                  <ng-container matColumnDef="status">
+                    <th mat-header-cell *matHeaderCellDef>Status</th>
+                    <td mat-cell *matCellDef="let request">
+                      <span class="status-badge" [ngClass]="request.status">
+                        {{ request.status }}
+                      </span>
+                    </td>
+                  </ng-container>
+                  
+                  <tr mat-header-row *matHeaderRowDef="requestColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: requestColumns;"></tr>
+                </table>
+              </div>
+              
+              <div *ngIf="requests.length === 0" class="no-data">
+                No requests found
+              </div>
+              
+              <div class="view-all-link">
+                <a mat-button color="primary" (click)="viewRequests()">View All Requests</a>
+              </div>
+            </div>
+          </mat-tab>
+          
+          <!-- Warnings Tab -->
+          <mat-tab label="Warnings">
+            <div class="tab-content">
+              <h3>Warnings</h3>
+              
+              <div class="table-responsive">
+                <table mat-table [dataSource]="warnings">
+                  <!-- Title Column -->
+                  <ng-container matColumnDef="title">
+                    <th mat-header-cell *matHeaderCellDef>Title</th>
+                    <td mat-cell *matCellDef="let warning">{{ warning.title }}</td>
+                  </ng-container>
+                  
+                  <!-- Issue Date Column -->
+                  <ng-container matColumnDef="issueDate">
+                    <th mat-header-cell *matHeaderCellDef>Issue Date</th>
+                    <td mat-cell *matCellDef="let warning">{{ formatDate(warning.issueDate) }}</td>
+                  </ng-container>
+                  
+                  <!-- Severity Column -->
+                  <ng-container matColumnDef="severity">
+                    <th mat-header-cell *matHeaderCellDef>Severity</th>
+                    <td mat-cell *matCellDef="let warning">
+                      <span class="severity-badge" [ngClass]="warning.severity">
+                        {{ warning.severity }}
+                      </span>
+                    </td>
+                  </ng-container>
+                  
+                  <!-- Acknowledged Column -->
+                  <ng-container matColumnDef="acknowledged">
+                    <th mat-header-cell *matHeaderCellDef>Acknowledged</th>
+                    <td mat-cell *matCellDef="let warning">
+                      <mat-icon color="primary" *ngIf="warning.acknowledgement && warning.acknowledgement.acknowledged">check_circle</mat-icon>
+                      <mat-icon color="warn" *ngIf="!warning.acknowledgement || !warning.acknowledgement.acknowledged">cancel</mat-icon>
+                    </td>
+                  </ng-container>
+                  
+                  <tr mat-header-row *matHeaderRowDef="warningColumns"></tr>
+                  <tr mat-row *matRowDef="let row; columns: warningColumns;"></tr>
+                </table>
+              </div>
+              
+              <div *ngIf="warnings.length === 0" class="no-data">
+                No warnings found
+              </div>
+              
+              <div class="view-all-link">
+                <button mat-raised-button color="warn" (click)="issueWarning()">
+                  <mat-icon>add_alert</mat-icon> Issue Warning
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 

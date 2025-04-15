@@ -1,0 +1,276 @@
+<div class="requests-container">
+  <mat-card class="requests-card">
+    <mat-card-header>
+      <div class="back-button-container" *ngIf="singleEmployeeMode">
+        <button mat-icon-button (click)="navigateBack()" matTooltip="Back to Employee">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+      </div>
+      <mat-card-title>
+        {{ singleEmployeeMode ? (currentEmployee?.name + '\'s Requests') : 'Employee Requests' }}
+      </mat-card-title>
+      <mat-card-subtitle>
+        {{ singleEmployeeMode ? ('Manage requests for ' + currentEmployee?.name) : 'Manage leave, sick days, and other employee requests' }}
+      </mat-card-subtitle>
+    </mat-card-header>
+
+    <!-- Loading Indicator -->
+    <div *ngIf="isLoading" class="loading-container">
+      <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+      <p class="loading-text">Loading data...</p>
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="hasError" class="error-container">
+      <mat-icon color="warn">error</mat-icon>
+      <p class="error-message">{{ errorMessage }}</p>
+    </div>
+
+    <mat-card-content *ngIf="!isLoading || (employeeRequests.length > 0)">
+      <mat-tab-group animationDuration="300ms">
+        <!-- View Requests Tab -->
+        <mat-tab label="All Requests">
+          <div class="tab-content">
+            <!-- Filters -->
+            <div class="filters-container">
+              <div class="filter-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Filter by Status</mat-label>
+                  <mat-select [(ngModel)]="statusFilter" (selectionChange)="applyFilters()">
+                    <mat-option value="all">All Statuses</mat-option>
+                    <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+                      {{ status.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline" *ngIf="!singleEmployeeMode">
+                  <mat-label>Filter by Employee</mat-label>
+                  <mat-select [(ngModel)]="employeeFilter" (selectionChange)="applyFilters()">
+                    <mat-option value="all">All Employees</mat-option>
+                    <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                      {{ employee.name }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Filter by Type</mat-label>
+                  <mat-select [(ngModel)]="typeFilter" (selectionChange)="applyFilters()">
+                    <mat-option value="all">All Types</mat-option>
+                    <mat-option *ngFor="let type of requestTypes" [value]="type.value">
+                      {{ type.label }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <button mat-stroked-button color="primary" (click)="resetFilters()">
+                  <mat-icon>filter_alt_off</mat-icon>
+                  Reset Filters
+                </button>
+              </div>
+            </div>
+
+            <!-- Requests Table -->
+            <div class="table-container">
+              <div *ngIf="employeeRequests.length === 0 && !isLoading" class="no-data">
+                <mat-icon>inbox</mat-icon>
+                <p>No employee requests found matching the selected filters.</p>
+              </div>
+
+              <table mat-table [dataSource]="employeeRequests" matSort class="requests-table" *ngIf="employeeRequests.length > 0">
+                <!-- Employee Column - Hide in single employee mode -->
+                <ng-container matColumnDef="employee">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Employee</th>
+                  <td mat-cell *matCellDef="let request">
+                    <div class="employee-info">
+                      <span class="employee-name">{{ request.employee.name }}</span>
+                      <span class="employee-job">{{ request.employee.jobTitle }}</span>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Type Column -->
+                <ng-container matColumnDef="type">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Type</th>
+                  <td mat-cell *matCellDef="let request">
+                    <mat-chip [color]="getRequestTypeChipColor(request.type)" selected>
+                      {{ getRequestTypeLabel(request.type) }}
+                    </mat-chip>
+                  </td>
+                </ng-container>
+
+                <!-- Start Date Column -->
+                <ng-container matColumnDef="startDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Start Date</th>
+                  <td mat-cell *matCellDef="let request">
+                    {{ request.startDate | date:'MMM d, y' }}
+                  </td>
+                </ng-container>
+
+                <!-- End Date Column -->
+                <ng-container matColumnDef="endDate">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>End Date</th>
+                  <td mat-cell *matCellDef="let request">
+                    {{ request.endDate | date:'MMM d, y' }}
+                    <span class="days-count">
+                      ({{ getDaysBetween(request.startDate, request.endDate) }} days)
+                    </span>
+                  </td>
+                </ng-container>
+
+                <!-- Reason Column -->
+                <ng-container matColumnDef="reason">
+                  <th mat-header-cell *matHeaderCellDef>Reason</th>
+                  <td mat-cell *matCellDef="let request">
+                    <div class="reason-text">
+                      {{ request.reason }}
+                      <mat-icon *ngIf="request.details" 
+                                matTooltip="{{ request.details }}"
+                                class="details-icon">info</mat-icon>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Status Column -->
+                <ng-container matColumnDef="status">
+                  <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+                  <td mat-cell *matCellDef="let request">
+                    <mat-chip [color]="getStatusChipColor(request.status)" selected>
+                      {{ request.status | titlecase }}
+                    </mat-chip>
+                    <div *ngIf="request.responseDate" class="response-info">
+                      {{ request.responseDate | date:'MMM d, y' }}
+                    </div>
+                  </td>
+                </ng-container>
+
+                <!-- Actions Column -->
+                <ng-container matColumnDef="actions">
+                  <th mat-header-cell *matHeaderCellDef>Actions</th>
+                  <td mat-cell *matCellDef="let request">
+                    <div class="action-buttons">
+                      <button *ngIf="request.status === 'pending'" 
+                              mat-icon-button color="primary" 
+                              matTooltip="Approve Request"
+                              (click)="approveRequest(request)">
+                        <mat-icon>check_circle</mat-icon>
+                      </button>
+                      
+                      <button *ngIf="request.status === 'pending'" 
+                              mat-icon-button color="warn" 
+                              matTooltip="Reject Request"
+                              (click)="rejectRequest(request)">
+                        <mat-icon>cancel</mat-icon>
+                      </button>
+                      
+                      <button mat-icon-button color="warn" 
+                              matTooltip="Delete Request"
+                              (click)="deleteRequest(request)">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="singleEmployeeMode ? displayedColumnsWithoutEmployee : displayedColumns"></tr>
+                <tr mat-row *matRowDef="let row; columns: singleEmployeeMode ? displayedColumnsWithoutEmployee : displayedColumns;"></tr>
+              </table>
+
+              <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]" showFirstLastButtons></mat-paginator>
+            </div>
+          </div>
+        </mat-tab>
+
+        <!-- Create Request Tab -->
+        <mat-tab label="Create Request">
+          <div class="tab-content">
+            <div class="form-container">
+              <h3>Submit New Request</h3>
+              <form [formGroup]="requestForm" (ngSubmit)="submitRequest()">
+                <div class="form-grid">
+                  <mat-form-field appearance="outline" *ngIf="!singleEmployeeMode">
+                    <mat-label>Employee</mat-label>
+                    <mat-select formControlName="employeeId">
+                      <mat-option *ngFor="let employee of employees" [value]="employee.id">
+                        {{ employee.name }} ({{ employee.jobTitle }})
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="requestForm.get('employeeId')?.hasError('required')">
+                      Employee is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <!-- Hidden field for single employee mode -->
+                  <div *ngIf="singleEmployeeMode" class="employee-display">
+                    <label>Employee:</label>
+                    <span>{{ currentEmployee?.name }} ({{ currentEmployee?.jobTitle }})</span>
+                  </div>
+
+                  <mat-form-field appearance="outline" [class.single-mode]="singleEmployeeMode">
+                    <mat-label>Request Type</mat-label>
+                    <mat-select formControlName="type">
+                      <mat-option *ngFor="let type of requestTypes" [value]="type.value">
+                        {{ type.label }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="requestForm.get('type')?.hasError('required')">
+                      Request type is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Start Date</mat-label>
+                    <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+                    <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #startPicker></mat-datepicker>
+                    <mat-error *ngIf="requestForm.get('startDate')?.hasError('required')">
+                      Start date is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>End Date</mat-label>
+                    <input matInput [matDatepicker]="endPicker" formControlName="endDate">
+                    <mat-datepicker-toggle matSuffix [for]="endPicker"></mat-datepicker-toggle>
+                    <mat-datepicker #endPicker></mat-datepicker>
+                    <mat-error *ngIf="requestForm.get('endDate')?.hasError('required')">
+                      End date is required
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Reason</mat-label>
+                    <textarea matInput formControlName="reason" rows="3" placeholder="Briefly explain your request reason"></textarea>
+                    <mat-error *ngIf="requestForm.get('reason')?.hasError('required')">
+                      Reason is required
+                    </mat-error>
+                    <mat-error *ngIf="requestForm.get('reason')?.hasError('minlength')">
+                      Reason must be at least 10 characters
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Additional Details</mat-label>
+                    <textarea matInput formControlName="details" rows="3" placeholder="Provide any additional details or context"></textarea>
+                    <mat-hint>Optional</mat-hint>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-actions">
+                  <button type="button" mat-stroked-button (click)="resetRequestForm()">
+                    Clear
+                  </button>
+                  <button type="submit" mat-raised-button color="primary" [disabled]="isLoading">
+                    <mat-icon>send</mat-icon>
+                    Submit Request
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    </mat-card-content>
+  </mat-card>
+</div> 

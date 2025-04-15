@@ -1,0 +1,272 @@
+<div class="work-order-form-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>Create New Work Order</mat-card-title>
+    </mat-card-header>
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <mat-card-content>
+        <mat-tab-group>
+          <!-- Work Order Details Tab -->
+          <mat-tab label="Work Order Details">
+            <div class="form-section" formGroupName="details">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Title</mat-label>
+                <input matInput formControlName="title" placeholder="Enter work order title">
+                <mat-error *ngIf="hasError('details.title', 'required')">Title is required</mat-error>
+                <mat-error *ngIf="hasError('details.title', 'minlength')">Title must be at least 5 characters</mat-error>
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Description</mat-label>
+                <textarea matInput formControlName="description" rows="4" placeholder="Describe the work order"></textarea>
+                <mat-error *ngIf="hasError('details.description', 'required')">Description is required</mat-error>
+                <mat-error *ngIf="hasError('details.description', 'minlength')">Description must be at least 20 characters</mat-error>
+              </mat-form-field>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Priority</mat-label>
+                  <mat-select formControlName="priority">
+                    <mat-option *ngFor="let priority of priorityOptions" [value]="priority">
+                      {{ priority | titlecase }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Category</mat-label>
+                  <mat-select formControlName="category">
+                    <mat-option *ngFor="let category of categoryOptions" [value]="category">
+                      {{ category }}
+                    </mat-option>
+                  </mat-select>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Start Date</mat-label>
+                  <input matInput [matDatepicker]="startPicker" formControlName="startDate">
+                  <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #startPicker></mat-datepicker>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Due Date</mat-label>
+                  <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
+                  <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
+                  <mat-datepicker #duePicker></mat-datepicker>
+                </mat-form-field>
+              </div>
+
+              <mat-form-field appearance="outline">
+                <mat-label>Estimated Cost</mat-label>
+                <input matInput type="number" formControlName="estimatedCost" min="0">
+                <span matPrefix>$&nbsp;</span>
+                <mat-error *ngIf="hasError('details.estimatedCost', 'required')">Estimated cost is required</mat-error>
+                <mat-error *ngIf="hasError('details.estimatedCost', 'min')">Cost cannot be negative</mat-error>
+              </mat-form-field>
+            </div>
+          </mat-tab>
+
+          <!-- Work Order Items Tab -->
+          <mat-tab label="Work Order Items">
+            <div class="form-section" formArrayName="items">
+              <button type="button" mat-raised-button color="primary" (click)="addItem()">
+                <mat-icon>add</mat-icon> Add Item
+              </button>
+
+              <div *ngFor="let item of items.controls; let i=index" [formGroupName]="i" class="array-item">
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Select Item</mat-label>
+                    <mat-select formControlName="itemId">
+                      <mat-option *ngFor="let item of availableItems" [value]="item.id">
+                        {{ item.title }} ({{ item.itemNumber }})
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Quantity</mat-label>
+                    <input matInput type="number" formControlName="quantity" min="1">
+                  </mat-form-field>
+
+                  <button type="button" mat-icon-button color="warn" (click)="removeItem(i)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Materials Tab -->
+          <mat-tab label="Materials">
+            <div class="form-section" formArrayName="materials">
+              <button type="button" mat-raised-button color="primary" (click)="addMaterial()">
+                <mat-icon>add</mat-icon> Add Material
+              </button>
+
+              <div *ngFor="let material of materials.controls; let i=index" [formGroupName]="i" class="array-item">
+                <mat-radio-group formControlName="type" class="material-type">
+                  <mat-radio-button value="Receivable">Receivable</mat-radio-button>
+                  <mat-radio-button value="Purchasable">Purchasable</mat-radio-button>
+                </mat-radio-group>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
+                    <input matInput formControlName="name">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Description</mat-label>
+                    <textarea matInput formControlName="description" rows="2"></textarea>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>Quantity</mat-label>
+                    <input matInput type="number" formControlName="quantity" min="1">
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>Unit</mat-label>
+                    <input matInput formControlName="unit">
+                  </mat-form-field>
+                </div>
+
+                <ng-container *ngIf="material.get('type')?.value === 'Purchasable'">
+                  <div class="form-row">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Unit Cost</mat-label>
+                      <input matInput type="number" formControlName="unitCost" min="0">
+                      <span matPrefix>$&nbsp;</span>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Supplier</mat-label>
+                      <input matInput formControlName="supplier">
+                    </mat-form-field>
+                  </div>
+
+                  <div class="form-row">
+                    <mat-form-field appearance="outline">
+                      <mat-label>Order Date</mat-label>
+                      <input matInput [matDatepicker]="orderPicker" formControlName="orderDate">
+                      <mat-datepicker-toggle matSuffix [for]="orderPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #orderPicker></mat-datepicker>
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                      <mat-label>Expected Delivery Date</mat-label>
+                      <input matInput [matDatepicker]="deliveryPicker" formControlName="deliveryDate">
+                      <mat-datepicker-toggle matSuffix [for]="deliveryPicker"></mat-datepicker-toggle>
+                      <mat-datepicker #deliveryPicker></mat-datepicker>
+                    </mat-form-field>
+                  </div>
+                </ng-container>
+
+                <button type="button" mat-icon-button color="warn" (click)="removeMaterial(i)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </div>
+            </div>
+          </mat-tab>
+
+          <!-- Additional Items Tab -->
+          <mat-tab label="Additional Items">
+            <mat-accordion class="additional-sections" formGroupName="additionalSections">
+              <!-- Issues -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Issues</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formArrayName="issues">
+                  <button type="button" mat-raised-button color="primary" (click)="addIssue()">
+                    <mat-icon>add</mat-icon> Add Issue
+                  </button>
+                  <div *ngFor="let issue of issues.controls; let i=index" [formGroupName]="i" class="array-item">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Title</mat-label>
+                      <input matInput formControlName="title">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Description</mat-label>
+                      <textarea matInput formControlName="description" rows="2"></textarea>
+                    </mat-form-field>
+                    <button type="button" mat-icon-button color="warn" (click)="removeIssue(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+
+              <!-- Tasks -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Tasks</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formArrayName="tasks">
+                  <button type="button" mat-raised-button color="primary" (click)="addTask()">
+                    <mat-icon>add</mat-icon> Add Task
+                  </button>
+                  <div *ngFor="let task of tasks.controls; let i=index" [formGroupName]="i" class="array-item">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Title</mat-label>
+                      <input matInput formControlName="title">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Description</mat-label>
+                      <textarea matInput formControlName="description" rows="2"></textarea>
+                    </mat-form-field>
+                    <button type="button" mat-icon-button color="warn" (click)="removeTask(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+
+              <!-- Remarks -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>Remarks</mat-panel-title>
+                </mat-expansion-panel-header>
+                <div formArrayName="remarks">
+                  <button type="button" mat-raised-button color="primary" (click)="addRemark()">
+                    <mat-icon>add</mat-icon> Add Remark
+                  </button>
+                  <div *ngFor="let remark of remarks.controls; let i=index" [formGroupName]="i" class="array-item">
+                    <mat-form-field appearance="outline" class="full-width">
+                      <mat-label>Content</mat-label>
+                      <textarea matInput formControlName="content" rows="2"></textarea>
+                    </mat-form-field>
+                    <button type="button" mat-icon-button color="warn" (click)="removeRemark(i)">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+              </mat-expansion-panel>
+
+              <!-- Other sections (attachments, actions, photos, forms) follow the same pattern -->
+            </mat-accordion>
+          </mat-tab>
+        </mat-tab-group>
+      </mat-card-content>
+
+      <mat-card-actions align="end">
+        <button mat-button type="button" routerLink="/work-orders">Cancel</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="!form.valid || loading">
+          <mat-icon>save</mat-icon>
+          Create Work Order
+        </button>
+      </mat-card-actions>
+
+      <div *ngIf="loading" class="loading-indicator">
+        <mat-spinner diameter="30"></mat-spinner>
+      </div>
+    </form>
+  </mat-card>
+</div>

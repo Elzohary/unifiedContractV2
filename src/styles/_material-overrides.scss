@@ -1,0 +1,102 @@
+/* Material Design Form Field Overrides */
+.mat-mdc-form-field {
+  width: 100%;
+
+  .mat-mdc-text-field-wrapper {
+    background-color: var(--form-bg, transparent);
+    border-radius: var(--border-radius-md);
+    padding: 0 12px;
+  }
+
+  .mat-mdc-form-field-flex {
+    color: var(--form-input-text, inherit);
+    min-height: 48px;
+  }
+
+  .mat-mdc-form-field-infix {
+    padding: 12px 0;
+    min-height: 48px;
+  }
+
+  .mat-mdc-form-field-label {
+    color: var(--form-label, rgba(0, 0, 0, 0.6));
+  }
+
+  .mat-mdc-input-element {
+    color: var(--form-input-text, inherit);
+  }
+
+  .mat-mdc-select-value {
+    color: var(--form-input-text, inherit);
+  }
+
+  .mat-mdc-select-arrow {
+    color: var(--form-label, rgba(0, 0, 0, 0.6));
+  }
+
+  .mat-mdc-form-field-underline {
+    background-color: var(--form-input-border, rgba(0, 0, 0, 0.12));
+  }
+
+  .mat-mdc-form-field-subscript-wrapper {
+    height: auto;
+    padding: 0;
+    margin-top: 4px;
+  }
+}
+
+/* Material Button Overrides */
+.mat-mdc-button,
+.mat-mdc-raised-button,
+.mat-mdc-stroked-button,
+.mat-mdc-flat-button {
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* Material Card Overrides */
+.mat-mdc-card {
+  border-radius: var(--border-radius-lg) !important;
+}
+
+/* Material Menu Overrides */
+.mat-mdc-menu-panel {
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* Material Dialog Overrides */
+.mat-mdc-dialog-container {
+  border-radius: var(--border-radius-lg) !important;
+}
+
+/* Material List Item Overrides */
+.mat-mdc-list-item {
+  border-radius: var(--border-radius-sm) !important;
+}
+
+/* Dark theme adjustments */
+.dark-theme {
+  .mat-mdc-form-field {
+    .mat-mdc-text-field-wrapper {
+      background-color: var(--form-bg, rgba(255, 255, 255, 0.05));
+    }
+
+    .mat-mdc-form-field-label {
+      color: var(--form-label, rgba(255, 255, 255, 0.7));
+    }
+
+    .mat-mdc-input-element,
+    .mat-mdc-select-value {
+      color: var(--form-input-text, rgba(255, 255, 255, 0.87));
+    }
+
+    .mat-mdc-select-arrow {
+      color: var(--form-label, rgba(255, 255, 255, 0.7));
+    }
+  }
+}
+
+/* Remove component-specific overrides */
+::ng-deep .mat-mdc-form-field,
+::ng-deep .mat-form-field {
+  all: unset;
+}

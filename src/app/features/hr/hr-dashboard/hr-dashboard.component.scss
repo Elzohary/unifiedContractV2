@@ -1,0 +1,378 @@
+@use '@angular/material' as mat;
+
+// Keep only spacing variables local to the component
+:host {
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+}
+
+// Coming soon placeholder
+.coming-soon-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: var(--spacing-lg);
+  text-align: center;
+
+  .coming-soon-icon {
+    font-size: 64px;
+    margin-bottom: var(--spacing-md);
+    color: var(--icon-primary);
+  }
+
+  h2 {
+    font-size: 24px;
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+  }
+
+  p {
+    margin-bottom: var(--spacing-lg);
+    color: var(--text-secondary);
+    max-width: 500px;
+  }
+}
+
+// Main dashboard layout
+.dashboard-container {
+  padding: var(--spacing-lg);
+  background-color: var(--dashboard-bg);
+  min-height: calc(100vh - 64px); // Adjust based on header height
+
+  .dashboard-header {
+    margin-bottom: var(--spacing-lg);
+
+    h1 {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    p {
+      margin-top: 8px;
+      margin-bottom: 0;
+      color: var(--text-secondary);
+    }
+  }
+}
+
+// Stats cards
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+
+  .stat-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    padding: var(--spacing-lg);
+    box-shadow: 0 2px 10px var(--card-shadow);
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px var(--card-shadow);
+    }
+
+    .stat-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: var(--spacing-md);
+
+      .stat-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: var(--spacing-md);
+
+        &.primary {
+          background-color: rgba(54, 153, 255, 0.1);
+          color: var(--icon-primary);
+        }
+
+        &.accent {
+          background-color: rgba(255, 159, 67, 0.1);
+          color: var(--icon-accent);
+        }
+
+        &.warning {
+          background-color: rgba(255, 168, 0, 0.1);
+          color: var(--icon-warning);
+        }
+
+        &.success {
+          background-color: rgba(11, 183, 131, 0.1);
+          color: var(--icon-success);
+        }
+
+        mat-icon {
+          font-size: 20px;
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      .stat-title {
+        font-size: 14px;
+        font-weight: normal;
+        color: var(--text-secondary);
+        margin: 0;
+      }
+    }
+
+    .stat-value {
+      font-size: 28px;
+      font-weight: 500;
+      color: var(--text-primary);
+      margin: 0 0 8px 0;
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      font-size: 12px;
+
+      &.positive {
+        color: var(--stat-trend-up);
+      }
+
+      &.negative {
+        color: var(--stat-trend-down);
+      }
+
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+    }
+  }
+}
+
+// Feature cards grid
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+
+  .feature-card {
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px var(--card-shadow);
+    border: 1px solid var(--card-border);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 15px var(--card-shadow);
+    }
+
+    mat-card-header {
+      background-color: var(--card-header-bg);
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--card-border);
+
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        font-size: 16px;
+        margin: 0;
+        color: var(--text-primary);
+
+        mat-icon {
+          margin-right: 8px;
+          color: var(--icon-primary);
+        }
+      }
+    }
+
+    mat-card-content {
+      padding: var(--spacing-md);
+
+      p {
+        color: var(--text-secondary);
+        margin-top: 0;
+        margin-bottom: var(--spacing-md);
+        font-size: 14px;
+      }
+
+      .feature-actions {
+        display: flex;
+        justify-content: flex-end;
+
+        button {
+          text-transform: uppercase;
+          font-size: 12px;
+          font-weight: 500;
+        }
+
+        // Use primary button color from global variables
+        button[mat-raised-button][color="primary"] {
+          background-color: var(--btn-primary) !important;
+        }
+      }
+    }
+  }
+}
+
+// Recent activities card
+.recent-activities {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px var(--card-shadow);
+  border: 1px solid var(--card-border);
+
+  mat-card-header {
+    background-color: var(--card-header-bg);
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--card-border);
+
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      margin: 0;
+      color: var(--text-primary);
+
+      mat-icon {
+        margin-right: 8px;
+        color: var(--icon-primary);
+      }
+    }
+  }
+
+  mat-card-content {
+    padding: 0;
+
+    .activity-list {
+      .activity-item {
+        display: flex;
+        padding: var(--spacing-md);
+        border-bottom: 1px solid var(--card-border);
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .activity-icon {
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: var(--spacing-md);
+          flex-shrink: 0;
+
+          &.primary {
+            background-color: rgba(54, 153, 255, 0.1);
+            color: var(--icon-primary);
+          }
+
+          &.accent {
+            background-color: rgba(255, 159, 67, 0.1);
+            color: var(--icon-accent);
+          }
+
+          &.success {
+            background-color: rgba(11, 183, 131, 0.1);
+            color: var(--icon-success);
+          }
+
+          &.warning {
+            background-color: rgba(255, 168, 0, 0.1);
+            color: var(--icon-warning);
+          }
+
+          mat-icon {
+            font-size: 18px;
+            width: 18px;
+            height: 18px;
+          }
+        }
+
+        .activity-content {
+          flex: 1;
+
+          .activity-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0 0 4px 0;
+          }
+
+          .activity-description {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 0 0 4px 0;
+          }
+
+          .activity-time {
+            font-size: 11px;
+            color: var(--text-secondary);
+            opacity: 0.8;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .stats-grid,
+  .features-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .dashboard-container {
+    padding: var(--spacing-md);
+  }
+}
+
+// Activity icon colors
+.activity-icon-employee {
+  color: #1976d2;
+}
+
+.activity-icon-request {
+  color: #9c27b0;
+}
+
+.activity-icon-attendance {
+  color: #4caf50;
+}
+
+.activity-icon-warning {
+  color: #f44336;
+}
+
+.activity-icon-announcement {
+  color: #ff9800;
+}
+
+// Update button colors to match the image
+.feature-actions {
+  button[mat-raised-button][color="primary"] {
+    background-color: var(--btn-primary);
+  }
+}
+
+// Global button overrides for Angular Material
+:host ::ng-deep {
+  .mat-mdc-raised-button.mat-primary {
+    background-color: var(--btn-primary) !important;
+  }
+}

@@ -1,0 +1,29 @@
+<mat-table mat-table [dataSource]="dataSource" class="mat-elevation-z8 demo-table">
+  <!-- Id Column -->
+  <ng-container matColumnDef="wo-id">
+    <mat-header-cell mat-header-cell *matHeaderCellDef> Id </mat-header-cell>
+    <mat-cell mat-cell *matCellDef="let element"> {{element.id}} </mat-cell>
+  </ng-container>
+
+  <!-- Location Column -->
+  <ng-container matColumnDef="wo-location">
+    <mat-header-cell mat-header-cell *matHeaderCellDef> Location </mat-header-cell>
+    <mat-cell mat-cell *matCellDef="let element"> {{element.location}} </mat-cell>
+  </ng-container>
+
+  <!-- Type Column -->
+  <ng-container matColumnDef="wo-type">
+    <mat-header-cell mat-header-cell *matHeaderCellDef> Type </mat-header-cell>
+    <mat-cell mat-cell *matCellDef="let element"> {{element.type}} </mat-cell>
+  </ng-container>
+
+  <!-- Status Column -->
+  <ng-container matColumnDef="wo-status">
+    <mat-header-cell mat-header-cell *matHeaderCellDef> Status </mat-header-cell>
+    <mat-cell mat-cell *matCellDef="let element"> {{element.status}} </mat-cell>
+  </ng-container>
+
+  <mat-header-row class="fw-bold tableHeader" mat-header-row
+    *matHeaderRowDef="displayedColumns sticky: true"></mat-header-row>
+  <mat-row mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="/portal/wo"></mat-row>
+</mat-table>

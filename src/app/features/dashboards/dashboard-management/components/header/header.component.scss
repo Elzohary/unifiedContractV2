@@ -1,0 +1,210 @@
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
+  height: var(--header-height);
+  background-color: var(--header-background);
+  box-shadow: var(--shadow-base);
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: var(--sidebar-width);
+  z-index: 999;
+  transition: left var(--transition-duration) ease;
+
+  .header-left {
+    display: flex;
+    align-items: center;
+
+    .toggle-menu-button {
+      margin-right: 16px;
+      min-width: 36px;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      
+      mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+        line-height: 24px;
+      }
+    }
+
+    .breadcrumb {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: var(--text-secondary);
+
+      .breadcrumb-separator {
+        margin: 0 8px;
+      }
+
+      .breadcrumb-item {
+        &.active {
+          color: var(--text-primary);
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+
+    .theme-toggle {
+      cursor: pointer;
+      margin-right: 8px;
+      min-width: 36px;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+      
+      mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+        line-height: 24px;
+      }
+    }
+
+    .notification-button {
+      position: relative;
+      min-width: 36px;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      
+      .notification-badge {
+        position: absolute;
+        top: 0;
+        right: 0;
+        background-color: var(--error);
+        color: white;
+        border-radius: 50%;
+        width: 18px;
+        height: 18px;
+        font-size: 10px;
+        line-height: 18px;
+        text-align: center;
+        font-weight: 600;
+      }
+      
+      mat-icon {
+        font-size: 24px;
+        height: 24px;
+        width: 24px;
+        line-height: 24px;
+      }
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: var(--border-radius-sm);
+      transition: background-color 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+
+      .user-avatar {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        margin-right: 8px;
+        object-fit: cover;
+      }
+
+      .user-name {
+        font-weight: 500;
+        font-size: 14px;
+        color: var(--text-primary);
+      }
+    }
+  }
+}
+
+.sidebar-collapsed {
+  .header-container {
+    left: var(--sidebar-collapsed-width);
+  }
+}
+
+@media (max-width: 768px) {
+  .header-container {
+    padding: 0 8px;
+    
+    .header-left {
+      .breadcrumb {
+        display: none;
+      }
+    }
+    
+    .header-right {
+      .user-info {
+        .user-name {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+// Dark theme enhancements
+:host-context(.dark-theme) {
+  .header-container {
+    background-color: var(--gray-2);
+    border-bottom: 1px solid var(--gray-4);
+  }
+  
+  .header-right {
+    .theme-toggle, .notification-button, .user-info {
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+  
+  .toggle-menu-button, .theme-toggle, .notification-button {
+    color: var(--gray-7);
+    
+    &:hover {
+      color: var(--gray-9);
+    }
+  }
+  
+  .user-name {
+    color: var(--gray-9) !important;
+  }
+  
+  .breadcrumb {
+    color: var(--gray-7) !important;
+    
+    .breadcrumb-item.active {
+      color: var(--gray-9) !important;
+    }
+  }
+  
+  .notification-badge {
+    background-color: var(--error) !important;
+    color: white !important;
+  }
+} 

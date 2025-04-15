@@ -1,0 +1,34 @@
+.dot {
+  color: rgb(14, 145, 14);
+}
+
+.part {
+  display: inline-block;
+  border-right: 1px solid #E5E9EB;
+  text-align: center;
+}
+
+.part-last {
+  display: inline-block;
+  text-align: center;
+}
+
+.side {
+  top: 0;
+  left: 0;
+  position:sticky;
+}
+
+p {
+  padding-inline: 5px;
+}
+
+.z {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.text {
+}

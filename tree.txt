@@ -1,0 +1,82 @@
+/project-management-app
+├── /src
+│   ├── /app
+│   │   ├── /core
+│   │   │   ├── /guards          # Auth and route guards
+│   │   │   ├── /interceptors    # HTTP interceptors for API handling
+│   │   │   ├── /services        # Global services (auth, API, etc.)
+│   │   │   ├── /models          # Interfaces and types for shared entities
+│   │   │   ├── /utils           # Utility functions (formatters, validators)
+│   │   │   └── /config          # Global configurations and constants
+│   │   ├── /shared
+│   │   │   ├── /components      # Reusable components (buttons, modals)
+│   │   │   │   ├── /forms       # Shared form components (input, dropdowns)
+│   │   │   │   ├── /tables      # Table components for data display
+│   │   │   │   └── /charts      # Reusable chart components
+│   │   │   ├── /directives      # Shared Angular directives
+│   │   │   ├── /pipes           # Custom pipes (e.g., date formatting)
+│   │   │   └── /styles          # Global SCSS styles and variables
+│   │   ├── /features
+│   │   │   ├── /dashboard
+│   │   │   │   ├── /components  # Widgets and views for dashboard
+│   │   │   │   │   ├── /stats   # KPI widgets for financials, progress
+│   │   │   │   │   └── /charts  # Graphical widgets (bar, pie, line charts)
+│   │   │   │   ├── /services    # Dashboard-specific services
+│   │   │   │   └── /state       # State management (NgRx or similar)
+│   │   │   ├── /projects
+│   │   │   │   ├── /list        # Project listing view
+│   │   │   │   ├── /details     # Project details and phases
+│   │   │   │   ├── /tasks       # Task management
+│   │   │   │   │   ├── /planning   # Task creation and scheduling
+│   │   │   │   │   └── /execution  # Task tracking and updates
+│   │   │   │   ├── /phases      # Subprojects and phases view
+│   │   │   │   └── /services    # Project-specific services
+│   │   │   ├── /resources
+│   │   │   │   ├── /components  # Resource views (materials, workers)
+│   │   │   │   │   ├── /workers # Resource management for human resources
+│   │   │   │   │   └── /equipment # Equipment tracking
+│   │   │   │   └── /services    # Resource-related services
+│   │   │   ├── /contracts
+│   │   │   │   ├── /list        # List of contracts and agreements
+│   │   │   │   ├── /details     # Contract details and history
+│   │   │   │   └── /services    # Contract management services
+│   │   │   ├── /reports
+│   │   │   │   ├── /components  # Reporting views
+│   │   │   │   │   ├── /financial # Financial reports
+│   │   │   │   │   └── /progress # Project progress reports
+│   │   │   │   └── /services    # Report generation services
+│   │   ├── /layout
+│   │   │   ├── /header          # App header components
+│   │   │   ├── /footer          # App footer components
+│   │   │   ├── /sidebar         # Navigation and sidebar
+│   │   │   └── /services        # Layout-related services
+│   │   ├── /auth
+│   │   │   ├── /login           # Login module
+│   │   │   ├── /register        # Registration module
+│   │   │   └── /services        # Auth-related services
+│   │   ├── /notifications
+│   │   │   ├── /components      # Notification components
+│   │   │   │   ├── /alerts      # Alert notifications (errors, warnings)
+│   │   │   │   └── /toasts      # Toast notifications for success/info
+│   │   │   └── /services        # Notification services
+│   │   └── /settings
+│   │       ├── /profile         # User profile settings
+│   │       ├── /app-settings    # General application settings
+│   │       │   └── /themes      # Theme-specific settings
+│   │       └── /services        # Settings services
+│   ├── /assets
+│   │   ├── /images              # Static images
+│   │   ├── /icons               # Icons and SVGs
+│   │   ├── /fonts               # Custom fonts
+│   │   └── /styles              # CSS/SCSS for assets
+│   ├── /environments            # Environment configuration files
+│   ├── /i18n                    # Localization files for multi-language support
+│   ├── /testing                 # Unit and end-to-end testing utilities
+│   └── /themes                  # App themes (dark mode, light mode)
+├── /docs                        # Documentation for developers
+├── /e2e                         # End-to-end test specs
+├── /node_modules                # Node dependencies
+├── /dist                        # Build outputs
+├── angular.json                 # Angular project configuration
+├── package.json                 # NPM dependencies
+└── README.md                    # Project overview

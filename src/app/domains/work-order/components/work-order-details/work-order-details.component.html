@@ -1,0 +1,1011 @@
+<div class="work-order-details-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading-container">
+    <mat-spinner diameter="48"></mat-spinner>
+    <span>Loading work order details...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error-container">
+    <mat-icon color="warn">error_outline</mat-icon>
+    <h2>Work order not found</h2>
+    <p>The work order you're looking for might not exist or has been deleted.</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Work Orders
+    </button>
+  </div>
+
+  <!-- Work Order Details -->
+  <div *ngIf="workOrder && !loading && !error" class="work-order-details-content">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="header-left">
+        <button mat-icon-button (click)="goBack()" matTooltip="Back to Work Orders" class="back-button">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+        <h1>Work Order #{{ workOrder.details.workOrderNumber }}</h1>
+      </div>
+
+      <div class="header-actions">
+        <button mat-stroked-button color="primary" class="action-button" matTooltip="Print this work order" (click)="printWorkOrder()">
+          <mat-icon>print</mat-icon>
+          <span>Print</span>
+        </button>
+        <button mat-stroked-button color="primary" class="action-button" (click)="exportToExcel()" matTooltip="Export to Excel">
+          <mat-icon>description</mat-icon>
+          <span>Export Excel</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="content-grid">
+      <!-- Left Column - Main Info -->
+      <div class="left-column">
+        <!-- Title Card -->
+        <mat-card class="detail-card title-card" appearance="outlined">
+          <mat-card-content>
+            <div class="card-title-row">
+              <h2 class="card-title">{{ workOrder.details.title }}</h2>
+              <div class="status-chip" [ngClass]="getStatusClass(workOrder.details.status)">
+                {{ workOrder.details.status | titlecase }}
+              </div>
+            </div>
+            <p class="work-order-description">{{ workOrder.details.description }}</p>
+
+            <!-- Tabs inside title card -->
+            <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start" class="info-tabs">
+              <!-- Overview Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">dashboard</mat-icon>
+                  <span>Overview</span>
+                </ng-template>
+                <div class="tab-content overview-tab">
+                  <h3>Work Order Information</h3>
+                  <div class="info-grid">
+                    <div class="info-item">
+                      <span class="info-label">Order Number</span>
+                      <span class="info-value">{{ workOrder.details.workOrderNumber }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Priority</span>
+                      <div class="priority-chip" [ngClass]="getPriorityClass(workOrder.details.priority)">
+                        {{ workOrder.details.priority | titlecase }}
+                      </div>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Status</span>
+                      <div class="status-chip" [ngClass]="getStatusClass(workOrder.details.status)">
+                        {{ workOrder.details.status | titlecase }}
+                      </div>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Category</span>
+                      <span class="info-value">{{ workOrder.details.category }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Category</span>
+                      <span class="info-value">{{ workOrder.details.category }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Location</span>
+                      <span class="info-value">{{ workOrder.details.location || 'Not specified' }}</span>
+                    </div>
+
+                    
+                    <div class="info-item">
+                      <span class="info-label">Created By</span>
+                      <span class="info-value">{{ workOrder.details.createdBy || 'System' }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Estimated Cost</span>
+                      <span class="info-value cost-value">${{ workOrder.estimatedCost ? workOrder.estimatedCost.toLocaleString() : '0' }}</span>
+                    </div>
+
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Client Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">business</mat-icon>
+                  <span>Client</span>
+                </ng-template>
+                <div class="tab-content client-tab">
+                  <h3>Client Information</h3>
+
+                  <div class="client-info">
+                    <div class="client-logo-placeholder">
+                      {{ workOrder.details.client.charAt(0).toUpperCase() }}
+                    </div>
+
+                    <div class="client-details">
+                      <h4 class="client-name">{{ workOrder.details.client }}</h4>
+
+                      <div class="client-contact-info">
+                        <div class="contact-item">
+                          <mat-icon>person</mat-icon>
+                          <span>{{ workOrder.details.client }}</span>
+                        </div>
+
+                        <div class="contact-item">
+                          <mat-icon>email</mat-icon>
+                          <span>{{ workOrder.details.client }}</span>
+                        </div>
+
+                        <div class="contact-item">
+                          <mat-icon>phone</mat-icon>
+                          <span>{{ workOrder.details.client }}</span>
+                        </div>
+
+                        <div class="contact-item">
+                          <mat-icon>location_on</mat-icon>
+                          <span>{{ workOrder.details.location }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Progress Tab (moved from separate card) -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">trending_up</mat-icon>
+                  <span>Progress</span>
+                </ng-template>
+                <div class="tab-content progress-tab">
+                  <h3>Work Order Progress</h3>
+
+                  <div class="completion-row">
+                    <span>Completion</span>
+                    <span class="completion-percentage">{{ workOrder.details.completionPercentage }}%</span>
+                  </div>
+                  <mat-progress-bar mode="determinate" [value]="workOrder.details.completionPercentage"
+                                   [color]="workOrder.details.completionPercentage < 50 ? 'warn' : 'primary'">
+                  </mat-progress-bar>
+
+                  <div class="progress-details">
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Start Date</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.startDate) }}</span>
+                    </div>
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Due Date</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.targetEndDate || workOrder.details.dueDate) }}</span>
+                    </div>
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Created</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.createdDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Tasks Card -->
+        <mat-card class="tasks-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>playlist_add_check</mat-icon>
+              <span>Tasks</span>
+            </mat-card-title>
+            <div class="header-actions">
+              <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                <mat-icon>add</mat-icon>
+                <span>Add Task</span>
+              </button>
+            </div>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start">
+              <!-- Tasks List Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">check_box</mat-icon>
+                  <span>Task List</span>
+                </ng-template>
+                <div class="tab-content tasks-tab">
+                  <div class="tasks-container">
+                    <ng-container *ngIf="workOrder.tasks && workOrder.tasks.length > 0; else noTasks">
+                      <div class="task-item" *ngFor="let task of workOrder.tasks; let i = index" [ngClass]="{'completed': task.completed}">
+                        <div class="task-header">
+                          <div class="task-status">
+                            <mat-checkbox
+                              [checked]="task.completed"
+                              (change)="toggleTaskStatus(i)"
+                              color="primary">
+                            </mat-checkbox>
+                          </div>
+                          <div class="task-title">{{ task.title }}</div>
+                          <div class="task-actions">
+                            <button mat-icon-button (click)="editTask(i, task)" matTooltip="Edit">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="deleteTask(i)" matTooltip="Delete">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="task-details" *ngIf="task.description">
+                          <div class="task-description">{{ task.description }}</div>
+                        </div>
+                        <div class="task-footer">
+                          <div class="task-meta">
+                            <span class="task-due-date" *ngIf="task.dueDate">
+                              <mat-icon>event</mat-icon>
+                              {{ task.dueDate | date:'MMM d, y' }}
+                            </span>
+                            <span class="task-assigned" *ngIf="task.manpower">
+                              <mat-icon>person</mat-icon>
+                              {{ task.manpower }}
+                            </span>
+                            <span class="task-priority" [ngClass]="'priority-' + task.priority">
+                              <mat-icon>flag</mat-icon>
+                              {{ task.priority }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #noTasks>
+                      <div class="no-data-container">
+                        <mat-icon>assignment</mat-icon>
+                        <p>No tasks created for this work order</p>
+                        <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                          <mat-icon>add</mat-icon>
+                          <span>Create First Task</span>
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Gantt Chart Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">stacked_bar_chart</mat-icon>
+                  <span>Gantt Chart</span>
+                </ng-template>
+                <div class="tab-content gantt-tab">
+                  <div *ngIf="workOrder.tasks && workOrder.tasks.length > 0; else noTasksForGantt">
+                    <p class="coming-soon-text">Gantt chart view coming soon</p>
+                    <!-- Placeholder for Gantt chart -->
+                    <div class="gantt-placeholder">
+                      <div class="gantt-timeline">
+                        <div class="gantt-days">
+                          <div class="gantt-day" *ngFor="let day of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]">
+                            Day {{ day }}
+                          </div>
+                        </div>
+                        <div class="gantt-tasks">
+                          <div class="gantt-task-row" *ngFor="let task of workOrder.tasks; let i = index">
+                            <div class="gantt-task-label">{{ task.title }}</div>
+                            <div class="gantt-task-bar"
+                              [ngStyle]="{
+                                'left': (i * 5) + '%',
+                                'width': '20%',
+                                'background-color': task.completed ? 'var(--success)' : 'var(--primary)'
+                              }">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <ng-template #noTasksForGantt>
+                    <div class="no-data-container">
+                      <mat-icon>stacked_bar_chart</mat-icon>
+                      <p>No tasks available to display in Gantt chart</p>
+                      <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                        <mat-icon>add</mat-icon>
+                        <span>Add Tasks to View Chart</span>
+                      </button>
+                    </div>
+                  </ng-template>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- After the tasks card, add the details card back -->
+        <mat-card class="detail-card tabs-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>construction</mat-icon>
+              <span>Resources & Materials</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start">
+              <!-- Team Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">people</mat-icon>
+                  <span>Team</span>
+                </ng-template>
+                <div class="tab-content team-tab">
+                  <h3>Assigned Personnel</h3>
+
+                  <div class="assigned-item engineer">
+                    <div class="assigned-icon">
+                      <mat-icon>engineering</mat-icon>
+                    </div>
+                    <div class="assigned-details">
+                      <span class="assigned-role">Engineer In Charge</span>
+                      <span class="assigned-name">{{ workOrder.engineerInCharge?.name || 'Not Assigned' }}</span>
+                    </div>
+                  </div>
+
+                  <div class="assigned-team">
+                    <h4>Team Members</h4>
+                    <div class="team-list">
+                      <div class="team-member" *ngFor="let member of workOrder.manpower">
+                        <div class="member-avatar">
+                          <!-- {{ member.charAt(0).toUpperCase() }} --> Member Name
+                        </div>
+                        <div class="member-name">User </div> <!-- {{ member.replace('user', '') }} -->
+                      </div>
+                      <div *ngIf="!workOrder.manpower?.length" class="no-data">
+                        No team members assigned
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Materials Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">inventory_2</mat-icon>
+                  <span>Materials</span>
+                </ng-template>
+                <div class="tab-content materials-tab">
+                  <div class="tab-header-with-action">
+                    <h3>Materials Required</h3>
+                    <button mat-stroked-button color="primary">
+                      <mat-icon>add</mat-icon>
+                      Add Material
+                    </button>
+                  </div>
+
+                  <div class="materials-list">
+                    <div *ngIf="workOrder.materials && workOrder.materials.length > 0; else noMaterials">
+                      <!-- Materials list content -->
+                      <div class="material-item" *ngFor="let material of workOrder.materials">
+                        <div class="material-icon">
+                          <mat-icon>inventory_2</mat-icon>
+                        </div>
+                        <div class="material-details">
+                          <div class="material-name">{{ material.receivableMaterial?.name }}</div>
+                          <div class="material-info">
+                            <span class="material-quantity">Qty: {{ material.receivableMaterial?.estimatedQuantity }} {{ material.receivableMaterial?.unit }}</span>
+                            <span class="material-status" [ngClass]="'status-' + material.receivableMaterial?.status?.toLowerCase()">
+                              {{ material.receivableMaterial?.status }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <ng-template #noMaterials>
+                      <div class="no-data-container">
+                        <mat-icon>inventory_2</mat-icon>
+                        <p>No materials have been added to this work order</p>
+                        <button mat-stroked-button color="primary">Add First Material</button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Equipment Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">build</mat-icon>
+                  <span>Equipment</span>
+                </ng-template>
+                <div class="tab-content equipment-tab">
+                  <h3>Equipment Information</h3>
+
+                  <div class="no-data-container">
+                    <mat-icon>build</mat-icon>
+                    <p>No equipment listed for this work order yet.</p>
+                    <button mat-stroked-button color="primary" (click)="addEquipment()">
+                      <mat-icon>add</mat-icon>
+                      Add Equipment
+                    </button>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- New Card for Permits, Remarks, and Issues -->
+        <mat-card class="detail-card documents-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>description</mat-icon>
+              <span>Documentation</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start">
+              <!-- Permits Tab (Moved from details card) -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">gavel</mat-icon>
+                  <span>Permits</span>
+                </ng-template>
+                <div class="tab-content permits-tab">
+                  <div class="permits-list">
+                    <ng-container *ngIf="workOrder.permits && workOrder.permits.length > 0; else noPermits">
+                      <div class="permit-item" *ngFor="let permit of workOrder.permits">
+                        <div class="permit-header">
+                          <div class="permit-type">
+                            <mat-icon>description</mat-icon>
+                            <span>{{ permit.type }}</span>
+                          </div>
+
+                          <div class="permit-status" [ngClass]="'status-' + permit.status">
+                            {{ permit.status | titlecase }}
+                          </div>
+                        </div>
+
+                        <div class="permit-content">
+                          <h4 class="permit-title">{{ permit.title }}</h4>
+                          <p class="permit-description">{{ permit.description }}</p>
+
+                          <div class="permit-meta">
+                            <div class="permit-number">
+                              <span class="meta-label">Permit #:</span>
+                              <span class="meta-value">{{ permit.number }}</span>
+                            </div>
+
+                            <div class="permit-authority">
+                              <span class="meta-label">Issuing Authority:</span>
+                              <span class="meta-value">{{ permit.authority }}</span>
+                            </div>
+
+                            <div class="permit-dates">
+                              <div class="issue-date">
+                                <span class="meta-label">Issued:</span>
+                                <span class="meta-value">{{ formatDate(permit.issueDate) }}</span>
+                              </div>
+
+                              <div class="expiry-date">
+                                <span class="meta-label">Expires:</span>
+                                <span class="meta-value">{{ formatDate(permit.expiryDate) }}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="permit-actions">
+                          <button mat-stroked-button color="primary">
+                            <mat-icon>visibility</mat-icon>
+                            View Details
+                          </button>
+
+                          <button mat-stroked-button>
+                            <mat-icon>download</mat-icon>
+                            Download
+                          </button>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #noPermits>
+                      <div class="no-data-container">
+                        <mat-icon>gavel</mat-icon>
+                        <p>No permits have been added to this work order.</p>
+                        <button mat-stroked-button color="primary" (click)="addPermit()">
+                          Add Permit
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Remarks Tab (Moved from details card) -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">comment</mat-icon>
+                  <span>Remarks</span>
+                </ng-template>
+                <div class="tab-content remarks-tab">
+                  <div class="tab-header">
+                    <h3>Work Order Remarks</h3>
+                    <button mat-stroked-button color="primary" (click)="addRemark()">
+                      <mat-icon>add</mat-icon>
+                      <span>Add Remark</span>
+                    </button>
+                  </div>
+
+                  <div class="remarks-list">
+                    <ng-container *ngIf="workOrder.remarks && workOrder.remarks.length > 0; else noRemarks">
+                      <div class="remark-item" *ngFor="let remark of workOrder.remarks">
+                        <div class="remark-header">
+                          <div class="remark-type" [ngClass]="getRemarkTypeClass(remark.type)">
+                            <mat-icon>{{ getRemarkIcon(remark.type) }}</mat-icon>
+                            <span>{{ remark.type | titlecase }}</span>
+                          </div>
+                          <div class="remark-actions">
+                            <button mat-icon-button color="primary" matTooltip="Edit Remark" (click)="editRemark(remark)">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button color="warn" matTooltip="Delete" (click)="deleteRemark(remark)">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+
+                        <div class="remark-content">
+                          {{ remark.content }}
+                        </div>
+
+                        <div class="remark-footer">
+                          <div class="remark-meta">
+                            <span class="remark-author">By: {{ remark.createdBy }}</span>
+                            <span class="remark-date">{{ formatDate(remark.createdDate) }}</span>
+                          </div>
+
+                          <div *ngIf="remark.peopleInvolved && remark.peopleInvolved.length > 0" class="remark-people">
+                            <span class="people-label">People involved:</span>
+                            <div class="people-chips">
+                              <div class="people-chip" *ngFor="let personId of remark.peopleInvolved">
+                                {{ personId }}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #noRemarks>
+                      <div class="no-data-container">
+                        <mat-icon>comment</mat-icon>
+                        <p>No remarks have been added to this work order yet.</p>
+                        <button mat-stroked-button color="primary" (click)="addRemark()">
+                          <mat-icon>add</mat-icon>
+                          <span>Add First Remark</span>
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Issues Tab (Moved from details card) -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">error_outline</mat-icon>
+                  <span>Issues</span>
+                </ng-template>
+                <div class="tab-content issues-tab">
+                  <div class="tab-header">
+                    <h3>Issues & Problems</h3>
+                    <button mat-stroked-button color="primary" (click)="reportIssue()">
+                      <mat-icon>add</mat-icon>
+                      <span>Report Issue</span>
+                    </button>
+                  </div>
+
+                  <div class="issues-list">
+                    <ng-container *ngIf="workOrder.issues && workOrder.issues.length > 0; else noIssues">
+                      <div class="issue-item" *ngFor="let issue of workOrder.issues">
+                        <div class="issue-severity" [ngClass]="'severity-' + issue.severity">
+                          <mat-icon>{{ issue.severity === 'high' ? 'error' : (issue.severity === 'medium' ? 'warning' : 'info') }}</mat-icon>
+                        </div>
+
+                        <div class="issue-content">
+                          <h4 class="issue-title">{{ issue.title }}</h4>
+                          <p class="issue-description">{{ issue.description }}</p>
+
+                          <div class="issue-meta">
+                            <div class="reported-by">
+                              <span class="meta-label">Reported by:</span>
+                              <span class="meta-value">{{ issue.reportedBy }}</span>
+                            </div>
+
+                            <div class="reported-date">
+                              <span class="meta-label">Date:</span>
+                              <span class="meta-value">{{ formatDate(issue.reportedDate) }}</span>
+                            </div>
+
+                            <div class="issue-status" [ngClass]="'status-' + issue.status">
+                              {{ issue.status | titlecase }}
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="issue-actions">
+                          <button mat-icon-button [matMenuTriggerFor]="issueMenu" aria-label="Issue actions">
+                            <mat-icon>more_vert</mat-icon>
+                          </button>
+                          <mat-menu #issueMenu="matMenu">
+                            <button mat-menu-item (click)="editIssue(issue)">
+                              <mat-icon>edit</mat-icon>
+                              <span>Edit</span>
+                            </button>
+                            <button mat-menu-item *ngIf="issue.status !== 'resolved'" (click)="resolveIssue(issue.id)">
+                              <mat-icon>check_circle</mat-icon>
+                              <span>Mark as Resolved</span>
+                            </button>
+                            <button mat-menu-item (click)="deleteIssue(issue.id)">
+                              <mat-icon>delete</mat-icon>
+                              <span>Delete</span>
+                            </button>
+                          </mat-menu>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #noIssues>
+                      <div class="no-data-container">
+                        <mat-icon>check_circle</mat-icon>
+                        <p>No issues have been reported for this work order.</p>
+                        <button mat-stroked-button color="primary" (click)="reportIssue()">
+                          <mat-icon>add</mat-icon>
+                          <span>Report an Issue</span>
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+      </div>
+
+      <!-- Right Column - Timeline & Activity -->
+      <div class="right-column">
+        <!-- Actions Needed Card -->
+        <mat-card class="detail-card actions-needed-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>assignment_late</mat-icon>
+              <span>Actions Needed</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="actions-needed-list">
+              <ng-container *ngIf="workOrder.actionsNeeded && workOrder.actionsNeeded.length > 0; else noActions">
+                <div class="action-item" *ngFor="let action of workOrder.actionsNeeded">
+                  <div class="action-priority" [ngClass]="'priority-' + action.priority">
+                    <mat-icon>{{ action.priority === 'high' ? 'priority_high' : 'low_priority' }}</mat-icon>
+                  </div>
+
+                  <div class="action-content">
+                    <div class="action-title">
+                      {{ action.title }}
+                    </div>
+                    <div class="action-description">
+                      {{ action.description }}
+                    </div>
+                    <div class="action-meta">
+                      <span class="action-assignee">Assigned to: {{ action.assignedTo || 'Unassigned' }}</span>
+                      <span class="action-due-date">Due: {{ formatDate(action.dueDate) }}</span>
+                    </div>
+                  </div>
+
+                  <div class="action-status" [ngClass]="'status-' + action.status">
+                    {{ action.status }}
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #noActions>
+                <div class="no-data-container">
+                  <mat-icon>check_circle</mat-icon>
+                  <p>No action items required at this time.</p>
+                  <button mat-stroked-button color="primary" (click)="createActionItem()">
+                    <mat-icon>add</mat-icon>
+                    <span>Create Action Item</span>
+                  </button>
+                </div>
+              </ng-template>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Expenses Summary Card (New) -->
+        <mat-card class="detail-card expenses-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>pie_chart</mat-icon>
+              <span>Expenses Summary</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="expenses-summary">
+              <div class="expense-chart-container">
+                <!-- Pie chart visualization -->
+                <div class="pie-chart-placeholder">
+                  <div class="pie-chart">
+                    <div class="slice slice-1"></div>
+                    <div class="slice slice-2"></div>
+                    <div class="slice slice-3"></div>
+                  </div>
+                </div>
+
+                <div class="expense-details">
+                  <div class="expense-detail-item">
+                    <div class="expense-color" style="background-color: var(--primary);"></div>
+                    <div class="expense-info">
+                      <span class="expense-category">Materials</span>
+                      <span class="expense-amount">$12,500</span>
+                    </div>
+                    <span class="expense-percentage">50%</span>
+                  </div>
+
+                  <div class="expense-detail-item">
+                    <div class="expense-color" style="background-color: var(--success);"></div>
+                    <div class="expense-info">
+                      <span class="expense-category">Labor</span>
+                      <span class="expense-amount">$8,750</span>
+                    </div>
+                    <span class="expense-percentage">35%</span>
+                  </div>
+
+                  <div class="expense-detail-item">
+                    <div class="expense-color" style="background-color: var(--warning);"></div>
+                    <div class="expense-info">
+                      <span class="expense-category">Other</span>
+                      <span class="expense-amount">$3,750</span>
+                    </div>
+                    <span class="expense-percentage">15%</span>
+                  </div>
+                </div>
+
+                <div class="expense-total">
+                  <span class="total-label">Total Expenses:</span>
+                  <span class="total-amount">${{ workOrder.estimatedCost ? workOrder.estimatedCost.toLocaleString() : '0' }}</span>
+                </div>
+              </div>
+
+              <button mat-stroked-button color="primary" class="view-all-expenses">
+                <mat-icon>visibility</mat-icon>
+                <span>View All Expenses</span>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Activity Log Card -->
+        <mat-card class="detail-card activity-log-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>history</mat-icon>
+              <span>Activity Log</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="activity-logs-list">
+              <ng-container *ngIf="activityLogs && activityLogs.length > 0; else noActivities">
+                <div class="activity-item" *ngFor="let log of activityLogs">
+                  <div class="activity-icon" [ngClass]="getActivityIconClass(log)">
+                    <mat-icon>{{ getActivityIcon(log) }}</mat-icon>
+                  </div>
+
+                  <div class="activity-content">
+                    <div class="activity-description">
+                      {{ getActivityDescription(log) }}
+                    </div>
+
+                    <div class="activity-meta">
+                      <span class="activity-user">{{ log.userName }}</span>
+                      <span class="activity-time">{{ formatActivityTimestamp(log.timestamp) }}</span>
+                    </div>
+
+                    <div *ngIf="log.details" class="activity-details">
+                      <div *ngFor="let key of objectKeys(log.details)" class="detail-item">
+                        <span class="detail-label">{{ key | titlecase }}:</span>
+                        <span class="detail-value">{{ log.details[key] }}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+
+              <ng-template #noActivities>
+                <div class="no-data-container">
+                  <mat-icon>history</mat-icon>
+                  <p>No activity has been recorded for this work order yet.</p>
+                </div>
+              </ng-template>
+            </div>
+
+            <div class="view-all-link">
+              <a mat-button color="primary" routerLink="/activity-log">
+                View All Activity Logs
+                <mat-icon>arrow_forward</mat-icon>
+              </a>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Actions Card -->
+        <mat-card class="detail-card actions-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>build</mat-icon>
+              <span>Quick Actions</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div class="quick-actions-grid">
+              <button mat-stroked-button class="quick-action-button" (click)="updateStatus('in-progress')" [disabled]="workOrder.details.status === 'in-progress'">
+                <mat-icon>update</mat-icon>
+                <span>Update Status</span>
+              </button>
+
+              <button mat-stroked-button class="quick-action-button" (click)="updateStatus('completed')" [disabled]="workOrder.details.status === 'completed'">
+                <mat-icon>assignment_turned_in</mat-icon>
+                <span>Complete</span>
+              </button>
+
+              <button mat-stroked-button class="quick-action-button">
+                <mat-icon>person_add</mat-icon>
+                <span>Assign</span>
+              </button>
+
+              <button mat-stroked-button class="quick-action-button">
+                <mat-icon>chat</mat-icon>
+                <span>Add Comment</span>
+              </button>
+
+              <button mat-stroked-button class="quick-action-button">
+                <mat-icon>attach_file</mat-icon>
+                <span>Attachments</span>
+              </button>
+
+              <button mat-stroked-button class="quick-action-button">
+                <mat-icon>content_copy</mat-icon>
+                <span>Duplicate</span>
+              </button>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Related Section Card -->
+        <mat-card class="detail-card related-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>link</mat-icon>
+              <span>Related Items</span>
+            </mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <mat-nav-list>
+              <a mat-list-item routerLink="/work-order-sections/forms">
+                <mat-icon matListItemIcon>description</mat-icon>
+                <span matListItemTitle>Forms & Documents</span>
+                <span matListItemLine class="item-count">3 items</span>
+              </a>
+
+              <a mat-list-item routerLink="/work-order-sections/photos">
+                <mat-icon matListItemIcon>photo_library</mat-icon>
+                <span matListItemTitle>Photos & Media</span>
+                <span matListItemLine class="item-count">2 items</span>
+              </a>
+
+              <a mat-list-item routerLink="/work-order-sections/expenses">
+                <mat-icon matListItemIcon>monetization_on</mat-icon>
+                <span matListItemTitle>Expenses</span>
+                <span matListItemLine class="item-count">4 items</span>
+              </a>
+
+              <a mat-list-item routerLink="/work-order-sections/invoices">
+                <mat-icon matListItemIcon>receipt</mat-icon>
+                <span matListItemTitle>Invoices</span>
+                <span matListItemLine class="item-count">1 item</span>
+              </a>
+            </mat-nav-list>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Style fixes for layout issues -->
+<style>
+  /* Global fixes for the entire component */
+  :host {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+
+  /* Fix card layouts and spacing */
+  mat-card {
+    margin-bottom: 16px;
+    overflow: hidden;
+  }
+
+  mat-card-header {
+    padding: 16px;
+    background-color: rgba(var(--primary-rgb), 0.05);
+  }
+
+  .card-header-container {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  mat-card-content {
+    padding: 16px !important;
+  }
+
+  /* Fix all tab label spacing */
+  ::ng-deep mat-tab-group .mat-mdc-tab .mdc-tab__content .mdc-tab__text-label {
+    display: flex;
+    align-items: center;
+  }
+
+  ::ng-deep mat-tab-group .mat-mdc-tab .mdc-tab__content .mdc-tab__text-label mat-icon {
+    margin-right: 8px;
+  }
+
+  /* Fix side menu when it's open */
+  .details-container {
+    padding: 16px;
+    box-sizing: border-box;
+  }
+
+  /* Ensure proper spacing around actions needed card */
+  .actions-needed-card .no-data-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 24px;
+  }
+
+  /* Fix alignment in pie chart and expenses card */
+  .expenses-summary {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .expenses-chart-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pie-chart-container {
+    width: 200px;
+    height: 200px;
+    position: relative;
+  }
+
+  /* Fix button icon spacing */
+  button .mat-icon {
+    margin-right: 8px;
+  }
+</style>

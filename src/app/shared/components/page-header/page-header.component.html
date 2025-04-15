@@ -1,0 +1,60 @@
+<div class="page-header">
+  <div class="header-title">
+    <h1>{{ title }}</h1>
+    <p *ngIf="subtitle" class="subtitle">{{ subtitle }}</p>
+  </div>
+  <div class="header-actions">
+    <ng-container *ngFor="let action of actions">
+      <ng-container *ngIf="action.visible !== false">
+        <!-- Basic button -->
+        <button *ngIf="!action.variant || action.variant === 'basic'"
+          mat-button
+          [color]="action.color || ''"
+          [disabled]="action.disabled"
+          (click)="onActionClick(action.callback)">
+          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+          <span>{{ action.label }}</span>
+        </button>
+
+        <!-- Raised button -->
+        <button *ngIf="action.variant === 'raised'"
+          mat-raised-button
+          [color]="action.color || ''"
+          [disabled]="action.disabled"
+          (click)="onActionClick(action.callback)">
+          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+          <span>{{ action.label }}</span>
+        </button>
+
+        <!-- Stroked button -->
+        <button *ngIf="action.variant === 'stroked'"
+          mat-stroked-button
+          [color]="action.color || ''"
+          [disabled]="action.disabled"
+          (click)="onActionClick(action.callback)">
+          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+          <span>{{ action.label }}</span>
+        </button>
+
+        <!-- Flat button -->
+        <button *ngIf="action.variant === 'flat'"
+          mat-flat-button
+          [color]="action.color || ''"
+          [disabled]="action.disabled"
+          (click)="onActionClick(action.callback)">
+          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+          <span>{{ action.label }}</span>
+        </button>
+
+        <!-- Icon button -->
+        <button *ngIf="action.variant === 'icon'"
+          mat-icon-button
+          [color]="action.color || ''"
+          [disabled]="action.disabled"
+          (click)="onActionClick(action.callback)">
+          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+        </button>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>

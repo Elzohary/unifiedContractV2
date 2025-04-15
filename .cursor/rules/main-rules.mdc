@@ -1,0 +1,15 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- Never change in the design, colors, alignment for anything without I ask you or without taking my permission. Again, Don't change in colors or design or alignment without my permission.
+
+- Modularity is the top piriority. follow the Modularity best practices.
+
+- Before creating a new component check if there's a component can be re-used.
+
+- Before creating a new file, folder or any new thing, check the project hierarchy to choose the best correct location and the correct Module to be placed in. 

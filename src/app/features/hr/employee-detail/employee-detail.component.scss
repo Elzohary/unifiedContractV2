@@ -1,0 +1,464 @@
+.employee-detail-container {
+  padding: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 64px 0;
+  
+  p {
+    margin-top: 16px;
+    color: var(--text-secondary);
+  }
+}
+
+.employee-header {
+  display: flex;
+  margin-bottom: 24px;
+  
+  .back-button {
+    margin-right: 16px;
+    align-self: flex-start;
+  }
+  
+  .header-content {
+    display: flex;
+    flex: 1;
+    gap: 24px;
+    align-items: flex-start;
+    
+    @media (max-width: 768px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+    }
+  }
+  
+  .employee-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 3px solid var(--primary);
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--primary-light);
+    
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .avatar-icon {
+      font-size: 60px;
+      height: 60px;
+      width: 60px;
+      color: var(--primary);
+    }
+  }
+  
+  .employee-info {
+    flex: 1;
+    
+    h1 {
+      font-size: 28px;
+      margin: 0 0 8px 0;
+      font-weight: 500;
+    }
+    
+    .employee-job-info {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 16px;
+      
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
+      
+      .job-title {
+        font-size: 18px;
+        color: var(--text-secondary);
+      }
+      
+      .badge-number {
+        font-size: 16px;
+        background-color: #3f51b5;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 4px;
+      }
+    }
+    
+    .employee-quick-info {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      
+      @media (max-width: 768px) {
+        justify-content: center;
+      }
+      
+      .info-item {
+        display: flex;
+        align-items: center;
+        
+        mat-icon {
+          margin-right: 8px;
+          color: var(--text-secondary);
+        }
+        
+        span {
+          color: var(--text-secondary);
+        }
+      }
+    }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 8px;
+    
+    @media (max-width: 768px) {
+      margin-top: 16px;
+      align-self: center;
+    }
+  }
+}
+
+.performance-section {
+  margin-bottom: 24px;
+  
+  mat-card {
+    border-radius: 8px;
+    
+    .performance-metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 24px;
+      
+      .metric {
+        display: flex;
+        flex-direction: column;
+        
+        h3 {
+          font-size: 16px;
+          font-weight: 500;
+          margin: 0 0 8px 0;
+          color: var(--text-secondary);
+        }
+        
+        .progress-container {
+          display: flex;
+          flex-direction: column;
+          
+          mat-progress-bar {
+            margin-bottom: 4px;
+          }
+          
+          span {
+            text-align: right;
+            font-weight: 500;
+          }
+        }
+        
+        .value {
+          font-size: 24px;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+}
+
+.details-card {
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: var(--shadow-base);
+  
+  ::ng-deep {
+    // Align with our global tab styling while retaining specific overrides
+    .mat-mdc-tab-group {
+      // Full height tabs for a more elegant look
+      height: 100%;
+      
+      .mat-mdc-tab-header {
+        padding: 0 16px;
+        border-bottom: none;
+        height: 56px;
+        
+        &:after {
+          height: 1px;
+          background-color: var(--border-color);
+        }
+      }
+      
+      .mat-mdc-tab {
+        height: 56px;
+        padding: 0 20px;
+        min-width: 140px;
+        transition: background-color 0.2s ease;
+        
+        // Add subtle label-only animation
+        .mat-mdc-tab-label-content {
+          position: relative;
+          font-size: 15px;
+          letter-spacing: 0.25px;
+          transition: all 0.3s ease;
+          
+          &:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -4px;
+            left: 50%;
+            background-color: var(--primary);
+            transform: translateX(-50%);
+            transition: width 0.3s ease;
+            opacity: 0;
+            border-radius: 2px;
+          }
+        }
+        
+        &.mdc-tab--active .mat-mdc-tab-label-content:after {
+          width: 40%;
+          opacity: 1;
+        }
+      }
+      
+      // Add subtle fade animation for better UX
+      .mat-mdc-tab-body-content {
+        opacity: 0;
+        animation: fadeIn 0.3s ease forwards;
+        animation-delay: 0.05s;
+      }
+      
+      @keyframes fadeIn {
+        to { opacity: 1; }
+      }
+    }
+  }
+  
+  .tab-content {
+    padding: 24px 16px;
+  }
+}
+
+.detail-section {
+  margin-bottom: 32px;
+  
+  h3 {
+    font-size: 18px;
+    font-weight: 500;
+    margin: 0 0 16px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    padding-bottom: 8px;
+  }
+  
+  .detail-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      
+      .label {
+        font-size: 14px;
+        color: var(--text-secondary);
+        margin-bottom: 4px;
+      }
+      
+      .value {
+        font-size: 16px;
+        
+        &.capitalize {
+          text-transform: capitalize;
+        }
+      }
+    }
+  }
+}
+
+.managed-employees {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  .managed-employee {
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    .employee-chip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-radius: 20px;
+      padding: 4px 12px 4px 4px;
+      background-color: rgba(0, 0, 0, 0.05);
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.1);
+      }
+      
+      img {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+    }
+  }
+}
+
+.table-responsive {
+  overflow-x: auto;
+  margin-bottom: 16px;
+  
+  table {
+    width: 100%;
+  }
+}
+
+.status-badge, .severity-badge, .request-type {
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  text-transform: capitalize;
+  font-weight: 500;
+  display: inline-block;
+  
+  &.present {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  &.absent {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  &.late {
+    background-color: #ff9800;
+    color: white;
+  }
+  
+  &.sick-leave, &.vacation {
+    background-color: #9c27b0;
+    color: white;
+  }
+  
+  &.minor {
+    background-color: #ff9800;
+    color: white;
+  }
+  
+  &.moderate {
+    background-color: #ff5722;
+    color: white;
+  }
+  
+  &.severe {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  &.pending {
+    background-color: #2196f3;
+    color: white;
+  }
+  
+  &.approved {
+    background-color: #4caf50;
+    color: white;
+  }
+  
+  &.rejected {
+    background-color: #f44336;
+    color: white;
+  }
+  
+  &.in-review {
+    background-color: #9c27b0;
+    color: white;
+  }
+}
+
+.no-data {
+  text-align: center;
+  color: var(--text-secondary);
+  font-style: italic;
+  padding: 16px;
+}
+
+.view-all-link {
+  margin-top: 16px;
+  text-align: right;
+}
+
+// Dark theme overrides
+:host-context(.dark-theme) {
+  .employee-chip {
+    background-color: rgba(255, 255, 255, 0.1);
+    
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+  }
+  
+  .details-card {
+    background-color: var(--gray-2);
+    border: 1px solid var(--gray-4);
+    
+    ::ng-deep {
+      .mat-mdc-tab-header {
+        background-color: var(--gray-2);
+        
+        &:after {
+          background-color: var(--gray-4);
+        }
+      }
+      
+      .mat-mdc-tab {
+        &:not(.mdc-tab--active):hover {
+          background-color: rgba(255, 255, 255, 0.05);
+        }
+      }
+      
+      .mat-mdc-tab-body-content {
+        background-color: var(--gray-2);
+      }
+    }
+  }
+  
+  .detail-section {
+    h3 {
+      border-bottom-color: var(--gray-4);
+      color: var(--gray-9);
+    }
+    
+    .detail-list {
+      .detail-item {
+        .label {
+          color: var(--gray-7);
+        }
+        
+        .value {
+          color: var(--gray-9);
+        }
+      }
+    }
+  }
+} 

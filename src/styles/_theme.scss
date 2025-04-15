@@ -1,0 +1,36 @@
+@use '@angular/material' as mat;
+@use '../../_theme-colors' as theme;
+
+// Create the palettes for your theme using the Material Design palettes available in palette.scss
+$primary-palette: mat.define-palette(theme.get-palette('primary'));
+$accent-palette: mat.define-palette(theme.get-palette('secondary'));
+$warn-palette: mat.define-palette(mat.$red-palette);
+
+// Create the theme object
+$light-theme: mat.define-light-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+$dark-theme: mat.define-dark-theme((
+  color: (
+    primary: $primary-palette,
+    accent: $accent-palette,
+    warn: $warn-palette,
+  ),
+  typography: mat.define-typography-config(),
+  density: 0,
+));
+
+// Apply the light theme by default
+@include mat.all-component-themes($light-theme);
+
+// Apply the dark theme only when the `.dark-theme` class is applied to an ancestor element
+.dark-theme {
+  @include mat.all-component-colors($dark-theme);
+}

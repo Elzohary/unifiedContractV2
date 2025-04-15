@@ -1,0 +1,21 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "extends": "./tsconfig.app.json",
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc/server",
+    "module": "CommonJS",
+    "types": [
+      "node"
+    ],
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "files": [
+    "src/main.server.ts",
+    "server.ts"
+  ],
+  "angularCompilerOptions": {
+    "entryModule": "./src/app/app.server.module#AppServerModule"
+  }
+} 

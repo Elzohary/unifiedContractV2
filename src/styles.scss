@@ -1,0 +1,132 @@
+/* You can add global styles to this file, and also import other style files */
+@import './styles/material-overrides';
+
+/* CSS Variables for Border Radius */
+:root {
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  --border-radius-xl: 16px;
+  --border-radius-pill: 9999px;
+}
+
+/* Global theme variables */
+body {
+  /* Base colors shared by both themes */
+  --card-shadow: rgba(0, 0, 0, 0.2);
+}
+
+/* Base styles for light and dark themes */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+body {
+  transition: background-color 0.3s ease;
+}
+
+/* Light theme styles */
+body.light-theme {
+  background-color: #fafafa;
+  color: rgba(0, 0, 0, 0.87);
+
+  /* Theme colors for light mode */
+  --dashboard-bg: #f5f5f5;
+  --card-bg: #ffffff;
+  --card-header-bg: #fafafa;
+  --card-border: #e0e0e0;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+  --icon-primary: #1976d2;
+  --icon-accent: #ff9800;
+  --icon-success: #4caf50;
+  --icon-warning: #ff9800;
+  --icon-danger: #f44336;
+  --stat-trend-up: #4caf50;
+  --stat-trend-down: #f44336;
+  --btn-primary: #1976d2;
+}
+
+/* Dark theme styles */
+body.dark-theme {
+  background-color: #303030;
+  color: #ffffff;
+
+  /* Theme colors for dark mode */
+  --dashboard-bg: #0f0f1a00;
+  --card-bg: #39393b;
+  --card-header-bg: #39393b;
+  --card-border: #39393b;
+  --text-primary: #ffffff;
+  --text-secondary: #d1d1dd;
+  --icon-primary: #3699ff;
+  --icon-accent: #ff9f43;
+  --icon-success: #65dab7;
+  --icon-warning: #ffa800;
+  --icon-danger: #f64e60;
+  --stat-trend-up: #8ce4c9;
+  --stat-trend-down: #e48c8c;
+  --card-shadow: rgba(0, 0, 0, 0.3);
+  --btn-primary: #3699ff;
+}
+
+/* Fix for Angular Material overlay issues */
+.cdk-overlay-container {
+  z-index: 1050;
+}
+
+/* Border Radius Utility Classes */
+.rounded-none { border-radius: 0; }
+.rounded-sm { border-radius: var(--border-radius-sm); }
+.rounded-md { border-radius: var(--border-radius-md); }
+.rounded-lg { border-radius: var(--border-radius-lg); }
+.rounded-xl { border-radius: var(--border-radius-xl); }
+.rounded-pill { border-radius: var(--border-radius-pill); }
+
+/* Common utility classes */
+.full-width { width: 100%; }
+.text-center { text-align: center; }
+.text-right { text-align: right; }
+.text-left { text-align: left; }
+
+/* Margins */
+.mt-1 { margin-top: 8px; }
+.mt-2 { margin-top: 16px; }
+.mt-3 { margin-top: 24px; }
+.mt-4 { margin-top: 32px; }
+
+.mb-1 { margin-bottom: 8px; }
+.mb-2 { margin-bottom: 16px; }
+.mb-3 { margin-bottom: 24px; }
+.mb-4 { margin-bottom: 32px; }
+
+.ml-1 { margin-left: 8px; }
+.ml-2 { margin-left: 16px; }
+.ml-3 { margin-left: 24px; }
+
+.mr-1 { margin-right: 8px; }
+.mr-2 { margin-right: 16px; }
+.mr-3 { margin-right: 24px; }
+
+/* Padding */
+.p-1 { padding: 8px; }
+.p-2 { padding: 16px; }
+.p-3 { padding: 24px; }
+.p-4 { padding: 32px; }
+
+/* Display */
+.d-flex { display: flex; }
+.flex-column { flex-direction: column; }
+.justify-content-between { justify-content: space-between; }
+.justify-content-center { justify-content: center; }
+.justify-content-end { justify-content: flex-end; }
+.align-items-center { align-items: center; }
+.align-items-start { align-items: flex-start; }
+.align-items-end { align-items: flex-end; }
+
+/* Global Material overrides */
+.mat-mdc-raised-button.mat-primary {
+  background-color: var(--btn-primary) !important;
+}

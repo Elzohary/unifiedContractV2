@@ -1,0 +1,555 @@
+/* Modern Side Menu Styling */
+app-side-menu-content {
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  flex: 1;
+}
+
+/* Global fix for Angular Material components */
+.mat-mdc-list-base,
+.mat-nav-list,
+mat-nav-list {
+  overflow: visible !important;
+  height: auto !important;
+  contain: none !important;
+}
+
+/* Reset scrollbar behavior for Angular Material components */
+.mat-mdc-list-base div,
+.mat-mdc-list-base mat-list-item,
+.mat-nav-list div,
+.mat-nav-list a {
+  overflow: visible !important;
+  height: auto !important;
+  contain: none !important;
+}
+
+/* Global fix for scrollbar issues */
+.no-scrollbar {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+/* Only this element should have a scrollbar */
+.sidenav-content {
+  padding: 8px 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  height: 100%;
+  background-color: var(--sidebar-background);
+
+  /* Custom scrollbar styling */
+  &::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb, rgba(0, 0, 0, 0.2));
+    border-radius: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover, rgba(0, 0, 0, 0.3));
+  }
+}
+
+/* Fix for Angular Material components to prevent scrollbars */
+.mat-mdc-list-base,
+.mat-nav-list,
+.mat-list,
+.mat-mdc-list-item,
+.mat-mdc-list-item-interactive,
+.mdc-list,
+.mdc-list-item {
+  overflow: visible !important;
+  height: auto !important;
+}
+
+.mat-mdc-list-base {
+  --mdc-list-list-item-one-line-container-height: var(--menu-item-height, 42px);
+  --mdc-list-list-item-container-shape: 0;
+  padding: 0 !important;
+}
+
+/* Reset any height constraints that might cause scrollbars */
+.mat-nav-list, .mat-list {
+  height: auto !important;
+  padding: 0 !important;
+}
+
+/* Menu section styling */
+.menu-section {
+  margin-bottom: 4px;
+  position: relative;
+  overflow: visible;
+}
+
+/* Section header styling - matches Muse Ant Design Dashboard */
+.section-header {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  margin: 0;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: 8px;
+  margin: 0 8px;
+
+  &:hover {
+    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--menu-item-hover-color);
+  }
+
+  .section-icon {
+    margin-right: 10px;
+    color: var(--icon-default-color);
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+  }
+
+  .section-label {
+    flex: 1;
+    letter-spacing: 0.1px;
+  }
+
+  .expand-icon {
+    color: var(--icon-default-color);
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    opacity: 0.7;
+  }
+}
+
+/* Menu items container */
+.menu-items {
+  padding: 6px 0;
+  margin-left: 12px;
+  overflow: visible;
+}
+
+/* Individual menu item styling */
+.menu-item {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  .item-icon {
+    margin-right: 10px;
+    color: var(--icon-default-color);
+    transition: all 0.2s ease;
+    font-size: 18px;
+    height: 18px;
+    width: 18px;
+    opacity: 0.8;
+  }
+
+  .item-label {
+    font-size: 17.2px;
+    font-weight: 400;
+    letter-spacing: 0.1px;
+    line-height: 40px;
+  }
+}
+
+/* Navigation section styling */
+.nav-section {
+  margin-bottom: 16px;
+
+  .nav-section-title {
+    padding: 12px 16px;
+    margin: 0;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-tertiary, #8392ab);
+  }
+}
+
+/* Menu item styling */
+.item {
+  display: flex;
+  align-items: center;
+  height: var(--menu-item-height, 44px);
+  padding: var(--menu-item-padding, 0 16px);
+  color: var(--menu-item-color, #344767);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  font-size: 14.5px;
+  margin: 5px 8px;
+  border-radius: 8px;
+  font-weight: 500;
+  letter-spacing: 0.15px;
+
+  &:hover {
+    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--menu-item-hover-color, #344767);
+    transform: translateX(4px);
+  }
+
+  .mat-icon {
+    margin-right: 10px;
+    color: var(--icon-default-color, #344767);
+    transition: all 0.2s ease;
+    font-size: 20px;
+    height: 20px;
+    width: 20px;
+    opacity: 0.8;
+  }
+}
+
+/* Active menu item */
+.activeItem {
+  color: var(--menu-item-active-color, #cb0c9f);
+  background-color: var(--menu-item-active-bg, rgba(203, 12, 159, 0.1));
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+  .mat-icon {
+    color: var(--menu-item-active-color, #cb0c9f);
+    opacity: 1;
+  }
+}
+
+/* Submenu items */
+.subItem {
+  font-size: 14px;
+  margin: 2px 24px;
+  padding: 0 12px;
+  height: 36px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--menu-item-hover-color, #344767);
+  }
+}
+
+.activeSubItem {
+  background-color: var(--menu-item-active-bg, rgba(203, 12, 159, 0.1)) !important;
+  font-weight: 600;
+  color: var(--menu-item-active-color, #cb0c9f);
+}
+
+.menu-header {
+  color: var(--text-tertiary, #8392ab);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 16px 16px 8px;
+  margin: 0;
+}
+
+.title {
+  color: var(--text-secondary, #344767);
+  font-weight: 500;
+}
+
+.itemBtn {
+  background-color: transparent;
+  width: 100%;
+  border: none;
+  border-radius: 8px;
+  color: var(--menu-item-color, #344767);
+  cursor: pointer;
+}
+
+/* Standard elements */
+img {
+  min-width: 3rem;
+  max-width: 4rem;
+}
+
+ul, li {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Dividers with improved visibility */
+mat-divider {
+  margin: 4px 0;
+  border-top-color: var(--border-color, rgba(0, 0, 0, 0.08));
+  opacity: 0.8;
+}
+
+/* Active link styling */
+.active-link {
+  background-color: var(--menu-item-active-bg, rgba(203, 12, 159, 0.1)) !important;
+  color: var(--menu-item-active-color, #cb0c9f) !important;
+  font-weight: 600;
+
+  mat-icon {
+    color: var(--menu-item-active-color, #cb0c9f) !important;
+    opacity: 1;
+  }
+
+  .menu-item {
+    .item-icon {
+      color: var(--menu-item-active-color, #cb0c9f) !important;
+      opacity: 1;
+    }
+
+    .item-label {
+      color: var(--menu-item-active-color, #cb0c9f) !important;
+      font-weight: 600;
+    }
+  }
+}
+
+/* Material Design improvements for Angular Material components */
+:host ::ng-deep {
+  .mat-mdc-list-item {
+    border-radius: 8px;
+    margin: 3px 8px;
+    min-height: var(--menu-item-height, 44px);
+    padding: 0 4px;
+
+    &.active-link,
+    &.mdc-list-item--activated {
+      background-color: var(--menu-item-active-bg, rgba(203, 12, 159, 0.1)) !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+      .mdc-list-item__primary-text {
+        color: var(--menu-item-active-color, #cb0c9f) !important;
+        font-weight: 600;
+      }
+
+      .mat-icon {
+        color: var(--menu-item-active-color, #cb0c9f) !important;
+        opacity: 1;
+      }
+    }
+
+    &:hover {
+      background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+      transform: translateX(4px);
+      transition: transform 0.2s ease;
+    }
+  }
+
+  .mdc-list-item__primary-text {
+    display: flex;
+    align-items: center;
+    color: var(--menu-item-color, #344767);
+    font-weight: 500;
+    font-size: 14.5px;
+  }
+}
+
+/* Menu panel styling */
+.mat-menu-content {
+  padding: 0 !important;
+  background-color: var(--card-bg, #fff) !important;
+}
+
+.submenu {
+  min-width: 200px;
+  background-color: var(--card-bg, #fff);
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+
+  .mat-menu-item {
+    height: 40px;
+    line-height: 40px;
+    padding: 0 16px;
+    color: var(--menu-item-color, #344767);
+    background-color: var(--card-bg, #fff);
+    font-weight: 500;
+
+    &:hover {
+      background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+      color: var(--menu-item-hover-color, #344767);
+    }
+
+    .mat-icon {
+      margin-right: 10px;
+      color: var(--icon-default-color, #344767);
+      opacity: 0.8;
+    }
+  }
+}
+
+/* Badge styling */
+.badge {
+  margin-left: auto;
+  background-color: var(--primary, #cb0c9f);
+  color: white;
+  border-radius: 16px;
+  padding: 2px 12px;
+  font-size: 12px;
+  font-weight: 600;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Media queries */
+@media (max-width: 600px) {
+  .nav-section-title {
+    font-size: 11px;
+    padding: 8px 12px;
+  }
+
+  :host ::ng-deep {
+    .mat-mdc-list-item {
+      margin: 2px 4px;
+    }
+  }
+}
+
+/* Dark theme specific enhancements */
+:host-context(.dark-theme) {
+  // Side menu background
+  .sidenav-content {
+    background-color: var(--gray-900, #1a2035);
+    border-right: 1px solid var(--gray-800, #1e2743);
+  }
+
+  // Menu items with better contrast
+  .item, .menu-item {
+    color: var(--gray-300, #d1d5db);
+
+    .mat-icon, .item-icon {
+      color: var(--gray-300, #d1d5db);
+    }
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      color: var(--white, #fff);
+
+      .mat-icon, .item-icon {
+        color: var(--primary-hover, #e535b7);
+      }
+    }
+  }
+
+  // Section header styling for dark theme
+  .section-header {
+    color: var(--gray-300, #d1d5db);
+
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.05);
+      color: var(--white, #fff);
+
+      .section-icon, .expand-icon {
+        color: var(--primary-hover, #e535b7);
+      }
+    }
+
+    .section-icon, .expand-icon {
+      color: var(--gray-300, #d1d5db);
+    }
+  }
+
+  // Active items with more distinction
+  .activeItem, .active-link {
+    background-color: var(--primary-light, rgba(203, 12, 159, 0.2)) !important;
+    color: var(--primary-hover, #e535b7) !important;
+    border-left-color: var(--primary-hover, #e535b7);
+
+    .mat-icon, .item-icon {
+      color: var(--primary-hover, #e535b7) !important;
+    }
+
+    .item-label {
+      color: var(--primary-hover, #e535b7) !important;
+    }
+  }
+
+  // Section headers more visible
+  .menu-header, .nav-section-title {
+    color: var(--gray-400, #9ca3af);
+  }
+
+  // List items styling
+  .mat-mdc-list-item {
+    .mat-icon {
+      color: var(--gray-300, #d1d5db) !important;
+    }
+
+    .mdc-list-item__primary-text {
+      color: var(--gray-300, #d1d5db) !important;
+    }
+
+    &:hover {
+      .mdc-list-item__primary-text {
+        color: var(--white, #fff) !important;
+      }
+
+      .mat-icon {
+        color: var(--primary-hover, #e535b7) !important;
+      }
+    }
+  }
+
+  // Menu panel background
+  .mat-menu-content, .submenu {
+    background-color: var(--gray-800, #1e2743) !important;
+
+    .mat-menu-item {
+      color: var(--gray-300, #d1d5db) !important;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.08) !important;
+        color: var(--white, #fff) !important;
+      }
+
+      .mat-icon {
+        color: var(--gray-300, #d1d5db) !important;
+      }
+    }
+  }
+
+  // Badge styling
+  .badge {
+    background-color: var(--primary-hover, #e535b7);
+    color: var(--white, #fff);
+  }
+
+  // Dividers more visible
+  mat-divider {
+    border-top-color: var(--gray-700, #374151);
+  }
+
+  // Custom scrollbar in dark mode
+  .sidenav-content {
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: var(--gray-600, #4b5563);
+
+      &:hover {
+        background: var(--gray-500, #6b7280);
+      }
+    }
+  }
+
+  // Make title text more visible
+  .title {
+    color: var(--gray-300, #d1d5db);
+  }
+
+  // Icon color fix for all contexts
+  .mat-mdc-list-item-icon {
+    color: var(--gray-300, #d1d5db) !important;
+  }
+}

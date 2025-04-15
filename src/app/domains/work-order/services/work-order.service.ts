@@ -1,0 +1,535 @@
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, of, throwError, timer } from 'rxjs';
+import { map, catchError, finalize, switchMap, tap, mergeMap, delay } from 'rxjs/operators';
+import { ApiService } from '../../../core/services/api.service';
+import { StateService } from '../../../core/services/state.service';
+import { ActivityLogService } from '../../../shared/services/activity-log.service';
+import {
+  WorkOrder,
+  WorkOrderStatus,
+  WorkOrderPriority,
+  WorkOrderRemark,
+  Task,
+  WorkOrderIssue,
+  workOrderDetail,
+  workOrderItem,
+  Material,
+  WorkOrderAction,
+  WorkOrderPhoto,
+  WorkOrderForm,
+  WorkOrderExpense,
+  WorkOrderInvoice,
+  ActionItem
+} from '../models/work-order.model';
+
+export interface WorkOrderStatusResponse {
+  id: string;
+  name: string;
+  code: string;
+}
+
+interface StatusTransitionHistory {
+  id: string;
+  workOrderId: string;
+  fromStatus: WorkOrderStatus;
+  toStatus: WorkOrderStatus;
+  changedBy: string;
+  changedDate: string;
+  reason?: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class WorkOrderService {
+  private endpoint = 'work-orders';
+  private statusEndpoint = 'work-order-statuses';
+  private statusesCache$ = new BehaviorSubject<WorkOrderStatusResponse[]>([]);
+
+  // Status transition rules
+  private readonly allowedStatusTransitions: Record<WorkOrderStatus, WorkOrderStatus[]> = {
+    [WorkOrderStatus.Pending]: [WorkOrderStatus.InProgress, WorkOrderStatus.Cancelled],
+    [WorkOrderStatus.InProgress]: [WorkOrderStatus.Completed, WorkOrderStatus.OnHold],
+    [WorkOrderStatus.OnHold]: [WorkOrderStatus.InProgress, WorkOrderStatus.Cancelled],
+    [WorkOrderStatus.Completed]: [WorkOrderStatus.InProgress], // Allow reopening if needed
+    [WorkOrderStatus.Cancelled]: [WorkOrderStatus.Pending] // Allow reactivation
+  };
+
+  private mockWorkOrders: WorkOrder[] = [
+    {
+      id: 'wo1',
+      details: {
+        workOrderNumber: 'WO-2024-001',
+        internalOrderNumber: 'INT-2024-001',
+        title: 'Commercial Building Renovation',
+        description: 'Renovation of the 3rd floor office space at Downtown Business Center',
+        status: 'in-progress' as WorkOrderStatus,
+        priority: 'high' as WorkOrderPriority,
+        createdDate: new Date().toISOString(),
+        dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        startDate: new Date().toISOString(),
+        targetEndDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        location: '123 Business Street, Downtown Business Center',
+        category: 'Renovation',
+        receivedDate: new Date().toISOString(),
+        client: 'Acme Corporation',
+        completionPercentage: 35,
+        createdBy: 'Admin'
+      },
+      estimatedCost: 50000,
+      remarks: [],
+      issues: [],
+      materials: [],
+      permits: [],
+      tasks: [],
+      manpower: [],
+      actions: [],
+      photos: [],
+      forms: [],
+      expenses: [],
+      invoices: [],
+      expenseBreakdown: {
+        materials: 20000,
+        labor: 25000,
+        other: 5000
+      }
+    }
+  ];
+  private workOrdersSubject = new BehaviorSubject<WorkOrder[]>(this.mockWorkOrders);
+  workOrders$ = this.workOrdersSubject.asObservable();
+
+  private simulateNetwork<T>(data: T): Observable<T> {
+    return timer(500).pipe(map(() => data));
+  }
+
+  constructor(
+    private apiService: ApiService,
+    private stateService: StateService,
+    private activityLogService: ActivityLogService
+  ) {
+    this.loadStatuses();
+  }
+
+  private loadStatuses(): void {
+    this.apiService.get<WorkOrderStatusResponse[]>(this.statusEndpoint).pipe(
+      map(response => response.data),
+      catchError(() => of([]))
+    ).subscribe(
+      statuses => this.statusesCache$.next(statuses)
+    );
+  }
+
+  getStatuses(): Observable<WorkOrderStatusResponse[]> {
+    if (this.statusesCache$.value.length > 0) {
+      return this.statusesCache$.asObservable();
+    }
+    
+    return this.apiService.get<WorkOrderStatusResponse[]>(this.statusEndpoint).pipe(
+      map(response => response.data),
+      tap(statuses => this.statusesCache$.next(statuses)),
+      catchError(() => of([]))
+    );
+  }
+
+  isValidStatus(status: string): boolean {
+    return Object.values(WorkOrderStatus).includes(status as WorkOrderStatus);
+  }
+
+  getStatusDisplayName(status: WorkOrderStatus): string {
+    return status.split('-')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  }
+
+  canTransitionTo(currentStatus: WorkOrderStatus, newStatus: WorkOrderStatus): boolean {
+    return this.allowedStatusTransitions[currentStatus]?.includes(newStatus) ?? false;
+  }
+
+  updateWorkOrderStatus(id: string, newStatus: WorkOrderStatus, reason?: string): Observable<WorkOrder> {
+    return this.getWorkOrderById(id).pipe(
+      switchMap(workOrder => {
+        if (!this.canTransitionTo(workOrder.details.status, newStatus)) {
+          return throwError(() => new Error(
+            `Invalid status transition from ${this.getStatusDisplayName(workOrder.details.status)} to ${this.getStatusDisplayName(newStatus)}`
+          ));
+        }
+
+        const historyEntry: StatusTransitionHistory = {
+          id: `st${Date.now()}`,
+          workOrderId: id,
+          fromStatus: workOrder.details.status,
+          toStatus: newStatus,
+          changedBy: 'System',
+          changedDate: new Date().toISOString(),
+          reason
+        };
+
+        this.activityLogService.logActivity({
+          action: 'update',
+          description: `Status changed from ${this.getStatusDisplayName(workOrder.details.status)} to ${this.getStatusDisplayName(newStatus)}${reason ? ` - Reason: ${reason}` : ''}`,
+          entityId: id,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrder(id, { 
+          details: {
+            ...workOrder.details,
+            status: newStatus
+          }
+        });
+      })
+    );
+  }
+
+  getStatusHistory(workOrderId: string): Observable<StatusTransitionHistory[]> {
+    return this.apiService.get<StatusTransitionHistory[]>(`${this.endpoint}/${workOrderId}/status-history`).pipe(
+      map(response => response.data),
+      catchError(() => of([]))
+    );
+  }
+
+  getAllWorkOrders(): Observable<WorkOrder[]> {
+    this.stateService.setLoading(true);
+    this.stateService.setError(null);
+
+    // For development, use mock data
+    return this.simulateNetwork(this.workOrdersSubject.value).pipe(
+      tap(workOrders => {
+        this.stateService.updateWorkOrders(workOrders);
+      }),
+      catchError(error => {
+        this.stateService.setError(error.message);
+        return of([]);
+      }),
+      finalize(() => {
+        this.stateService.setLoading(false);
+      })
+    );
+  }
+
+  getWorkOrderById(id: string): Observable<WorkOrder> {
+    this.stateService.setLoading(false)
+    this.stateService.setError(null);
+
+    const workOrder = this.workOrdersSubject.value.find(wo => wo.id === id);
+    if (!workOrder) {
+      return throwError(() => new Error(`Work order with ID ${id} not found`));
+    }
+
+    return this.simulateNetwork(workOrder).pipe(
+      catchError(error => {
+        this.stateService.setError(error.message);
+        return throwError(() => error);
+      }),
+      finalize(() => {
+        this.stateService.setLoading(false);
+      })
+    );
+  }
+
+  createWorkOrder(workOrderData: Partial<WorkOrder>): Observable<WorkOrder> {
+    console.log('Creating new work order with data:', workOrderData);
+
+    const newWorkOrder: WorkOrder = {
+      id: `wo${this.workOrdersSubject.value.length + 1}`,
+      details: {
+        workOrderNumber: `WO-${new Date().getFullYear()}-${String(this.workOrdersSubject.value.length + 1).padStart(3, '0')}`,
+        internalOrderNumber: `INT-${new Date().getFullYear()}-${String(this.workOrdersSubject.value.length + 1).padStart(3, '0')}`,
+        title: workOrderData.details?.title || '',
+        description: workOrderData.details?.description || '',
+        status: workOrderData.details?.status || 'pending' as WorkOrderStatus,
+        priority: workOrderData.details?.priority || 'medium' as WorkOrderPriority,
+        createdDate: new Date().toISOString(),
+        dueDate: workOrderData.details?.dueDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        startDate: workOrderData.details?.startDate || new Date().toISOString(),
+        targetEndDate: workOrderData.details?.targetEndDate || new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        location: workOrderData.details?.location || '',
+        category: workOrderData.details?.category || '',
+        client: workOrderData.details?.client || '',
+        completionPercentage: workOrderData.details?.completionPercentage || 0,
+        receivedDate: workOrderData.details?.receivedDate || new Date().toISOString(),
+        createdBy: workOrderData.details?.createdBy || 'System'
+      },
+      estimatedCost: workOrderData.estimatedCost || 0,
+      remarks: workOrderData.remarks || [],
+      issues: workOrderData.issues || [],
+      materials: workOrderData.materials || [],
+      permits: workOrderData.permits || [],
+      tasks: workOrderData.tasks || [],
+      manpower: workOrderData.manpower || [],
+      actions: workOrderData.actions || [],
+      photos: workOrderData.photos || [],
+      forms: workOrderData.forms || [],
+      expenses: workOrderData.expenses || [],
+      invoices: workOrderData.invoices || [],
+      expenseBreakdown: workOrderData.expenseBreakdown || {
+        materials: 0,
+        labor: 0,
+        other: 0
+      }
+    };
+
+    const workOrders = [...this.workOrdersSubject.value, newWorkOrder];
+    this.workOrdersSubject.next(workOrders);
+    this.stateService.updateWorkOrders(workOrders);
+
+    return this.simulateNetwork(newWorkOrder);
+  }
+
+  updateWorkOrder(id: string, workOrderData: Partial<WorkOrder>): Observable<WorkOrder> {
+    console.log(`Updating work order ${id} with data:`, workOrderData);
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${id} not found`));
+    }
+
+    const updatedWorkOrder = {
+      ...workOrders[workOrderIndex],
+      ...workOrderData,
+      details: {
+        ...workOrders[workOrderIndex].details,
+        ...workOrderData.details
+      }
+    };
+
+    workOrders[workOrderIndex] = updatedWorkOrder;
+    this.workOrdersSubject.next(workOrders);
+    this.stateService.updateWorkOrders(workOrders);
+
+    return this.simulateNetwork(updatedWorkOrder);
+  }
+
+  deleteWorkOrder(id: string): Observable<boolean> {
+    console.log(`Deleting work order ${id}`);
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === id);
+
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${id} not found`));
+    }
+
+    workOrders.splice(workOrderIndex, 1);
+    this.workOrdersSubject.next(workOrders);
+    this.stateService.updateWorkOrders(workOrders);
+
+    return this.simulateNetwork(true);
+  }
+
+  updateWorkOrderPriority(id: string, priority: WorkOrderPriority): Observable<WorkOrder> {
+    console.log(`Updating work order ${id} priority to ${priority}`);
+    return this.getWorkOrderById(id).pipe(
+      switchMap(workOrder => {
+        return this.updateWorkOrder(id, { 
+          details: {
+            ...workOrder.details,
+            priority
+          }
+        });
+      })
+    );
+  }
+
+  // Remark Management
+  addRemarkToWorkOrder(workOrderId: string, remarkData: RemarkData): Observable<WorkOrder> {
+    console.log(`Adding remark to work order ${workOrderId}:`, remarkData);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const newRemark: WorkOrderRemark = {
+      id: `rem${Date.now()}`,
+      content: remarkData.content,
+      createdDate: new Date().toISOString(),
+      createdBy: remarkData.createdBy || 'System',
+      type: remarkData.type || 'general',
+      workOrderId: workOrderId,
+      peopleInvolved: remarkData.peopleInvolved || []
+    };
+
+    const updatedWorkOrder = { ...workOrders[workOrderIndex] };
+    updatedWorkOrder.remarks = [...(updatedWorkOrder.remarks || []), newRemark];
+
+    workOrders[workOrderIndex] = updatedWorkOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(updatedWorkOrder);
+  }
+
+  updateRemark(workOrderId: string, remarkId: string, remarkData: Partial<RemarkData>): Observable<WorkOrder> {
+    console.log(`Updating remark ${remarkId} for work order ${workOrderId}:`, remarkData);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const updatedWorkOrder = { ...workOrders[workOrderIndex] };
+
+    if (!updatedWorkOrder.remarks) {
+      return throwError(() => new Error(`No remarks found for work order ${workOrderId}`));
+    }
+
+    const remarkIndex = updatedWorkOrder.remarks.findIndex(r => r.id === remarkId);
+    if (remarkIndex === -1) {
+      return throwError(() => new Error(`Remark with ID ${remarkId} not found`));
+    }
+
+    updatedWorkOrder.remarks[remarkIndex] = {
+      ...updatedWorkOrder.remarks[remarkIndex],
+      content: remarkData.content || updatedWorkOrder.remarks[remarkIndex].content,
+      type: remarkData.type || updatedWorkOrder.remarks[remarkIndex].type,
+      peopleInvolved: remarkData.peopleInvolved || updatedWorkOrder.remarks[remarkIndex].peopleInvolved
+    };
+
+    workOrders[workOrderIndex] = updatedWorkOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(updatedWorkOrder);
+  }
+
+  deleteRemark(workOrderId: string, remarkId: string): Observable<WorkOrder> {
+    console.log(`Deleting remark ${remarkId} from work order ${workOrderId}`);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const updatedWorkOrder = { ...workOrders[workOrderIndex] };
+
+    if (!updatedWorkOrder.remarks || !Array.isArray(updatedWorkOrder.remarks)) {
+      return throwError(() => new Error(`No remarks found for work order ${workOrderId}`));
+    }
+
+    const remarkToDelete = updatedWorkOrder.remarks.find(r => r.id === remarkId);
+    if (!remarkToDelete) {
+      return throwError(() => new Error(`Remark with ID ${remarkId} not found in work order ${workOrderId}`));
+    }
+
+    updatedWorkOrder.remarks = updatedWorkOrder.remarks.filter(r => r.id !== remarkId);
+
+    workOrders[workOrderIndex] = updatedWorkOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(updatedWorkOrder);
+  }
+
+  // Task Management
+  updateWorkOrderTask(workOrderId: string, taskIndex: number, updatedTask: Task): Observable<WorkOrder> {
+    console.log(`Updating task at index ${taskIndex} in work order ${workOrderId}:`, updatedTask);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const workOrder = { ...workOrders[workOrderIndex] };
+
+    if (!workOrder.tasks || !Array.isArray(workOrder.tasks)) {
+      return throwError(() => new Error(`Tasks array not found in work order ${workOrderId}`));
+    }
+
+    if (taskIndex < 0 || taskIndex >= workOrder.tasks.length) {
+      return throwError(() => new Error('Invalid task index'));
+    }
+
+    // Update the task
+    workOrder.tasks[taskIndex] = updatedTask;
+
+    // Update the work order
+    workOrders[workOrderIndex] = workOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(workOrder);
+  }
+
+  addTaskToWorkOrder(workOrderId: string, taskData: Partial<Task>): Observable<WorkOrder> {
+    console.log(`Adding task to work order ${workOrderId}:`, taskData);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const workOrder = { ...workOrders[workOrderIndex] };
+
+    // Initialize tasks array if it doesn't exist
+    if (!workOrder.tasks) {
+      workOrder.tasks = [];
+    }
+
+    // Create new task
+    const newTask: Task = {
+      id: `task${Date.now()}`,
+      title: taskData.title || '',
+      description: taskData.description || '',
+      dueDate: taskData.dueDate || new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+      startDate: taskData.startDate || new Date().toISOString(),
+      priority: taskData.priority || 'medium',
+      status: taskData.status || 'pending',
+      completed: false,
+      workOrderId: workOrderId
+    };
+
+    // Add the new task
+    workOrder.tasks.push(newTask);
+
+    // Update the work order
+    workOrders[workOrderIndex] = workOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(workOrder);
+  }
+
+  deleteTask(workOrderId: string, taskIndex: number): Observable<WorkOrder> {
+    console.log(`Deleting task at index ${taskIndex} from work order ${workOrderId}`);
+
+    const workOrders = this.workOrdersSubject.value;
+    const workOrderIndex = workOrders.findIndex(wo => wo.id === workOrderId);
+
+    if (workOrderIndex === -1) {
+      return throwError(() => new Error(`Work order with ID ${workOrderId} not found`));
+    }
+
+    const workOrder = { ...workOrders[workOrderIndex] };
+
+    if (!workOrder.tasks || !Array.isArray(workOrder.tasks)) {
+      return throwError(() => new Error(`Tasks array not found in work order ${workOrderId}`));
+    }
+
+    if (taskIndex < 0 || taskIndex >= workOrder.tasks.length) {
+      return throwError(() => new Error('Invalid task index'));
+    }
+
+    // Remove the task
+    workOrder.tasks.splice(taskIndex, 1);
+
+    // Update the work order
+    workOrders[workOrderIndex] = workOrder;
+    this.workOrdersSubject.next(workOrders);
+
+    return this.simulateNetwork(workOrder);
+  }
+}
+
+// Define RemarkData interface for type safety
+interface RemarkData {
+  content: string;
+  createdBy?: string;
+  type?: 'general' | 'technical' | 'safety' | 'quality';
+  peopleInvolved?: string[];
+}

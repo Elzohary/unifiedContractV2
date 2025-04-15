@@ -1,0 +1,113 @@
+.stats-card {
+  display: flex;
+  align-items: center;
+  padding: 20px;
+  background-color: var(--card-background);
+  border-radius: var(--border-radius-base);
+  box-shadow: var(--shadow-card);
+  margin-bottom: 24px;
+  transition: all var(--transition-duration) ease;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+
+  &:hover {
+    box-shadow: var(--shadow-drawer);
+    transform: translateY(-2px);
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+  }
+
+  &.stats-card-primary::before {
+    background-color: var(--primary);
+  }
+
+  &.stats-card-success::before {
+    background-color: var(--success);
+  }
+
+  &.stats-card-warning::before {
+    background-color: var(--warning);
+  }
+
+  &.stats-card-error::before {
+    background-color: var(--error);
+  }
+}
+
+.stats-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  font-size: 24px;
+  color: var(--white);
+  flex-shrink: 0;
+}
+
+.stats-card-primary .stats-card-icon {
+  background-color: var(--primary);
+}
+
+.stats-card-success .stats-card-icon {
+  background-color: var(--success);
+}
+
+.stats-card-warning .stats-card-icon {
+  background-color: var(--warning);
+}
+
+.stats-card-error .stats-card-icon {
+  background-color: var(--error);
+}
+
+.stats-card-content {
+  flex: 1;
+}
+
+.stats-card-value {
+  font-size: var(--font-size-xxl);
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0 0 4px 0;
+  line-height: 1.2;
+}
+
+.stats-card-label {
+  font-size: var(--font-size-base);
+  color: var(--text-secondary);
+  margin: 0 0 8px 0;
+}
+
+.stats-card-trend {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-size-sm);
+  
+  span {
+    display: flex;
+    align-items: center;
+    
+    mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
+      margin-right: 2px;
+    }
+  }
+  
+  .trend-label {
+    margin-left: 8px;
+    color: var(--text-secondary);
+  }
+}
