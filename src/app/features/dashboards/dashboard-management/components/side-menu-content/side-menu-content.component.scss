@@ -37,7 +37,7 @@ mat-nav-list {
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
-  background-color: var(--sidebar-background);
+  background-color: var(--sidebar-background, var(--card-bg));
 
   /* Custom scrollbar styling */
   &::-webkit-scrollbar {
@@ -49,12 +49,12 @@ mat-nav-list {
   }
 
   &::-webkit-scrollbar-thumb {
-    background: var(--scrollbar-thumb, rgba(0, 0, 0, 0.2));
+    background: var(--scrollbar-thumb, var(--primary-light));
     border-radius: 6px;
   }
 
   &::-webkit-scrollbar-thumb:hover {
-    background: var(--scrollbar-thumb-hover, rgba(0, 0, 0, 0.3));
+    background: var(--scrollbar-thumb-hover, var(--primary-light));
   }
 }
 
@@ -172,7 +172,7 @@ mat-nav-list {
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    color: var(--text-tertiary, var(--neutral-variant, #8392ab));
+    color: var(--text-tertiary, var(--neutral-variant));
   }
 }
 
@@ -182,7 +182,7 @@ mat-nav-list {
   align-items: center;
   height: var(--menu-item-height, 44px);
   padding: var(--menu-item-padding, 0 16px);
-  color: var(--menu-item-color, var(--neutral-variant, #344767));
+  color: var(--menu-item-color, var(--text-secondary));
   text-decoration: none;
   transition: all 0.2s ease;
   font-size: 14.5px;
@@ -192,14 +192,14 @@ mat-nav-list {
   letter-spacing: 0.15px;
 
   &:hover {
-    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+    background-color: var(--menu-item-hover-bg, var(--primary-light));
     color: var(--menu-item-hover-color, var(--primary));
     transform: translateX(4px);
   }
 
   .mat-icon {
     margin-right: 10px;
-    color: var(--icon-default-color, var(--neutral-variant, #344767));
+    color: var(--icon-default-color, var(--text-secondary));
     transition: all 0.2s ease;
     font-size: 20px;
     height: 20px;
@@ -211,7 +211,7 @@ mat-nav-list {
 /* Active menu item */
 .activeItem {
   color: var(--menu-item-active-color, var(--primary));
-  background-color: var(--menu-item-active-bg, var(--primary-light, rgba(0, 150, 136, 0.1)));
+  background-color: var(--menu-item-active-bg, var(--primary-light));
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
@@ -230,19 +230,19 @@ mat-nav-list {
   border-radius: 8px;
 
   &:hover {
-    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
-    color: var(--menu-item-hover-color, #344767);
+    background-color: var(--menu-item-hover-bg);
+    color: var(--menu-item-hover-color, var(--text-secondary));
   }
 }
 
 .activeSubItem {
-  background-color: var(--menu-item-active-bg, var(--primary-light, rgba(0, 150, 136, 0.1))) !important;
+  background-color: var(--menu-item-active-bg, var(--primary-light)) !important;
   font-weight: 600;
   color: var(--menu-item-active-color, var(--primary));
 }
 
 .menu-header {
-  color: var(--text-tertiary, var(--neutral-variant, #8392ab));
+  color: var(--text-tertiary, var(--neutral-variant));
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 1px;
@@ -252,7 +252,7 @@ mat-nav-list {
 }
 
 .title {
-  color: var(--text-secondary, var(--neutral-variant, #344767));
+  color: var(--text-secondary);
   font-weight: 500;
 }
 
@@ -261,7 +261,7 @@ mat-nav-list {
   width: 100%;
   border: none;
   border-radius: 8px;
-  color: var(--menu-item-color, var(--neutral-variant, #344767));
+  color: var(--menu-item-color, var(--text-secondary));
   cursor: pointer;
 }
 
@@ -285,13 +285,13 @@ a {
 /* Dividers with improved visibility */
 mat-divider {
   margin: 4px 0;
-  border-top-color: var(--border-color, rgba(0, 0, 0, 0.08));
+  border-top-color: var(--border-color, var(--card-border));
   opacity: 0.8;
 }
 
 /* Active link styling */
 .active-link {
-  background-color: var(--menu-item-active-bg, var(--primary-light, rgba(0, 150, 136, 0.1))) !important;
+  background-color: var(--menu-item-active-bg, var(--primary-light)) !important;
   color: var(--menu-item-active-color, var(--primary)) !important;
   font-weight: 600;
 
@@ -323,7 +323,7 @@ mat-divider {
 
     &.active-link,
     &.mdc-list-item--activated {
-      background-color: var(--menu-item-active-bg, var(--primary-light, rgba(0, 150, 136, 0.1))) !important;
+      background-color: var(--menu-item-active-bg, var(--primary-light)) !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 
       .mdc-list-item__primary-text {
@@ -338,7 +338,7 @@ mat-divider {
     }
 
     &:hover {
-      background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+      background-color: var(--menu-item-hover-bg);
       transform: translateX(4px);
       transition: transform 0.2s ease;
     }
@@ -347,7 +347,7 @@ mat-divider {
   .mdc-list-item__primary-text {
     display: flex;
     align-items: center;
-    color: var(--menu-item-color, var(--neutral-variant, #344767));
+    color: var(--menu-item-color, var(--text-secondary));
     font-weight: 500;
     font-size: 14.5px;
   }
@@ -356,12 +356,12 @@ mat-divider {
 /* Menu panel styling */
 .mat-menu-content {
   padding: 0 !important;
-  background-color: var(--card-bg, #fff) !important;
+  background-color: var(--card-bg) !important;
 }
 
 .submenu {
   min-width: 200px;
-  background-color: var(--card-bg, #fff);
+  background-color: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -370,18 +370,18 @@ mat-divider {
     height: 40px;
     line-height: 40px;
     padding: 0 16px;
-    color: var(--menu-item-color, var(--neutral-variant, #344767));
-    background-color: var(--card-bg, #fff);
+    color: var(--menu-item-color, var(--text-secondary));
+    background-color: var(--card-bg);
     font-weight: 500;
 
     &:hover {
-      background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
-      color: var(--menu-item-hover-color, var(--neutral-variant, #344767));
+      background-color: var(--menu-item-hover-bg);
+      color: var(--menu-item-hover-color, var(--text-secondary));
     }
 
     .mat-icon {
       margin-right: 10px;
-      color: var(--icon-default-color, var(--neutral-variant, #344767));
+      color: var(--icon-default-color, var(--text-secondary));
       opacity: 0.8;
     }
   }
@@ -391,7 +391,7 @@ mat-divider {
 .badge {
   margin-left: auto;
   background-color: var(--primary);
-  color: white;
+  color: var(--text-primary);
   border-radius: 16px;
   padding: 2px 12px;
   font-size: 12px;
@@ -418,21 +418,21 @@ mat-divider {
 :host-context(.dark-theme) {
   // Side menu background
   .sidenav-content {
-    background-color: var(--gray-900, #1a2035);
-    border-right: 1px solid var(--gray-800, #1e2743);
+    background-color: var(--sidebar-background-dark, var(--card-bg));
+    border-right: 1px solid var(--border-color, var(--card-border));
   }
 
   // Menu items with better contrast
   .item, .menu-item {
-    color: var(--gray-300, #d1d5db);
+    color: var(--text-secondary);
 
     .mat-icon, .item-icon {
-      color: var(--gray-300, #d1d5db);
+      color: var(--text-secondary);
     }
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.08);
-      color: var(--white, #fff);
+      background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.08));
+      color: var(--text-primary);
 
       .mat-icon, .item-icon {
         color: var(--primary);
@@ -442,11 +442,11 @@ mat-divider {
 
   // Section header styling for dark theme
   .section-header {
-    color: var(--gray-300, #d1d5db);
+    color: var(--text-secondary);
 
     &:hover {
-      background-color: rgba(255, 255, 255, 0.05);
-      color: var(--white, #fff);
+      background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.05));
+      color: var(--text-primary);
 
       .section-icon, .expand-icon {
         color: var(--primary);
@@ -454,43 +454,28 @@ mat-divider {
     }
 
     .section-icon, .expand-icon {
-      color: var(--gray-300, #d1d5db);
-    }
-  }
-
-  // Active items with more distinction
-  .activeItem, .active-link {
-    background-color: var(--primary-light, rgba(0, 150, 136, 0.2)) !important;
-    color: var(--primary) !important;
-    border-left-color: var(--primary);
-
-    .mat-icon, .item-icon {
-      color: var(--primary) !important;
-    }
-
-    .item-label {
-      color: var(--primary) !important;
+      color: var(--text-secondary);
     }
   }
 
   // Section headers more visible
   .menu-header, .nav-section-title {
-    color: var(--gray-400, #9ca3af);
+    color: var(--text-tertiary);
   }
 
   // List items styling
   .mat-mdc-list-item {
     .mat-icon {
-      color: var(--gray-300, #d1d5db) !important;
+      color: var(--text-secondary) !important;
     }
 
     .mdc-list-item__primary-text {
-      color: var(--gray-300, #d1d5db) !important;
+      color: var(--text-secondary) !important;
     }
 
     &:hover {
       .mdc-list-item__primary-text {
-        color: var(--white, #fff) !important;
+        color: var(--text-primary) !important;
       }
 
       .mat-icon {
@@ -501,18 +486,18 @@ mat-divider {
 
   // Menu panel background
   .mat-menu-content, .submenu {
-    background-color: var(--gray-800, #1e2743) !important;
+    background-color: var(--card-bg) !important;
 
     .mat-menu-item {
-      color: var(--gray-300, #d1d5db) !important;
+      color: var(--text-secondary) !important;
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.08) !important;
-        color: var(--white, #fff) !important;
+        background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.08)) !important;
+        color: var(--text-primary) !important;
       }
 
       .mat-icon {
-        color: var(--gray-300, #d1d5db) !important;
+        color: var(--text-secondary) !important;
       }
     }
   }
@@ -520,12 +505,12 @@ mat-divider {
   // Badge styling
   .badge {
     background-color: var(--primary);
-    color: var(--white, #fff);
+    color: var(--text-primary);
   }
 
   // Dividers more visible
   mat-divider {
-    border-top-color: var(--gray-700, #374151);
+    border-top-color: var(--card-border);
   }
 
   // Custom scrollbar in dark mode
@@ -535,21 +520,21 @@ mat-divider {
     }
 
     &::-webkit-scrollbar-thumb {
-      background: var(--gray-600, #4b5563);
+      background: var(--scrollbar-thumb, var(--card-border));
 
       &:hover {
-        background: var(--gray-500, #6b7280);
+        background: var(--scrollbar-thumb-hover, var(--card-border));
       }
     }
   }
 
   // Make title text more visible
   .title {
-    color: var(--gray-300, #d1d5db);
+    color: var(--text-secondary);
   }
 
   // Icon color fix for all contexts
   .mat-mdc-list-item-icon {
-    color: var(--gray-300, #d1d5db) !important;
+    color: var(--text-secondary) !important;
   }
 }
