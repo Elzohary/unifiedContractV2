@@ -1,45 +1,64 @@
 /* Modern Side Menu Styling */
-app-side-menu-content {
+:host {
   display: block;
   height: 100%;
   overflow: hidden;
   flex: 1;
 }
 
-/* Global fix for Angular Material components */
-.mat-mdc-list-base,
-.mat-nav-list,
-mat-nav-list {
-  overflow: visible !important;
-  height: auto !important;
-  contain: none !important;
+/* Component-specific Material overrides */
+:host {
+  .mat-mdc-list-base,
+  .mat-nav-list,
+  mat-nav-list {
+    overflow: visible !important;
+    height: auto !important;
+    contain: none !important;
+  }
+
+  /* Reset scrollbar behavior for Angular Material components */
+  .mat-mdc-list-base div,
+  .mat-mdc-list-base mat-list-item,
+  .mat-nav-list div,
+  .mat-nav-list a {
+    overflow: visible !important;
+    height: auto !important;
+    contain: none !important;
+  }
+
+  /* Fix for Angular Material components to prevent scrollbars */
+  .mat-mdc-list-base,
+  .mat-nav-list,
+  .mat-list,
+  .mat-mdc-list-item,
+  .mat-mdc-list-item-interactive,
+  .mdc-list,
+  .mdc-list-item {
+    overflow: visible !important;
+    height: auto !important;
+  }
+
+  .mat-mdc-list-base {
+    --mdc-list-list-item-one-line-container-height: var(--menu-item-height, 42px);
+    --mdc-list-list-item-container-shape: 0;
+    padding: 0 !important;
+  }
+
+  /* Reset any height constraints that might cause scrollbars */
+  .mat-nav-list, .mat-list {
+    height: auto !important;
+    padding: 0 !important;
+  }
 }
 
-/* Reset scrollbar behavior for Angular Material components */
-.mat-mdc-list-base div,
-.mat-mdc-list-base mat-list-item,
-.mat-nav-list div,
-.mat-nav-list a {
-  overflow: visible !important;
-  height: auto !important;
-  contain: none !important;
-}
-
-/* Global fix for scrollbar issues */
-.no-scrollbar {
-  overflow: visible !important;
-  height: auto !important;
-}
-
-/* Only this element should have a scrollbar */
-.sidenav-content {
+/* Component-specific scrollbar styling */
+.side-menu-scrollbar {
   padding: 8px 0;
   overflow-y: auto;
   overflow-x: hidden;
   height: 100%;
   background-color: var(--sidebar-background, var(--card-bg));
 
-  /* Custom scrollbar styling */
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -56,30 +75,6 @@ mat-nav-list {
   &::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover, var(--primary-light));
   }
-}
-
-/* Fix for Angular Material components to prevent scrollbars */
-.mat-mdc-list-base,
-.mat-nav-list,
-.mat-list,
-.mat-mdc-list-item,
-.mat-mdc-list-item-interactive,
-.mdc-list,
-.mdc-list-item {
-  overflow: visible !important;
-  height: auto !important;
-}
-
-.mat-mdc-list-base {
-  --mdc-list-list-item-one-line-container-height: var(--menu-item-height, 42px);
-  --mdc-list-list-item-container-shape: 0;
-  padding: 0 !important;
-}
-
-/* Reset any height constraints that might cause scrollbars */
-.mat-nav-list, .mat-list {
-  height: auto !important;
-  padding: 0 !important;
 }
 
 /* Menu section styling */
@@ -105,7 +100,7 @@ mat-nav-list {
 
   &:hover {
     background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
-    color: var(--menu-item-hover-color);
+    color: var(--primary);
   }
 
   .section-icon {
@@ -192,9 +187,14 @@ mat-nav-list {
   letter-spacing: 0.15px;
 
   &:hover {
-    background-color: var(--menu-item-hover-bg, var(--primary-light));
-    color: var(--menu-item-hover-color, var(--primary));
-    transform: translateX(4px);
+    background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+    color: var(--primary);
+    transform: none;
+
+    .mat-icon {
+      color: var(--primary);
+      opacity: 1;
+    }
   }
 
   .mat-icon {
@@ -265,50 +265,56 @@ mat-nav-list {
   cursor: pointer;
 }
 
-/* Standard elements */
-img {
-  min-width: 3rem;
-  max-width: 4rem;
-}
+/* Component-specific standard elements */
+:host {
+  img {
+    min-width: 3rem;
+    max-width: 4rem;
+  }
 
-ul, li {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
-}
+  ul, li {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
 
-a {
-  text-decoration: none;
-  color: inherit;
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 }
 
 /* Dividers with improved visibility */
-mat-divider {
-  margin: 4px 0;
-  border-top-color: var(--border-color, var(--card-border));
-  opacity: 0.8;
+:host {
+  mat-divider {
+    margin: 4px 0;
+    border-top-color: var(--border-color, var(--card-border));
+    opacity: 0.8;
+  }
 }
 
 /* Active link styling */
-.active-link {
-  background-color: var(--menu-item-active-bg, var(--primary-light)) !important;
-  color: var(--menu-item-active-color, var(--primary)) !important;
-  font-weight: 600;
-
-  mat-icon {
+:host {
+  .active-link {
+    background-color: var(--menu-item-active-bg, var(--primary-light)) !important;
     color: var(--menu-item-active-color, var(--primary)) !important;
-    opacity: 1;
-  }
+    font-weight: 600;
 
-  .menu-item {
-    .item-icon {
+    mat-icon {
       color: var(--menu-item-active-color, var(--primary)) !important;
       opacity: 1;
     }
 
-    .item-label {
-      color: var(--menu-item-active-color, var(--primary)) !important;
-      font-weight: 600;
+    .menu-item {
+      .item-icon {
+        color: var(--menu-item-active-color, var(--primary)) !important;
+        opacity: 1;
+      }
+
+      .item-label {
+        color: var(--menu-item-active-color, var(--primary)) !important;
+        font-weight: 600;
+      }
     }
   }
 }
@@ -338,9 +344,18 @@ mat-divider {
     }
 
     &:hover {
-      background-color: var(--menu-item-hover-bg);
-      transform: translateX(4px);
-      transition: transform 0.2s ease;
+      background-color: var(--menu-item-hover-bg, rgba(0, 0, 0, 0.04));
+      transform: none;
+      transition: background-color 0.2s ease;
+
+      .mdc-list-item__primary-text {
+        color: var(--primary) !important;
+      }
+
+      .mat-icon {
+        color: var(--primary) !important;
+        opacity: 1;
+      }
     }
   }
 
@@ -354,9 +369,11 @@ mat-divider {
 }
 
 /* Menu panel styling */
-.mat-menu-content {
-  padding: 0 !important;
-  background-color: var(--card-bg) !important;
+:host {
+  .mat-menu-content {
+    padding: 0 !important;
+    background-color: var(--card-bg) !important;
+  }
 }
 
 .submenu {
@@ -402,12 +419,12 @@ mat-divider {
 
 /* Media queries */
 @media (max-width: 600px) {
-  .nav-section-title {
-    font-size: 11px;
-    padding: 8px 12px;
-  }
+  :host {
+    .nav-section-title {
+      font-size: 11px;
+      padding: 8px 12px;
+    }
 
-  :host ::ng-deep {
     .mat-mdc-list-item {
       margin: 2px 4px;
     }
@@ -417,7 +434,7 @@ mat-divider {
 /* Dark theme specific enhancements */
 :host-context(.dark-theme) {
   // Side menu background
-  .sidenav-content {
+  .side-menu-scrollbar {
     background-color: var(--sidebar-background-dark, var(--card-bg));
     border-right: 1px solid var(--border-color, var(--card-border));
   }
@@ -431,8 +448,8 @@ mat-divider {
     }
 
     &:hover {
-      background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.08));
-      color: var(--text-primary);
+      background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.05));
+      color: var(--primary);
 
       .mat-icon, .item-icon {
         color: var(--primary);
@@ -446,15 +463,11 @@ mat-divider {
 
     &:hover {
       background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.05));
-      color: var(--text-primary);
+      color: var(--primary);
 
       .section-icon, .expand-icon {
         color: var(--primary);
       }
-    }
-
-    .section-icon, .expand-icon {
-      color: var(--text-secondary);
     }
   }
 
@@ -514,7 +527,7 @@ mat-divider {
   }
 
   // Custom scrollbar in dark mode
-  .sidenav-content {
+  .side-menu-scrollbar {
     &::-webkit-scrollbar-track {
       background: transparent;
     }

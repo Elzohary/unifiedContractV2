@@ -4,9 +4,9 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
-import { SharedModule } from '../../../../shared/shared.module';
-import { StatsCardComponent } from '../../../../shared/components/stats-card/stats-card.component';
-import { UnderConstructionComponent } from '../../../../shared/components/under-construction/under-construction.component';
+import { SharedModule } from '../../../../../shared/shared.module';
+import { StatsCardComponent } from '../../../../../shared/components/stats-card/stats-card.component';
+import { UnderConstructionComponent } from '../../../../../shared/components/under-construction/under-construction.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 @Component({
