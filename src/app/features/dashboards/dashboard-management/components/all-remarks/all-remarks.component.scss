@@ -9,7 +9,6 @@
   max-width: 1280px;
   margin: 0 auto;
   min-height: calc(100vh - 64px); // Account for header height
-  background-color: var(--background);
   
   &.loading-state {
     opacity: 0.6;

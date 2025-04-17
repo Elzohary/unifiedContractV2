@@ -1,10 +1,25 @@
 /* You can add global styles to this file, and also import other style files */
 @use 'sass:map';
 @use '@angular/material' as mat;
-@use './_theme-colors' as theme;
+@use '../_theme-colors' as theme;
 
 // Include core Material styles (only once)
 @include mat.core();
+
+// Create a unified color system
+@function color($palette-name, $hue) {
+  @if $palette-name == 'primary' {
+    @return get-color-from-palette(theme.$primary-palette, $hue);
+  }
+  @else if $palette-name == 'tertiary' {
+    @return get-color-from-palette(theme.$tertiary-palette, $hue);
+  }
+  @else {
+    // Extract from primary palette for all other palettes
+    $nested-palette: map.get(theme.$primary-palette, $palette-name);
+    @return get-color-from-palette($nested-palette, $hue);
+  }
+}
 
 // Helper function to get color from palette
 @function get-color-from-palette($palette, $hue: 500) {
@@ -40,47 +55,57 @@ body {
 /* Light theme styles */
 body.light-theme {
   @include theme.high-contrast-overrides(light);
-  background-color: get-color-from-palette(theme.$primary-palette, 95);
-  color: get-color-from-palette(theme.$primary-palette, 10);
-
+  background-color: #{color('primary', 98)};
+  color: #{color('primary', 10)};
+  
   /* Theme colors for light mode */
-  --dashboard-bg: get-color-from-palette(theme.$primary-palette, 98);
-  --card-bg: get-color-from-palette(theme.$primary-palette, 99);
-  --card-header-bg: get-color-from-palette(theme.$primary-palette, 95);
-  --card-border: get-color-from-palette(theme.$primary-palette, 80);
-  --text-primary: get-color-from-palette(theme.$primary-palette, 10);
-  --text-secondary: get-color-from-palette(theme.$primary-palette, 30);
-  --icon-primary: get-color-from-palette(theme.$primary-palette, 40);
-  --icon-accent: get-color-from-palette(theme.$tertiary-palette, 40);
-  --icon-success: get-color-from-palette(theme.$primary-palette, 40);
-  --icon-warning: get-color-from-palette(theme.$tertiary-palette, 40);
-  --icon-danger: get-color-from-palette(theme.$error-palette, 40);
-  --stat-trend-up: get-color-from-palette(theme.$primary-palette, 40);
-  --stat-trend-down: get-color-from-palette(theme.$error-palette, 40);
-  --btn-primary: get-color-from-palette(theme.$primary-palette, 40);
+  --dashboard-bg: #{color('primary', 98)};
+  --card-bg: #{color('neutral', 50)};
+  --card-header-bg: #{color('primary', 95)};
+  --card-border: #{color('primary', 80)};
+  --text-primary: #{color('primary', 10)};
+  --text-secondary: #{color('primary', 30)};
+  --icon-primary: #{color('primary', 40)};
+  --icon-accent: #{color('tertiary', 40)};
+  --icon-success: #{color('primary', 40)};
+  --icon-warning: #{color('tertiary', 40)};
+  --icon-danger: #{color('error', 40)};
+  --stat-trend-up: #{color('primary', 40)};
+  --stat-trend-down: #{color('error', 40)};
+  --btn-primary: #{color('primary', 40)};
+  --btn-primary-hover: #{color('primary', 50)};
+  --btn-primary-active: #{color('primary', 60)};
+  --primary: #{color('primary', 40)};
+  --primary-light: rgba(0, 106, 96, 0.1);
+  --neutral-variant: #{color('neutral-variant', 60)};
 }
 
 /* Dark theme styles */
 body.dark-theme {
-  @include theme.high-contrast-overrides(dark);
-  background-color: get-color-from-palette(theme.$primary-palette, 10);
-  color: get-color-from-palette(theme.$primary-palette, 90);
+  /* @include theme.high-contrast-overrides(dark); */
+  background-color: #{color('neutral', 10)};
+  color: #{color('neutral', 98)};
 
   /* Theme colors for dark mode */
-  --dashboard-bg: get-color-from-palette(theme.$primary-palette, 20);
-  --card-bg: get-color-from-palette(theme.$primary-palette, 20);
-  --card-header-bg: get-color-from-palette(theme.$primary-palette, 10);
-  --card-border: get-color-from-palette(theme.$primary-palette, 30);
-  --text-primary: get-color-from-palette(theme.$primary-palette, 90);
-  --text-secondary: get-color-from-palette(theme.$primary-palette, 70);
-  --icon-primary: get-color-from-palette(theme.$primary-palette, 80);
-  --icon-accent: get-color-from-palette(theme.$tertiary-palette, 80);
-  --icon-success: get-color-from-palette(theme.$primary-palette, 80);
-  --icon-warning: get-color-from-palette(theme.$tertiary-palette, 80);
-  --icon-danger: get-color-from-palette(theme.$error-palette, 80);
-  --stat-trend-up: get-color-from-palette(theme.$primary-palette, 80);
-  --stat-trend-down: get-color-from-palette(theme.$error-palette, 80);
-  --btn-primary: get-color-from-palette(theme.$primary-palette, 80);
+  --dashboard-bg: #{color('primary', 20)};
+  --card-bg: #{color('neutral', 20)};
+  --card-header-bg: #{color('primary', 10)};
+  --card-border: #{color('primary', 30)};
+  --text-primary: #{color('primary', 90)};
+  --text-secondary: #{color('primary', 70)};
+  --icon-primary: #{color('primary', 80)};
+  --icon-accent: #{color('tertiary', 80)};
+  --icon-success: #{color('primary', 80)};
+  --icon-warning: #{color('tertiary', 80)};
+  --icon-danger: #{color('error', 80)};
+  --stat-trend-up: #{color('primary', 80)};
+  --stat-trend-down: #{color('error', 80)};
+  --btn-primary: #{color('primary', 80)};
+  --btn-primary-hover: #{color('primary', 70)};
+  --btn-primary-active: #{color('primary', 60)};
+  --primary: #{color('primary', 80)};
+  --primary-light: rgba(103, 217, 201, 0.2);
+  --neutral-variant: #{color('neutral-variant', 60)};
 }
 
 /* Fix for Angular Material overlay issues */
@@ -140,4 +165,13 @@ body.dark-theme {
 /* Global Material overrides */
 .mat-mdc-raised-button.mat-primary {
   background-color: var(--btn-primary) !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.mat-mdc-raised-button.mat-primary:hover {
+  background-color: var(--btn-primary-hover) !important;
+}
+
+.mat-mdc-raised-button.mat-primary:active {
+  background-color: var(--btn-primary-active) !important;
 }
