@@ -2,13 +2,13 @@
   <mat-nav-list class="no-scrollbar">
     <div *ngFor="let section of projectMenu" class="no-scrollbar">
       <div class="menu-section no-scrollbar">
-        <h3 class="section-header" (click)="toggleSection(section.label)">
+        <button class="section-header" (click)="toggleSection(section.label)">
           <mat-icon class="section-icon">{{section.icon}}</mat-icon>
           <span class="section-label">{{section.label}}</span>
           <mat-icon class="expand-icon">
             {{isSectionCollapsed(section.label) ? 'expand_more' : 'expand_less'}}
           </mat-icon>
-        </h3>
+        </button>
 
         <div [hidden]="isSectionCollapsed(section.label)" class="menu-items no-scrollbar">
           <a mat-list-item *ngFor="let item of section.subItems"

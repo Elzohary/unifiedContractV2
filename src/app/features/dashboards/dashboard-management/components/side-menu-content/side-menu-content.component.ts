@@ -29,7 +29,7 @@ import { projectMenuItems } from '../../models/menu-items';
 })
 export class SideMenuContentComponent {
   projectMenu = projectMenuItems;
-  collapsedSections: { [key: string]: boolean } = {};
+  collapsedSections: Record<string, boolean> = {};
 
   toggleSection(sectionLabel: string): void {
     this.collapsedSections[sectionLabel] = !this.collapsedSections[sectionLabel];

@@ -460,6 +460,9 @@
   // Section header styling for dark theme
   .section-header {
     color: var(--text-secondary);
+    border: none;
+    outline: none !important;
+    background-color: transparent;
 
     &:hover {
       background-color: var(--menu-item-hover-bg, rgba(255, 255, 255, 0.05));
