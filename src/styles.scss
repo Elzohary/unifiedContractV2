@@ -54,15 +54,15 @@ body {
 
 /* Light theme styles */
 body.light-theme {
-  @include theme.high-contrast-overrides(light);
-  background-color: #{color('primary', 98)};
+  /* @include theme.high-contrast-overrides(light); */
+  background-color: #{color('neutral', 99)};
   color: #{color('primary', 10)};
 
   /* Theme colors for light mode */
   --dashboard-bg: #{color('primary', 98)};
-  --card-bg: #{color('neutral', 50)};
+  --card-bg: #{color('neutral', 98)};
   --card-header-bg: #{color('primary', 95)};
-  --card-border: #{color('primary', 80)};
+  --card-border: #{color('primary', 35)};
   --text-primary: #{color('primary', 10)};
   --text-secondary: #{color('primary', 30)};
   --icon-primary: #{color('primary', 40)};
@@ -73,11 +73,16 @@ body.light-theme {
   --stat-trend-up: #{color('primary', 40)};
   --stat-trend-down: #{color('error', 40)};
   --btn-primary: #{color('primary', 40)};
-  --btn-primary-hover: #{color('primary', 50)};
+  --btn-primary-hover: #{color('primary', 10)};
   --btn-primary-active: #{color('primary', 60)};
   --primary: #{color('primary', 40)};
   --primary-light: rgba(0, 106, 96, 0.1);
   --neutral-variant: #{color('neutral-variant', 60)};
+
+  /* .mat-mdc-raised-button.mat-primary {
+    background-color: var(--btn-primary) !important;
+    border-radius: var(--border-radius-md) !important;
+  } */
 }
 
 /* Dark theme styles */
@@ -91,6 +96,7 @@ body.dark-theme {
   --card-bg: #{color('neutral', 17)};
   --card-header-bg: #{color('neutral', 12)};
   --card-border: #{color('primary', 20)};
+  --card-shadow: rgba(0, 0, 0, 0.2);
   --text-primary: #{color('primary', 90)};
   --text-secondary: #{color('primary', 70)};
   --icon-primary: #{color('primary', 80)};
@@ -109,9 +115,9 @@ body.dark-theme {
 }
 
 /* Fix for Angular Material overlay issues */
-.cdk-overlay-container {
+/* .cdk-overlay-container {
   z-index: 1050;
-}
+} */
 
 /* Border Radius Utility Classes */
 .rounded-none { border-radius: 0; }
@@ -163,15 +169,12 @@ body.dark-theme {
 .align-items-end { align-items: flex-end; }
 
 /* Global Material overrides */
-.mat-mdc-raised-button.mat-primary {
-  background-color: var(--btn-primary) !important;
-  transition: background-color 0.3s ease !important;
-}
 
-.mat-mdc-raised-button.mat-primary:hover {
+
+/* .mat-mdc-raised-button.mat-primary:hover {
   background-color: var(--btn-primary-hover) !important;
 }
 
 .mat-mdc-raised-button.mat-primary:active {
   background-color: var(--btn-primary-active) !important;
-}
+} */

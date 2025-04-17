@@ -33,6 +33,7 @@ import { RemarkDialogComponent } from '../remark-dialog/remark-dialog.component'
     MatPaginatorModule,
     MatInputModule,
     MatFormFieldModule,
+    MatInputModule,
     MatButtonModule,
     MatIconModule,
     MatTooltipModule,

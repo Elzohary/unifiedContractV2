@@ -22,7 +22,6 @@
   align-items: center;
   margin-bottom: 24px;
   padding: 16px;
-  background: var(--card-bg);
   border-radius: var(--border-radius-md);
   box-shadow: var(--card-shadow);
 
@@ -46,7 +45,6 @@
 }
 
 .filters-container {
-  background: var(--card-bg);
   padding: 16px;
   border-radius: var(--border-radius-m);
   box-shadow: var(--card-shadow);
@@ -64,15 +62,11 @@
   }
 
   .filter-form-field{
-    background: red;
     border-radius: var(--border-radius-md);
-    padding: 10px;
   }
 
   .filter-form-field-input {
-    background: green;
     border-radius: var(--border-radius-md);
-    padding: 10px;
   }
 }
 
@@ -271,114 +265,13 @@
 // Pagination styles
 mat-paginator {
   background: var(--card-bg);
-  border-radius: var(--card-border-radius);
+  border-radius: var(--border-radius-md);
   box-shadow: var(--card-shadow);
   margin-top: 24px;
 }
 
 // Custom styling for dark theme
-:host-context(.dark-theme) {
-  .all-remarks-container {
-    background-color: var(--gray-1);
-  }
 
-  .page-header, .filters-container {
-    background-color: var(--gray-2);
-    box-shadow: var(--shadow-base);
-
-    h1 {
-      color: var(--gray-9);
-    }
-  }
-
-  .remarks-list .remark-card {
-    background-color: var(--gray-2);
-    border-color: var(--gray-4);
-    box-shadow: var(--shadow-card);
-  }
-
-  .remark-type {
-    &.type-general, &.type-client, &.type-internal {
-      background-color: rgba(24, 144, 255, 0.3);
-      color: var(--primary-hover);
-    }
-
-    &.type-technical {
-      background-color: rgba(82, 196, 26, 0.3);
-      color: var(--success-hover);
-    }
-
-    &.type-safety {
-      background-color: rgba(255, 77, 79, 0.3);
-      color: var(--error-hover);
-    }
-
-    &.type-quality, &.type-feedback {
-      background-color: rgba(250, 173, 20, 0.3);
-      color: var(--warning-hover);
-    }
-  }
-
-  mat-paginator {
-    background-color: var(--gray-2);
-  }
-
-  .remark-content {
-    color: var(--gray-9);
-  }
-
-  .remark-footer {
-    color: var(--gray-7);
-    border-top-color: var(--gray-4);
-
-    .created-by, .created-date {
-      mat-icon {
-        color: var(--gray-7);
-      }
-    }
-
-    .work-order a {
-      color: var(--primary-hover);
-    }
-  }
-
-  .remark-actions button {
-    color: var(--gray-7);
-
-    &:hover {
-      color: var(--primary-hover);
-      background-color: rgba(24, 144, 255, 0.15);
-    }
-  }
-
-  .filter-form {
-    mat-form-field {
-      .mat-form-field-label {
-        color: var(--gray-7) !important;
-      }
-
-      .mat-input-element, .mat-select-value {
-        color: var(--gray-9) !important;
-      }
-    }
-  }
-
-  .no-data-container, .error-container, .loading-container {
-    background-color: var(--gray-2);
-
-    p {
-      color: var(--gray-7);
-    }
-
-    mat-icon {
-      color: var(--gray-7);
-    }
-  }
-
-  .error-container mat-icon {
-    color: var(--error-hover);
-  }
-}
 
 // Responsive adjustments
 @media (max-width: 768px) {
@@ -428,119 +321,3 @@ mat-paginator {
   }
 }
 
-:host ::ng-deep {
-  // Material Design improvements for form fields
-  .mat-mdc-form-field {
-    .mat-mdc-text-field-wrapper {
-      background-color: var(--form-bg);
-    }
-
-    .mat-mdc-form-field-flex {
-      color: var(--form-input-text);
-    }
-
-    .mat-mdc-select-value {
-      color: var(--form-input-text);
-    }
-
-    .mat-mdc-select-arrow {
-      color: var(--form-label);
-    }
-
-    .mat-mdc-form-field-label {
-      color: var(--form-label);
-    }
-
-    .mat-mdc-input-element {
-      color: var(--form-input-text);
-    }
-
-    .mat-mdc-form-field-underline {
-      background-color: var(--form-input-border);
-    }
-  }
-
-  // Menu and dialog improvements
-  .mat-mdc-menu-panel {
-    background-color: var(--card-bg);
-  }
-
-  .mat-mdc-menu-item {
-    color: var(--card-text);
-
-    &:hover {
-      background-color: var(--menu-item-hover-bg);
-    }
-
-    .mat-icon {
-      color: var(--icon-default-color);
-    }
-  }
-
-  .mat-mdc-dialog-container {
-    background-color: var(--card-bg);
-    color: var(--card-text);
-
-    .mat-mdc-dialog-title {
-      color: var(--card-text);
-    }
-
-    .mat-mdc-dialog-content {
-      color: var(--card-text);
-    }
-  }
-
-  /* Material button styling */
-  .mat-mdc-raised-button.mat-primary {
-    background-color: var(--primary);
-    color: white;
-    font-weight: 500;
-  }
-
-  .mat-mdc-button.mat-primary {
-    color: var(--primary);
-  }
-
-  /* Action buttons with improved hover states */
-  .remark-actions button {
-    color: var(--text-secondary);
-    border-radius: 50%;
-
-    &:hover {
-      color: var(--primary);
-      background-color: rgba(24, 144, 255, 0.1);
-    }
-  }
-
-  /* Paginator styling */
-  .mat-mdc-paginator {
-    color: var(--text-secondary);
-
-    .mat-mdc-paginator-range-label {
-      color: var(--text-secondary);
-    }
-
-    .mat-mdc-paginator-page-size-label {
-      color: var(--text-secondary);
-    }
-
-    .mat-mdc-paginator-page-size-select {
-      .mat-mdc-select-value {
-        color: var(--text-primary);
-      }
-    }
-
-    .mat-mdc-icon-button {
-      color: var(--text-secondary);
-
-      &.mat-mdc-paginator-navigation-first,
-      &.mat-mdc-paginator-navigation-previous,
-      &.mat-mdc-paginator-navigation-next,
-      &.mat-mdc-paginator-navigation-last {
-        &:not([disabled]) {
-          color: var(--text-primary);
-        }
-      }
-    }
-  }
-}

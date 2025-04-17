@@ -14,13 +14,13 @@
   <!-- Filters -->
   <div class="filters-container">
     <form [formGroup]="filterForm" class="filter-form">
-      <mat-form-field appearance="outline" class="filter-form-field">
+      <mat-form-field  class="filter-form-field">
         <mat-label>Search</mat-label>
         <input class="filter-form-field-input" matInput formControlName="search" placeholder="Search remarks...">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field >
         <mat-label>Type</mat-label>
         <mat-select formControlName="type">
           <mat-option value="">All Types</mat-option>
@@ -34,7 +34,7 @@
         </mat-select>
       </mat-form-field>
 
-      <mat-form-field appearance="outline">
+      <mat-form-field>
         <mat-label>Sort By</mat-label>
         <mat-select formControlName="sortBy">
           <mat-option value="createdDate">Date Created</mat-option>
