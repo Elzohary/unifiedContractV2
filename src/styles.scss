@@ -57,7 +57,7 @@ body.light-theme {
   @include theme.high-contrast-overrides(light);
   background-color: #{color('primary', 98)};
   color: #{color('primary', 10)};
-  
+
   /* Theme colors for light mode */
   --dashboard-bg: #{color('primary', 98)};
   --card-bg: #{color('neutral', 50)};
@@ -88,9 +88,9 @@ body.dark-theme {
 
   /* Theme colors for dark mode */
   --dashboard-bg: #{color('primary', 20)};
-  --card-bg: #{color('neutral', 20)};
-  --card-header-bg: #{color('primary', 10)};
-  --card-border: #{color('primary', 30)};
+  --card-bg: #{color('neutral', 17)};
+  --card-header-bg: #{color('neutral', 12)};
+  --card-border: #{color('primary', 20)};
   --text-primary: #{color('primary', 90)};
   --text-secondary: #{color('primary', 70)};
   --icon-primary: #{color('primary', 80)};

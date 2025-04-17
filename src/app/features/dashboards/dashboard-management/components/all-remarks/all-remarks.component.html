@@ -14,9 +14,9 @@
   <!-- Filters -->
   <div class="filters-container">
     <form [formGroup]="filterForm" class="filter-form">
-      <mat-form-field appearance="outline">
+      <mat-form-field appearance="outline" class="filter-form-field">
         <mat-label>Search</mat-label>
-        <input matInput formControlName="search" placeholder="Search remarks...">
+        <input class="filter-form-field-input" matInput formControlName="search" placeholder="Search remarks...">
         <mat-icon matSuffix>search</mat-icon>
       </mat-form-field>
 
@@ -121,4 +121,4 @@
       aria-label="Select page of remarks">
     </mat-paginator>
   </div>
-</div> 
+</div>
