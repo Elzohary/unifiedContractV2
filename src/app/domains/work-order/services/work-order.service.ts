@@ -334,6 +334,10 @@ export class WorkOrderService {
     private activityLogService: ActivityLogService
   ) {
     this.loadStatuses();
+    // Ensure the subject is initialized with the mock data
+    if (this.mockWorkOrders && this.mockWorkOrders.length > 0) {
+      this.workOrdersSubject.next(this.mockWorkOrders);
+    }
   }
 
   private loadStatuses(): void {
@@ -411,8 +415,11 @@ export class WorkOrderService {
     this.stateService.setLoading(true);
     this.stateService.setError(null);
 
+    // Make sure we return a copy of the data to avoid reference issues
+    const workOrders = [...this.workOrdersSubject.value];
+    
     // For development, use mock data
-    return this.simulateNetwork(this.workOrdersSubject.value).pipe(
+    return this.simulateNetwork(workOrders).pipe(
       tap(workOrders => {
         this.stateService.updateWorkOrders(workOrders);
       }),

@@ -12,6 +12,8 @@ import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { AddUserDialogComponent } from './add-user-dialog.component';
 
 @Component({
   selector: 'app-user-list',
@@ -26,7 +28,9 @@ import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
     MatTableModule,
     MatButtonModule,
     MatChipsModule,
-    MatPaginatorModule
+    MatPaginatorModule,
+    MatDialogModule,
+    AddUserDialogComponent
   ],
   templateUrl: './user-list.component.html',
   styleUrls: ['./user-list.component.scss']
@@ -41,7 +45,7 @@ export class UserListComponent implements OnInit {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   dataSource!: MatTableDataSource<User>;
 
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService, private dialog: MatDialog) {}
 
   ngOnInit(): void {
     this.userService.getUsers().subscribe(users => {
@@ -75,8 +79,20 @@ export class UserListComponent implements OnInit {
     alert(`Delete user: ${user.name}`);
   }
 
-  addUser(): void {
-    // TODO: Implement add user logic (navigate or open dialog)
-    alert('Add new user');
+  openAddUserDialog(): void {
+    const dialogRef = this.dialog.open(AddUserDialogComponent, {
+      width: '400px',
+      data: {}
+    });
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Assign a new ID (mock logic, replace with real backend logic as needed)
+        const newId = this.users.length > 0 ? Math.max(...this.users.map(u => u.id)) + 1 : 1;
+        const newUser = { ...result, id: newId };
+        this.users = [newUser, ...this.users];
+        this.dataSource.data = this.users;
+        this.applyFilter();
+      }
+    });
   }
 }

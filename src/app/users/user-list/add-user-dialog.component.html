@@ -1,0 +1,30 @@
+<h2 mat-dialog-title>Add New User</h2>
+<form [formGroup]="userForm" (ngSubmit)="onSubmit()" mat-dialog-content>
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Name</mat-label>
+    <input matInput formControlName="name" required>
+    <mat-error *ngIf="userForm.get('name')?.hasError('required')">Name is required</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Email</mat-label>
+    <input matInput formControlName="email" required>
+    <mat-error *ngIf="userForm.get('email')?.hasError('required')">Email is required</mat-error>
+    <mat-error *ngIf="userForm.get('email')?.hasError('email')">Invalid email</mat-error>
+  </mat-form-field>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>Role</mat-label>
+    <mat-select formControlName="role" required>
+      <mat-option value="Admin">Admin</mat-option>
+      <mat-option value="User">User</mat-option>
+      <mat-option value="Manager">Manager</mat-option>
+    </mat-select>
+    <mat-error *ngIf="userForm.get('role')?.hasError('required')">Role is required</mat-error>
+  </mat-form-field>
+
+  <div mat-dialog-actions align="end">
+    <button mat-button type="button" (click)="onCancel()">Cancel</button>
+    <button mat-flat-button color="primary" type="submit" [disabled]="userForm.invalid">Add</button>
+  </div>
+</form>

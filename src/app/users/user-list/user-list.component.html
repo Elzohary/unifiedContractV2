@@ -11,6 +11,8 @@
   </mat-form-field>
 </div>
 
+
+
 <div class="user-table-container">
   <table mat-table [dataSource]="(filteredUsers$ | async) || []" class="mat-elevation-z2">
     <!-- Avatar Column -->
@@ -58,8 +60,13 @@
     <mat-icon>group_off</mat-icon>
     <p>No users found.</p>
   </div>
-</div>
 
-<button mat-fab color="accent" class="add-user-fab" (click)="addUser()">
+<button mat-fab color="accent" class="add-user-fab" (click)="openAddUserDialog()">
   <mat-icon>person_add</mat-icon>
 </button>
+
+
+</div>
+
+
+
