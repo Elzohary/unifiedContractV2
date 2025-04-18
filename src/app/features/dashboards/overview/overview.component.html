@@ -1,11 +1,11 @@
 <div class="dashboard-container">
   <!-- Page Header -->
-  <div class="dashboard-header mb-4">
-    <h1>Dashboard Overview</h1>
+  <div class="dashboard-header d-flex justify-content-between align-items-center mb-4">
+    <h1 class="dashboard-title">Dashboard Overview</h1>
     <div class="header-actions">
-      <button mat-raised-button color="primary">
-        <mat-icon>add</mat-icon>
-        New Work Order
+      <button mat-raised-button class="action-button">
+        <mat-icon>refresh</mat-icon>
+        <span class="ml-1">Refresh</span>
       </button>
     </div>
   </div>
@@ -29,97 +29,114 @@
     <!-- Left Column -->
     <div class="main-grid-left">
       <!-- Charts Section -->
-      <mat-card class="dashboard-card mb-4">
-        <mat-card-header>
-          <mat-card-title>Work Order Analytics</mat-card-title>
+      <div class="dashboard-card mb-4 rounded-lg">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="card-title">Work Order Analytics</h2>
           <div class="card-header-actions">
-            <button mat-button color="primary">
+            <button mat-button class="filter-button">
               <mat-icon>calendar_today</mat-icon>
-              Filter
+              <span class="ml-1">Filter</span>
             </button>
           </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="chart-placeholder">
+        </div>
+        <div class="card-body">
+          <div class="chart-container">
             <app-under-construction 
               title="Chart Coming Soon" 
               message="The analytics chart is currently under development and will be available soon.">
             </app-under-construction>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
 
       <!-- Table Section -->
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>Recent Work Orders</mat-card-title>
+      <div class="dashboard-card rounded-lg">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h2 class="card-title">Recent Work Orders</h2>
           <div class="card-header-actions">
-            <button mat-button color="primary">View All</button>
+            <button mat-button class="view-all-button">
+              <span>View All</span>
+              <mat-icon class="ml-1">arrow_forward</mat-icon>
+            </button>
           </div>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="work-orders-table-placeholder">
+        </div>
+        <div class="card-body">
+          <div class="work-orders-table-container">
             <app-under-construction 
               title="Work Orders Table Coming Soon" 
               message="The work orders table is currently under development and will be available soon.">
             </app-under-construction>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     </div>
 
     <!-- Right Column -->
     <div class="main-grid-right">
       <!-- Recent Activity -->
-      <mat-card class="activity-card right-card">
-        <div class="card-title">
-          <h3>Recent Activity</h3>
+      <div class="dashboard-card activity-card mb-4 rounded-lg">
+        <div class="card-header">
+          <h2 class="card-title">Recent Activity</h2>
         </div>
-        <div class="activity-list">
-          <div *ngIf="recentActivities.length === 0" class="no-activities">
-            <p>No recent activities in the last 12 hours</p>
-          </div>
-          <div *ngFor="let activity of recentActivities" class="activity-item">
-            <div class="activity-icon" [ngClass]="getIconColorClass(activity.action)">
-              <mat-icon>{{ getActivityIcon(activity.action) }}</mat-icon>
+        <div class="card-body">
+          <div class="activity-list">
+            <div *ngIf="recentActivities.length === 0" class="no-activities">
+              <div class="empty-state d-flex flex-column align-items-center justify-content-center p-3">
+                <mat-icon class="empty-icon">history</mat-icon>
+                <p class="empty-text mt-2">No recent activities in the last 12 hours</p>
+              </div>
             </div>
-            <div class="activity-content">
-              <div class="activity-title">{{ activity.description }}</div>
-              <div class="activity-meta">
-                <span class="activity-user">{{ activity.userName }}</span> • 
-                <span class="activity-time">{{ activity.timestamp | date:'short' }}</span>
+            <div *ngFor="let activity of recentActivities" class="activity-item d-flex align-items-start">
+              <div class="activity-icon-container" [ngClass]="getIconColorClass(activity.action)">
+                <mat-icon class="activity-icon">{{ getActivityIcon(activity.action) }}</mat-icon>
+              </div>
+              <div class="activity-content">
+                <div class="activity-title">{{ activity.description }}</div>
+                <div class="activity-meta">
+                  <span class="activity-user">{{ activity.userName }}</span>
+                  <span class="activity-separator">•</span>
+                  <span class="activity-time">{{ activity.timestamp | date:'short' }}</span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </mat-card>
+      </div>
 
       <!-- Quick Actions -->
-      <mat-card class="dashboard-card">
-        <mat-card-header>
-          <mat-card-title>Quick Actions</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
+      <div class="dashboard-card quick-actions-card rounded-lg">
+        <div class="card-header">
+          <h2 class="card-title">Quick Actions</h2>
+        </div>
+        <div class="card-body">
           <div class="quick-actions-grid">
-            <button mat-raised-button color="primary" class="quick-action-button">
-              <mat-icon>description</mat-icon>
-              <span>Create Work Order</span>
+            <button class="quick-action-button">
+              <div class="button-content d-flex flex-column align-items-center">
+                <mat-icon class="action-icon">description</mat-icon>
+                <span class="action-text mt-2">Create Work Order</span>
+              </div>
             </button>
-            <button mat-raised-button color="primary" class="quick-action-button">
-              <mat-icon>search</mat-icon>
-              <span>Search</span>
+            <button class="quick-action-button">
+              <div class="button-content d-flex flex-column align-items-center">
+                <mat-icon class="action-icon">search</mat-icon>
+                <span class="action-text mt-2">Search</span>
+              </div>
             </button>
-            <button mat-raised-button color="primary" class="quick-action-button">
-              <mat-icon>assignment</mat-icon>
-              <span>Reports</span>
+            <button class="quick-action-button">
+              <div class="button-content d-flex flex-column align-items-center">
+                <mat-icon class="action-icon">assignment</mat-icon>
+                <span class="action-text mt-2">Reports</span>
+              </div>
             </button>
-            <button mat-raised-button color="primary" class="quick-action-button">
-              <mat-icon>people</mat-icon>
-              <span>Users</span>
+            <button class="quick-action-button">
+              <div class="button-content d-flex flex-column align-items-center">
+                <mat-icon class="action-icon">people</mat-icon>
+                <span class="action-text mt-2">Users</span>
+              </div>
             </button>
           </div>
-        </mat-card-content>
-      </mat-card>
+        </div>
+      </div>
     </div>
   </div>
 </div>

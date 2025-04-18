@@ -1,139 +1,141 @@
-<div class="data-table-card mat-elevation-z2">
-  <!-- Title if provided and enabled -->
-  <h2 *ngIf="title && showTitle" class="table-title mat-headline-6">{{ title }}</h2>
+<mat-card class="data-table-card">
+  <!-- Card Header: Title and Controls -->
+  <mat-card-header class="card-header">
+    <mat-card-title *ngIf="title" class="card-title">{{ title }}</mat-card-title>
+    <div class="controls">
+      <!-- Search Input -->
+      <mat-form-field *ngIf="showSearch" class="search-input" subscriptSizing="dynamic">
+        <mat-label>{{ searchPlaceholder }}</mat-label>
+        <input matInput (input)="handleSearch($event)" #searchInput>
+        <mat-icon matSuffix>search</mat-icon>
+      </mat-form-field>
+    </div>
+  </mat-card-header>
 
-  <!-- Filter tabs -->
-  <div *ngIf="showFilters && filters && filters.length > 0" class="filters-tabs">
-    <mat-tab-group
-      (selectedTabChange)="onFilterTabChange($event)"
-      [selectedIndex]="selectedFilterIndex"
-      aria-label="Filter options">
-      <mat-tab *ngFor="let filter of filters" [label]="filter.label"></mat-tab>
-    </mat-tab-group>
-    <mat-divider></mat-divider>
-  </div>
+  <mat-divider></mat-divider>
 
-  <!-- Search input -->
-  <div *ngIf="showSearch" class="search-container">
-    <mat-form-field appearance="outline">
-      <mat-label>Filter</mat-label>
-      <input matInput (keyup)="applyFilter($event)" placeholder="Search..." aria-label="Search input">
-      <mat-icon matSuffix>search</mat-icon>
-    </mat-form-field>
-  </div>
+  <!-- Card Content: Table or State Display -->
+  <mat-card-content class="card-content">
 
-  <!-- Loading state -->
-  <div *ngIf="loading && showLoadingState" class="state-container loading-container">
-    <mat-spinner [diameter]="loadingState.spinnerDiameter" color="primary"></mat-spinner>
-    <p>{{ loadingState.message }}</p>
-  </div>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="state-container loading-container">
+      <mat-progress-spinner mode="indeterminate" [diameter]="50" color="primary"></mat-progress-spinner>
+      <p class="mat-body-1 state-message">Loading data...</p>
+    </div>
 
-  <!-- Error state -->
-  <div *ngIf="error && showErrorState && !loading" class="state-container error-container">
-    <mat-icon class="error-icon mat-warn" aria-hidden="true">{{ errorState.icon }}</mat-icon>
-    <h2>{{ errorState.title }}</h2>
-    <p>{{ errorState.message }}</p>
-    <button
-      *ngIf="errorState.buttonLabel"
-      mat-raised-button
-      color="warn"
-      (click)="onStateAction('error', errorState.buttonAction)">
-      {{ errorState.buttonLabel }}
-    </button>
-  </div>
+    <!-- Error State -->
+    <div *ngIf="!loading && error" class="state-container error-container">
+      <mat-icon class="state-icon" color="warn">error_outline</mat-icon>
+      <h3 class="mat-h3 state-title">Error Loading Data</h3>
+      <p class="mat-body-1 state-message">{{ error }}</p>
+      <button mat-stroked-button color="warn" (click)="handleStateButtonClick('retry')">Retry</button>
+    </div>
 
-  <!-- Empty state -->
-  <div *ngIf="!loading && !error && showEmptyState && dataSource.data.length === 0" class="state-container empty-container">
-    <mat-icon class="empty-icon" aria-hidden="true">{{ emptyState.icon }}</mat-icon>
-    <h2>{{ emptyState.title }}</h2>
-    <p>{{ emptyState.message }}</p>
-    <button
-      *ngIf="emptyState.buttonLabel"
-      mat-raised-button
-      color="primary"
-      (click)="onStateAction('empty', emptyState.buttonAction ?? '')">
-      {{ emptyState.buttonLabel }}
-    </button>
-  </div>
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && isEmpty()" class="state-container empty-container">
+      <mat-icon class="state-icon">{{ emptyConfig.icon || 'inbox' }}</mat-icon>
+      <h3 class="mat-h3 state-title">{{ emptyConfig.message }}</h3>
+      <button *ngIf="emptyConfig.showCreateButton" mat-raised-button color="primary" (click)="handleStateButtonClick(emptyConfig.createButtonAction || 'create')">
+        <mat-icon *ngIf="emptyConfig.icon === 'add'">add</mat-icon>
+        <span>{{ emptyConfig.createButtonText }}</span>
+      </button>
+    </div>
 
-  <!-- Data table -->
-  <div
-    class="table-container"
-    *ngIf="!loading && !error && dataSource.data.length > 0">
-    <table
-      mat-table
-      [dataSource]="dataSource"
-      matSort
-      class="data-table mat-elevation-z0"
-      [class.with-hover]="hoverEffect">
+    <!-- Table Container -->
+    <div class="table-container" *ngIf="showTable()">
+      <table mat-table [dataSource]="tableDataSource" matSort (matSortChange)="handleSortChange($event)" class="data-table">
 
-      <!-- Dynamic columns based on configuration -->
-      <ng-container *ngFor="let column of columns" [matColumnDef]="column.property">
-        <th
-          mat-header-cell
-          *matHeaderCellDef
-          [mat-sort-header]="column.sortable ? column.property : ''"
-          [style.width]="column.width"
-          [ngClass]="column.class">
-          {{ column.header }}
-        </th>
-        <td
-          mat-cell
-          *matCellDef="let item"
-          [ngClass]="column.class"
-          [ngStyle]="column.style">
-
-          <!-- Use custom template if specified -->
-          <ng-container *ngIf="column.customTemplate && customTemplates">
-            <ng-container *ngTemplateOutlet="customTemplates | getTemplateByName:column.customTemplate; context: {$implicit: item, column: column}"></ng-container>
-          </ng-container>
-
-          <!-- Default display -->
-          <ng-container *ngIf="!column.customTemplate">
-            {{ getDisplayValue(column, item) }}
-          </ng-container>
-        </td>
-      </ng-container>
-
-      <!-- Actions column -->
-      <ng-container *ngIf="actions && actions.length > 0" matColumnDef="actions">
-        <th mat-header-cell *matHeaderCellDef class="actions-cell">Actions</th>
-        <td mat-cell *matCellDef="let row" class="actions-cell">
-          <button mat-icon-button [matMenuTriggerFor]="actionsMenu" aria-label="Row actions">
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <mat-menu #actionsMenu="matMenu">
-            <ng-container *ngFor="let action of actions">
-              <button
-                mat-menu-item
-                *ngIf="!action.showFn || action.showFn(row)"
-                [disabled]="action.disableFn && action.disableFn(row)"
-                [ngClass]="[action.class || '', action.color ? 'menu-item-' + action.color : '']"
-                (click)="onRowAction(action.action, row)">
-                <mat-icon *ngIf="action.icon">{{action.icon}}</mat-icon>
-                <span>{{action.label}}</span>
-              </button>
+        <!-- Dynamic Columns Definition -->
+        <ng-container *ngFor="let column of columns; trackBy: trackByColumn" [matColumnDef]="column.property">
+          <!-- Header Cell Definition -->
+          <th mat-header-cell *matHeaderCellDef
+              [mat-sort-header]="column.sortable !== false ? column.property : ''"
+              [class]="column.headerClass"
+              [style.text-align]="column.headerClass?.includes('right-align') ? 'right' : (column.headerClass?.includes('center-align') ? 'center' : 'left')">
+            {{ column.header }}
+          </th>
+          <!-- Data Cell Definition -->
+          <td mat-cell *matCellDef="let item"
+              [ngClass]="column.cellClass"
+              [ngClass]="{'clickable': allowRowClick}"
+              (click)="onRowClick(item)"
+              (contextmenu)="onContextMenu($event, item)">
+            <!-- Check for specific custom template -->
+            <ng-container *ngIf="column.customTemplate && getCustomTemplate(column) as customTemplate; else defaultCellContent">
+              <ng-container *ngTemplateOutlet="customTemplate; context: { $implicit: item, value: getCellData(item, column) }"></ng-container>
             </ng-container>
-          </mat-menu>
-        </td>
-      </ng-container>
+            <!-- Default cell rendering -->
+            <ng-template #defaultCellContent>
+              {{ getCellData(item, column) | titlecase }}
+            </ng-template>
+          </td>
+        </ng-container>
 
-      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-      <tr
-        mat-row
-        *matRowDef="let row; columns: displayedColumns;"
-        (click)="onRowClick(row)"
-        [class.clickable]="hoverEffect"
-        tabindex="0">
-      </tr>
-    </table>
+        <!-- Actions Column Definition -->
+        <ng-container matColumnDef="actions" *ngIf="actions.length > 0">
+          <th mat-header-cell *matHeaderCellDef class="actions-header"> Actions </th>
+          <td mat-cell *matCellDef="let item" class="actions-cell">
+            <button mat-icon-button [matMenuTriggerFor]="rowActionsMenu" (click)="$event.stopPropagation()" aria-label="Row actions">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #rowActionsMenu="matMenu">
+              <ng-container *ngFor="let action of actions; trackBy: trackByAction">
+                <button mat-menu-item
+                        *ngIf="!action.showFn || action.showFn(item)"
+                        [disabled]="action.disableFn && action.disableFn(item)"
+                        (click)="handleAction(action.action, item)">
+                  <mat-icon *ngIf="action.icon" [color]="action.color">{{ action.icon }}</mat-icon>
+                  <span>{{ action.label }}</span>
+                </button>
+              </ng-container>
+            </mat-menu>
+          </td>
+        </ng-container>
 
-    <!-- Pagination -->
-    <mat-paginator
-      *ngIf="showPagination"
-      [pageSizeOptions]="pageSizeOptions"
-      [pageSize]="pageSize"
-      aria-label="Select page">
+        <!-- Header Row Definition -->
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <!-- Data Row Definition -->
+        <tr mat-row *matRowDef="let row; columns: displayedColumns; let i = index"
+            [class.row-hover]="useHoverEffect"
+            [attr.data-index]="i"
+            (contextmenu)="onContextMenu($event, row)"></tr>
+
+        <!-- Row shown when no data matches the filter -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data-cell" [attr.colspan]="displayedColumns.length">
+            <span *ngIf="tableDataSource.filter">No data matching "{{tableDataSource.filter}}"</span>
+            <span *ngIf="!tableDataSource.filter && selectedFilterValue">No data available for the selected filter.</span>
+            <span *ngIf="!tableDataSource.filter && !selectedFilterValue && isEmpty()">No data available.</span>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Paginator -->
+    <mat-paginator *ngIf="paginatorOptions.showPaginator && showTable()"
+                   [length]="tableDataSource.filteredData.length"
+                   [pageSize]="paginatorOptions.pageSize"
+                   [pageSizeOptions]="paginatorOptions.pageSizeOptions"
+                   [showFirstLastButtons]="paginatorOptions.showFirstLastButtons"
+                   (page)="handlePageChange($event)"
+                   aria-label="Select page">
     </mat-paginator>
-  </div>
-</div>
+
+  </mat-card-content>
+
+</mat-card>
+
+<!-- Context Menu Definition (Right Click) -->
+<mat-menu #contextMenu="matMenu">
+  <ng-template matMenuContent let-item="item">
+    <ng-container *ngFor="let action of actions; trackBy: trackByAction">
+      <button mat-menu-item
+              *ngIf="!action.showFn || action.showFn(item)"
+              [disabled]="action.disableFn && action.disableFn(item)"
+              (click)="handleAction(action.action, item)">
+        <mat-icon *ngIf="action.icon" [color]="action.color">{{ action.icon }}</mat-icon>
+        <span>{{ action.label }}</span>
+      </button>
+    </ng-container>
+  </ng-template>
+</mat-menu>

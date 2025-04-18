@@ -33,20 +33,7 @@
     gap: 8px;
     align-items: center;
     flex-wrap: wrap;
-    justify-content: flex-end;
-
-    button {
-      white-space: nowrap;
-
-      &[class*="mat-raised-button"],
-      &[class*="mat-flat-button"] {
-        min-width: 36px;
-      }
-
-      mat-icon + span {
-        margin-left: 4px;
-      }
-    }
+    justify-content: flex-end; 
   }
 }
 
@@ -89,31 +76,6 @@
 
     .header-actions {
       gap: 6px;
-
-      button {
-        /* Allow for button text to wrap on very small screens */
-        white-space: normal;
-        line-height: 1.2;
-        height: auto;
-        min-height: 36px;
-        padding: 8px 12px;
-
-        /* Icon-only buttons should remain square */
-        &[class*="mat-icon-button"] {
-          padding: 0;
-          min-width: 36px;
-          min-height: 36px;
-          width: 36px;
-          height: 36px;
-        }
-
-        /* Adjust icon size for better mobile display */
-        mat-icon {
-          font-size: 18px;
-          height: 18px;
-          width: 18px;
-        }
-      }
     }
   }
 }

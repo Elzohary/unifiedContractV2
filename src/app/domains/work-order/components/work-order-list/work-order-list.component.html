@@ -13,7 +13,7 @@
       [filters]="tableFilters"
       [actions]="tableActions"
       [loading]="loading"
-      [error]="loadingError"
+      [error]="loadingError ? 'Failed to load data.' : null"
       [selectedFilterIndex]="selectedStatusTab"
       (filterChange)="onDataTableFilterChange($event)"
       (rowAction)="onDataTableRowAction($event)"

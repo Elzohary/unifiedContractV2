@@ -149,6 +149,7 @@ export class WorkOrderListComponent implements OnInit {
       case 3: return 'completed';
       default: return undefined;
     }
+
   }
 
   onStatusTabChange(event: MatTabChangeEvent): void {
@@ -241,3 +242,4 @@ export class WorkOrderListComponent implements OnInit {
     }
   }
 }
+

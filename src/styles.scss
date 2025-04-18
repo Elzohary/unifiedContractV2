@@ -2,6 +2,7 @@
 @use 'sass:map';
 @use '@angular/material' as mat;
 @use '../_theme-colors' as theme;
+@import '../_component-styles.scss';
 
 // Include core Material styles (only once)
 @include mat.core();
@@ -55,13 +56,13 @@ body {
 /* Light theme styles */
 body.light-theme {
   /* @include theme.high-contrast-overrides(light); */
-  background-color: #{color('neutral', 99)};
+  background-color: #{color('neutral', 98)};
   color: #{color('primary', 10)};
 
   /* Theme colors for light mode */
-  --dashboard-bg: #{color('primary', 98)};
-  --card-bg: #{color('neutral', 98)};
-  --card-header-bg: #{color('primary', 95)};
+  --dashboard-bg: #{color('primary', 99)};
+  --card-bg: #{color('neutral', 100)};
+  --card-header-bg: #{color('primary', 100)};
   --card-border: #{color('primary', 35)};
   --text-primary: #{color('primary', 10)};
   --text-secondary: #{color('primary', 30)};
