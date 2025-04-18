@@ -72,6 +72,10 @@ export class DataTableCardComponent implements OnInit, OnChanges, AfterViewInit,
   @Input() pageSize = 10;
   @Input() pageSizeOptions = [5, 10, 25, 50];
   @Input() actions: TableAction[] = [];
+  /** Whether to use external filtering or let component handle it */
+  @Input() externalFiltering = false;
+  /** Search text to display in search box (two-way binding) */
+  @Input() searchText = '';
   
   // ViewChild references
   @ViewChild(MatPaginator) paginator!: MatPaginator;
@@ -85,7 +89,6 @@ export class DataTableCardComponent implements OnInit, OnChanges, AfterViewInit,
   // Component properties
   dataSource = new MatTableDataSource<any>([]);
   displayedColumns: string[] = [];
-  searchText = '';
   contextMenuPosition = { x: '0px', y: '0px' };
   selectedRow: any = null;
 

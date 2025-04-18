@@ -20,14 +20,19 @@
       [showPaginator]="true"
       [pageSize]="10" 
       [pageSizeOptions]="[10, 25, 50, 100]"
+      [externalFiltering]="true"
+      [searchText]="searchText"
       (rowClick)="onRowClicked($event)"
       (searchChange)="onSearchChanged($event)"
+      (sortChange)="onSortChanged($any($event))"
+      (pageChange)="onPageChanged($any($event))"
+      (rowAction)="onRowAction($event)"
     >
       <!-- Projected Filters Slot -->
       <div class="status-filter" data-card-filters>
         <mat-form-field appearance="fill">
           <mat-label>Filter by Status</mat-label>
-          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus()">
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="onStatusFilterChange($event.value)">
             <mat-option value="all">All Statuses</mat-option>
             <mat-option *ngFor="let status of statusOptions" [value]="status.value">
               {{status.label}}
@@ -45,8 +50,8 @@
 
       <!-- Status Template -->
       <ng-template #statusTemplate let-row>
-        <span class="status-badge" [ngClass]="row.details?.status || 'pending'">
-          {{ row.details?.status ? (row.details.status | titlecase) : 'Pending' }}
+        <span class="status-badge" [ngClass]="getStatusClass(row.details?.status || 'pending')">
+          {{ getStatusDisplayName(row.details?.status || 'pending') }}
         </span>
       </ng-template>
 
@@ -57,7 +62,7 @@
 
       <!-- Actual Value Template -->
       <ng-template #actualValueTemplate let-row>
-        {{ getTotalExpenses(row) | currency:'SAR ':'symbol':'1.2-2' }}
+        {{ calculateActualValue(row) | currency:'SAR ':'symbol':'1.2-2' }}
       </ng-template>
 
       <!-- Actions Needed Template -->

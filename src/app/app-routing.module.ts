@@ -9,6 +9,7 @@ import { AllRemarksComponent } from './features/dashboards/dashboard-management/
 import { ActivityLogPageComponent } from './features/dashboards/dashboard-management/components/activity-log-page/activity-log-page.component';
 import { EquipmentDashboardComponent } from './modules/resources/components/equipment-dashboard/equipment-dashboard.component';
 import { LoginComponent } from './auth/login/login.component';
+import { UserListComponent } from './users/user-list/user-list.component';
 
 export const routes: Routes = [
   // Login route
@@ -190,7 +191,7 @@ export const routes: Routes = [
   },
   {
     path: 'admin/users',
-    component: UnderConstructionComponent,
+    component: UserListComponent,
     data: { title: 'User Management', message: 'The user management page is currently under development.' }
   },
   {
