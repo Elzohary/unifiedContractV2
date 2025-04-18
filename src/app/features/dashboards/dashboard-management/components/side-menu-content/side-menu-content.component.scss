@@ -1,1 +1,136 @@
+// Modern Luxurious Side Menu - Based on Material Design
+@use 'sass:color';
+@use 'sass:math';
+
+// Variables
+$primary-color: #0d6efd; // Blue accent color from image
+$primary-light: rgba($primary-color, 0.1);
+$background-color: #ffffff;
+$text-color: #343a40;
+$text-muted: #6c757d;
+$border-radius: 12px;
+$transition-standard: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+$box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+$container-padding: 16px;
+
+
+.side-menu-container {
+  display: flex;
+  height: 100%;
+  padding: $container-padding;
+}
+
+
+// Menu Sections
+.menu-section {
+  margin-bottom: 24px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// Header Section
+.section-header {
+  padding: 0 !important;
+  margin-bottom: 8px;
+  width: 100%;
+  height: auto !important;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 16px 8px;
+    box-sizing: border-box;
+  }
+
+  .section-label, .section-icon, .expand-icon {
+    color: $text-muted;
+    font-weight: 300;
+    font-size: 0.92rem;
+  }
+}
+
+// Menu Items
+.menu-item {
+  display: flex;
+  align-items: center;
+  border-radius: $border-radius;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  position: relative;
+  gap: 12px;
+
+  .item-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: $text-color;
+    transition: all 0.2s ease-in-out;
+
+    &.colored {
+      color: $primary-color;
+    }
+  }
+
+  .item-label {
+    font-size: 0.9375rem;
+    font-weight: 400;
+    color: $text-color;
+    transition: all 0.2s ease-in-out;
+  }
+}
+
+a[mat-list-item] {
+  transition: background-color 0.2s ease-in-out;
+  border-radius: $border-radius;
+  margin-bottom: 4px;
+  padding: 0 16px !important;
+  height: 48px !important;
+
+  &:hover {
+    background-color: rgba($primary-color, 0.05);
+
+    .menu-item .item-icon,
+    .menu-item .item-label {
+      color: rgba($primary-color, 0.9);
+    }
+  }
+
+  &.active {
+    background-color: $primary-light;
+
+    .menu-item .item-icon,
+    .menu-item .item-label {
+      color: $primary-color;
+      font-weight: 500;
+    }
+  }
+}
+
+// Responsive Adjustments
+@media (max-width: 768px) {
+  .side-menu-container {
+    padding: 12px;
+  }
+  
+  .search-container ::ng-deep .mat-mdc-text-field-wrapper {
+    height: 40px;
+    
+    .mat-mdc-form-field-flex {
+      height: 40px;
+    }
+  }
+  
+  .section-header {
+    padding: 12px 8px;
+  }
+  a[mat-list-item] {
+    padding: 0 12px !important;
+    height: 44px !important;
+  }
+}
 

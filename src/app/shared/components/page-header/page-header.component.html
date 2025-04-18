@@ -5,15 +5,13 @@
   </div>
   <div class="header-actions">
     <ng-container *ngFor="let action of actions">
-      
-        <!-- Basic button -->
-        <button
-          [disabled]="action.disabled"
-          (click)="onActionClick(action.callback)" class="primary-button">
-          <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
-          <span>{{ action.label }}</span>
-        </button>
-      
+
+      <!-- Basic button -->
+      <button mat-stroked-button [disabled]="action.disabled" (click)="onActionClick(action.callback)">
+        <mat-icon *ngIf="action.icon">{{ action.icon }}</mat-icon>
+        <span>{{ action.label }}</span>
+      </button>
+
     </ng-container>
   </div>
 </div>

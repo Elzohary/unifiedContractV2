@@ -1,44 +1,91 @@
-<div class="work-order-list-container">
-
-  <app-page-header [title]="pageTitle" [actions]="headerActions" (actionClick)="onHeaderAction($event)">
+<div class="work-order-container">
+  <!-- Header -->
+  <app-page-header 
+    [title]="pageTitle" 
+    [actions]="headerActions"
+    (actionClick)="onHeaderAction($event)">
   </app-page-header>
 
-  <!-- New Data Table Card Implementation -->
-
-
-    <!-- Use the reusable data-table-card component -->
+  
+  <!-- Work Order Table using DataTableCardComponent -->
+  <div class="work-order-table-container">
     <app-data-table-card
-      [data]="dataSource.data"
       [columns]="tableColumns"
-      [filters]="tableFilters"
+      [data]="workOrders"
       [actions]="tableActions"
       [loading]="loading"
-      [error]="loadingError ? 'Failed to load data.' : null"
-      [selectedFilterIndex]="selectedStatusTab"
-      (filterChange)="onDataTableFilterChange($event)"
-      (rowAction)="onDataTableRowAction($event)"
-      (rowClick)="viewWorkOrder($event.id)"
-      (stateAction)="handleStateAction($event)">
+      [errorText]="loadingError ? errorMessage : undefined"
+      [emptyStateMessage]="'No work orders match your current filters.'"
+      [showSearch]="true" 
+      [showPaginator]="true"
+      [pageSize]="10" 
+      [pageSizeOptions]="[10, 25, 50, 100]"
+      (rowClick)="onRowClicked($event)"
+      (searchChange)="onSearchChanged($event)"
+    >
+      <!-- Projected Filters Slot -->
+      <div class="status-filter" data-card-filters>
+        <mat-form-field appearance="fill">
+          <mat-label>Filter by Status</mat-label>
+          <mat-select [(ngModel)]="selectedStatus" (selectionChange)="filterByStatus()">
+            <mat-option value="all">All Statuses</mat-option>
+            <mat-option *ngFor="let status of statusOptions" [value]="status.value">
+              {{status.label}}
+            </mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
 
-      <!-- Custom cell templates -->
-      <ng-template #priorityCell let-item>
-        <span class="priority-chip" [ngClass]="getPriorityClass(item.priority)">
-          {{item.priority | titlecase}}
+      <!-- Custom Column Templates -->
+
+      <!-- Received Date Template -->
+      <ng-template #receivedDateTemplate let-row>
+        {{ row.details?.receivedDate ? (row.details.receivedDate | date:'mediumDate') : 'Not provided' }}
+      </ng-template>
+
+      <!-- Status Template -->
+      <ng-template #statusTemplate let-row>
+        <span class="status-badge" [ngClass]="row.details?.status || 'pending'">
+          {{ row.details?.status ? (row.details.status | titlecase) : 'Pending' }}
         </span>
       </ng-template>
 
-      <ng-template #statusCell let-item>
-        <span class="status-chip" [ngClass]="getStatusClass(item.status)">
-          {{item.status | titlecase}}
+      <!-- Estimated Cost Template -->
+      <ng-template #estimatedCostTemplate let-row>
+        {{ row.estimatedCost | currency:'SAR ':'symbol':'1.2-2' }}
+      </ng-template>
+
+      <!-- Actual Value Template -->
+      <ng-template #actualValueTemplate let-row>
+        {{ getTotalExpenses(row) | currency:'SAR ':'symbol':'1.2-2' }}
+      </ng-template>
+
+      <!-- Actions Needed Template -->
+      <ng-template #actionsNeededTemplate let-row>
+        <span class="actions-badge" 
+              [ngClass]="{
+                'critical': getActionsCount(row) > 3, 
+                'moderate': getActionsCount(row) > 0 && getActionsCount(row) <= 3, 
+                'none': getActionsCount(row) === 0}">
+          {{ getActionsCount(row) }}
         </span>
       </ng-template>
 
-      <ng-template #completionCell let-item>
-        <div class="progress-container">
-          <div class="progress-bar" [style.width.%]="item.completionPercentage"></div>
-          <span class="progress-text">{{item.completionPercentage}}%</span>
+      <!-- Completion Percentage Template -->
+      <ng-template #completionPercentageTemplate let-row>
+        <div class="progress-cell">
+          <mat-progress-bar 
+            mode="determinate"
+            [value]="row.details?.completionPercentage || 0"
+            [color]="getProgressColor(row.details?.completionPercentage || 0)">
+          </mat-progress-bar>
+          <span class="progress-text">{{ row.details?.completionPercentage || 0 }}%</span>
         </div>
       </ng-template>
-    </app-data-table-card>
 
+    </app-data-table-card>
+  </div>
+</div>
+
+<!-- Removed original mat-table implementation -->
 
