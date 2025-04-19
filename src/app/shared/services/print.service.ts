@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WorkOrder, WorkOrderRemark, Material, purchasableMaterial, receivableMaterial } from '../../domains/work-order/models/work-order.model';
+import { WorkOrder, WorkOrderRemark, materialAssignment, purchasableMaterial, receivableMaterial } from '../../domains/work-order/models/work-order.model';
 import { ActivityLogService } from './activity-log.service';
 
 @Injectable({
@@ -366,7 +366,7 @@ export class PrintService {
             <span class="detail-label">Team Members</span>
             <div class="detail-value">
               ${workOrder.manpower && workOrder.manpower.length > 0
-                ? workOrder.manpower.map(m => m.user?.name || m.badgeNumber).join(', ')
+                ? workOrder.manpower.map(m => m.name || m.badgeNumber).join(', ')
                 : 'No team members assigned'}
             </div>
           </div>
@@ -385,7 +385,7 @@ export class PrintService {
               </tr>
             </thead>
             <tbody>
-              ${workOrder.materials.map((material: Material) => {
+              ${workOrder.materials.map((material: materialAssignment) => {
                 const materialData = material.materialType === 'purchasable' ? material.purchasableMaterial : material.receivableMaterial;
                 const quantity = material.materialType === 'purchasable'
                   ? (materialData as purchasableMaterial).quantity

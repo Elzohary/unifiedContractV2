@@ -63,7 +63,7 @@ export class WorkOrderStatusService {
     if (this.statusDisplayNameMap.has(statusValue)) {
       return this.statusDisplayNameMap.get(statusValue)!;
     }
-    
+
     // Default to title case of the status value
     return statusValue.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   }
@@ -89,31 +89,31 @@ export class WorkOrderStatusService {
    */
   getStatusCategory(status: string): 'active' | 'completed' | 'waiting' | 'cancelled' | 'other' {
     const lowerStatus = status.toLowerCase();
-    
-    if (lowerStatus.includes('in-progress') || 
-        lowerStatus.includes('ready for') || 
+
+    if (lowerStatus.includes('in-progress') ||
+        lowerStatus.includes('ready for') ||
         lowerStatus === WorkOrderStatus.InProgress.toLowerCase()) {
       return 'active';
     }
-    
-    if (lowerStatus.includes('completed') || 
-        lowerStatus.includes('closed') || 
+
+    if (lowerStatus.includes('completed') ||
+        lowerStatus.includes('closed') ||
         lowerStatus === WorkOrderStatus.Completed.toLowerCase()) {
       return 'completed';
     }
-    
-    if (lowerStatus.includes('waiting') || 
-        lowerStatus.includes('pending') || 
-        lowerStatus === WorkOrderStatus.Pending.toLowerCase() || 
+
+    if (lowerStatus.includes('waiting') ||
+        lowerStatus.includes('pending') ||
+        lowerStatus === WorkOrderStatus.Pending.toLowerCase() ||
         lowerStatus === WorkOrderStatus.OnHold.toLowerCase()) {
       return 'waiting';
     }
-    
-    if (lowerStatus.includes('cancel') || 
+
+    if (lowerStatus.includes('cancel') ||
         lowerStatus === WorkOrderStatus.Cancelled.toLowerCase()) {
       return 'cancelled';
     }
-    
+
     return 'other';
   }
 }
@@ -169,10 +169,10 @@ export class WorkOrderListComponent {
   // Page title and header actions
   pageTitle = 'Work Orders';
   headerActions: HeaderAction[] = [
-    { id: 'new', label: 'New Work Order', icon: 'add', color: 'primary', callback: 'createNewWorkOrder' }
+    { id: 'new', label: 'New Work Order', icon: 'add', color: 'primary', callback: 'work-orders/new' }
   ];
 
-  
+
   constructor(
     private workOrderService: WorkOrderService,
     private statusService: WorkOrderStatusService
@@ -184,10 +184,10 @@ export class WorkOrderListComponent {
   onHeaderAction(actionId: string): void {
     const action = this.headerActions.find(a => a.callback === actionId);
     if (!action) return;
-    
+
     if (action.id === 'new') {
       console.log('Create new work order');
       // TODO: Implement navigation to create view
     }
-  } 
+  }
 }

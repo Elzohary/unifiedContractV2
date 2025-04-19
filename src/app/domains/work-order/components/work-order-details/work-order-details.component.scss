@@ -1145,19 +1145,19 @@ mat-card-title {
         height: 100%;
 
         &.slice-1 {
-          background-color: var(--primary);
+          background-color: rgb(170, 170, 235);
           transform: rotate(0deg);
           clip-path: polygon(50% 50%, 100% 50%, 100% 0%, 0% 0%, 0% 100%, 50% 100%);
         }
 
         &.slice-2 {
-          background-color: var(--success);
+          background-color: rgb(223, 169, 169);
           transform: rotate(130deg);
           clip-path: polygon(50% 50%, 100% 50%, 100% 0%, 0% 0%, 0% 100%, 50% 100%);
         }
 
         &.slice-3 {
-          background-color: var(--warning);
+          background-color: rgb(121, 172, 121);
           transform: rotate(230deg);
           clip-path: polygon(50% 50%, 100% 50%, 100% 0%, 0% 0%, 0% 100%, 50% 100%);
         }

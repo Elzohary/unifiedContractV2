@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { PageHeaderAction, PageHeaderConfig } from './models/page-header.model';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-page-header',
@@ -20,6 +21,10 @@ export class PageHeaderComponent {
   @Input() subtitle = '';
   @Input() actions: PageHeaderAction[] = [];
 
+  constructor( private router: Router) {
+
+  }
+
   /**
    * Alternative way to configure the header with a single config object
    * This will override individual properties if provided
@@ -35,6 +40,8 @@ export class PageHeaderComponent {
   @Output() actionClick = new EventEmitter<string>();
 
   onActionClick(actionCallback: string): void {
-    this.actionClick.emit(actionCallback);
+    //this.actionClick.emit(actionCallback);
+    this.router.navigate([actionCallback]);
+    console.log(actionCallback);
   }
 }

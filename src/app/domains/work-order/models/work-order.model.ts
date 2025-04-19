@@ -32,35 +32,42 @@ export interface Permit {
   attachments?: Attachment[];
 }
 
-export interface Manpower {
+export interface ManpowerAssignment {
   id: string;
   badgeNumber: string;
   name: string;
-  user?: User;
+  userId?: string;
   role?: string;
   hoursAssigned: number;
   startDate: string;
   endDate?: string;
   notes?: string;
+  workOrderNumber: string;
 }
 
-export interface Equipment {
+export interface equipmentAssignment {
   id: string;
-  name: string;
+  companyNumber: string;
   type: string;
-  serialNumber?: string;
-  quantity: number;
-  assignedFrom: Date;
-  assignedTo?: Date;
-  status: 'available' | 'in-use' | 'maintenance' | 'damaged';
+  operatorBadgeNumber?: string;
+
+  hoursAssigned: number;
+  startDate: Date;
+  endDate?: string;
   notes?: string;
+  workOrderNumber: string;
 }
 
-export interface Material {
+
+export interface materialAssignment {
   id: string;
   materialType: 'purchasable' | 'receivable';
   purchasableMaterial?: purchasableMaterial;
   receivableMaterial?: receivableMaterial;
+  workOrderNumber?: string;
+  assignDate: string | Date;
+  assignedBy: string;
+  storingLocation?: string;
 }
 
 export interface purchasableMaterial {
@@ -90,8 +97,8 @@ export interface receivableMaterial {
   status: 'pending' | 'ordered' | 'received' | 'used';
   receivedDate?: string;
   returnedDate?: string;
-  receivedBy?: Manpower;
-  returnedBy?: Manpower;
+  receivedBy?: ManpowerAssignment;
+  returnedBy?: ManpowerAssignment;
 }
 
 export interface Issue {
@@ -127,20 +134,20 @@ export {WorkOrderStatus} from './work-order-status.enum';
 export interface WorkOrder {
   id: string;
   details: workOrderDetail;
-  estimatedCost: number;
+  estimatedCost: number;  // Total amount of the Work Order "items"'s estimatedPrice
   remarks: WorkOrderRemark[];
   engineerInCharge?: {
     id: string;
     name: string;
   };
-  actionsNeeded?: ActionItem[];
+  actionsNeeded?: ActionNeeded[];
   issues: WorkOrderIssue[];
-  materials?: Material[];
+  materials?: materialAssignment[];
   permits?: Permit[];
 
   // Additional properties used in services and mock data
   tasks?: Task[];
-  manpower?: Manpower[];
+  manpower?: ManpowerAssignment[];
   actions?: WorkOrderAction[];
   photos?: WorkOrderPhoto[];
   forms?: WorkOrderForm[];
@@ -176,11 +183,9 @@ export interface workOrderDetail {
 export interface workOrderItem {
   id: string;
   itemNumber: string;
-  title: string;
   description: string;
   unit: string;
   unitPrice: number;
-  status: string;
   estimatedQuantity: number;
   estimatedPrice: number;
   estimatedPriceWithVAT: number;
@@ -194,8 +199,8 @@ export interface Task {
   id: string | number;
   title: string;
   description?: string;
-  manpower?: Manpower[];
-  equipment?: Equipment[];
+  manpower?: ManpowerAssignment[];
+  equipment?: equipmentAssignment[];
   dueDate?: Date | string;
   startDate?: Date | string;
   priority?: 'low' | 'medium' | 'high' | 'critical';
@@ -206,7 +211,7 @@ export interface Task {
   createdBy?: string;
   createdAt?: Date | string;
   updatedAt?: Date | string;
-  confirmedBy?: Manpower ;
+  confirmedBy?: ManpowerAssignment ;
 }
 
 export interface WorkOrderRemark {
@@ -233,6 +238,7 @@ export interface WorkOrderIssue {
   resolutionNotes?: string;
 }
 
+// Repeated
 export interface WorkOrderAction {
   id: string;
   title: string;
@@ -243,6 +249,20 @@ export interface WorkOrderAction {
   dueDate: string;
   completedDate?: string;
   completedBy?: string;
+}
+
+// Repeated
+export interface ActionNeeded {
+  id: string;
+  title: string;
+  description: string;
+  priority: 'low' | 'medium' | 'high';
+  status: string;
+  dueDate: string | Date;
+  assignedTo?: string;
+  completedDate?: string | Date;
+  completedBy?: string;
+  notes?: string;
 }
 
 export interface WorkOrderPhoto {
@@ -289,17 +309,4 @@ export interface WorkOrderInvoice {
   paidDate?: string;
   paidBy?: string;
   url: string;
-}
-
-export interface ActionItem {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'low' | 'medium' | 'high';
-  status: string;
-  dueDate: string | Date;
-  assignedTo?: string;
-  completedDate?: string | Date;
-  completedBy?: string;
-  notes?: string;
 }

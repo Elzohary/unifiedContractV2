@@ -25,12 +25,12 @@ import { WorkOrderService } from '../../services/work-order.service';
 import { WorkOrderItemService } from '../../services/work-order-item.service';
 import { MaterialService } from '../../services/material.service';
 import { NotificationService } from '../../../../shared/services/notification.service';
-import { 
+import {
   WorkOrder,
   WorkOrderStatus,
   WorkOrderPriority,
   workOrderItem,
-  Material,
+  materialAssignment,
   Task,
   WorkOrderIssue,
   Attachment,
@@ -78,7 +78,7 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
 
   // Available items for dropdown
   availableItems: workOrderItem[] = [];
-  
+
   // Priority options
   readonly priorityOptions: WorkOrderPriority[] = [
     'low',

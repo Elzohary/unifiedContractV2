@@ -24,7 +24,7 @@ import { trigger, state, style, transition, animate } from '@angular/animations'
     DragDropModule,
     RouterLinkActive,
     RouterModule,
-    MatButtonModule 
+    MatButtonModule
   ],
   templateUrl: './side-menu-content.component.html',
   styleUrl: './side-menu-content.component.scss',
