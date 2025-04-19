@@ -10,7 +10,7 @@
 3.  Specific Business Requirements:
 
     -
-
+  // Modules: Work Order, Resources Managment, HR, Authentacation, User Managment
 4.  Create Domain Models for: - 
             
           1. Work Order with all related entities: 
@@ -267,6 +267,182 @@
 
 5. Technical Preferences:
   - Latest stable .net web API version.
+  - Scalar.
+  - Entity Framework Core.
+  - FluentValidation.
+  - SQL Server.
+  - Serilog for logging.
+  - Moq for mocking.
+  - SignalR.
+  - AutoMapper.
+  - JWT authentication.
+  - 
   - Repository Pattern & Unit of Work.
+  - DTO Layer.
+  - Business Logic layer.
+  - Activity Tracking Log Layer.
+  - Validators.
+  - CRUD operations.
   - Chacing mechanism should be implemented later (it's important).
+
+
+  ---------------
+
+  Looking at the dotNetProject.md file, I notice the following modules are specified:
+
+1. **Main Modules**:
+   - Work Order Module
+   - Resources Management Module
+   - HR Module
+   - Authentication Module
+   - User Management Module
+
+2. **Sub-Modules under Resources Management**:
+   - Material Management
+   - Equipment Management
+   - Manpower Management
+
+Let me revise the architecture to better reflect these modules:
+
+```
+backend/
+├── src/
+│   ├── UnifiedContract.API/
+│   │   ├── HR/
+│   │   │   ├── Employees/
+│   │   │   │   ├── EmployeeController.cs
+│   │   │   │   ├── EmployeeDocumentController.cs
+│   │   │   │   ├── LeaveController.cs
+│   │   │   │   ├── PerformanceReviewController.cs
+│   │   │   │   ├── TrainingController.cs
+│   │   │   │   └── SalaryController.cs
+│   │   │   └── Departments/
+│   │   │       └── DepartmentController.cs
+│   │
+│   ├── UnifiedContract.Application/
+│   │   ├── HR/
+│   │   │   ├── Employees/
+│   │   │   │   ├── Commands/
+│   │   │   │   │   ├── CreateEmployee/
+│   │   │   │   │   ├── UpdateEmployee/
+│   │   │   │   │   ├── DeleteEmployee/
+│   │   │   │   │   ├── AssignLeave/
+│   │   │   │   │   ├── AddPerformanceReview/
+│   │   │   │   │   └── UpdateSalary/
+│   │   │   │   └── Queries/
+│   │   │   │       ├── GetEmployee/
+│   │   │   │       ├── GetEmployeeDocuments/
+│   │   │   │       ├── GetEmployeeLeaves/
+│   │   │   │       └── GetEmployeePerformance/
+│   │   │   └── Departments/
+│   │
+│   ├── UnifiedContract.Domain/
+│   │   ├── HR/
+│   │   │   ├── Entities/
+│   │   │   │   ├── Employee.cs
+│   │   │   │   ├── Certification.cs
+│   │   │   │   ├── EmergencyContact.cs
+│   │   │   │   ├── Address.cs
+│   │   │   │   ├── EmployeeDocument.cs
+│   │   │   │   ├── Leave.cs
+│   │   │   │   ├── PerformanceReview.cs
+│   │   │   │   ├── Training.cs
+│   │   │   │   ├── Salary.cs
+│   │   │   │   ├── BankDetails.cs
+│   │   │   │   ├── Allowance.cs
+│   │   │   │   └── Deduction.cs
+│   │   │   ├── Enums/
+│   │   │   │   ├── EmployeeRole.cs
+│   │   │   │   ├── EmployeeStatus.cs
+│   │   │   │   ├── DocumentType.cs
+│   │   │   │   ├── LeaveType.cs
+│   │   │   │   ├── LeaveStatus.cs
+│   │   │   │   ├── TrainingStatus.cs
+│   │   │   │   └── PaymentFrequency.cs
+│   │   │   └── Interfaces/
+│   │
+│   ├── UnifiedContract.Infrastructure/
+│   │   ├── HR/
+│   │   │   ├── Repositories/
+│   │   │   │   ├── EmployeeRepository.cs
+│   │   │   │   ├── LeaveRepository.cs
+│   │   │   │   └── PerformanceReviewRepository.cs
+│   │   │   └── Services/
+│   │
+│   └── UnifiedContract.Persistence/
+│       └── Configurations/
+│           └── HR/
+│               ├── EmployeeConfiguration.cs
+│               ├── LeaveConfiguration.cs
+│               └── PerformanceReviewConfiguration.cs
+
+Key Implementation Details for Each Module:
+
+1. **Work Order Module**:
+   - Work Order CRUD operations
+   - Tasks management
+   - Items (activities) tracking
+   - Expenses tracking
+   - Permits management
+   - Remarks system
+   - Issues tracking
+   - Photos and attachments
+   - Forms management
+   - Invoices handling
+
+2. **Resources Management Module**:
+   - Material Management:
+     - Receivable materials
+     - Purchasable materials
+     - Inventory tracking
+     - Material assignments
+   
+   - Equipment Management:
+     - Equipment tracking
+     - Equipment assignments
+     - Maintenance records
+   
+   - Manpower Management:
+     - Employee assignments
+     - Time tracking
+     - Role management
+
+3. **HR Module**:
+   - Employee management
+   - Role management
+   - Department management
+   - Attendance tracking
+   - Performance management
+
+4. **Authentication Module**:
+   - JWT implementation
+   - Role-based access control
+   - Login/logout functionality
+   - Token management
+
+5. **User Management Module**:
+   - User CRUD operations (admin only)
+   - Role assignments
+   - Permission management
+   - User profile management
+
+Each module will have:
+- Its own domain models
+- Application services
+- Repository implementations
+- API controllers
+- DTOs
+- Validators
+- Unit tests
+
+Would you like me to proceed with creating this structure and implementing the initial setup? I'll start with:
+
+1. Creating the solution and projects
+2. Setting up the core domain models for each module
+3. Implementing the database context with proper relationships
+4. Setting up authentication and authorization
+5. Creating the basic API structure for each module
+
+Please let me know if you want me to proceed or if you'd like to make any adjustments to the proposed architecture based on the modules.
+
 
