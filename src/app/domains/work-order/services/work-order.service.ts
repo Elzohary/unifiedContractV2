@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError, timer } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { map, catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { StateService } from '../../../core/services/state.service';
@@ -325,7 +325,7 @@ export class WorkOrderService {
   workOrders$ = this.workOrdersSubject.asObservable();
 
   private simulateNetwork<T>(data: T): Observable<T> {
-    return timer(500).pipe(map(() => data));
+    return of(data);
   }
 
   constructor(
@@ -417,7 +417,7 @@ export class WorkOrderService {
 
     // Make sure we return a copy of the data to avoid reference issues
     const workOrders = [...this.workOrdersSubject.value];
-    
+
     // For development, use mock data
     return this.simulateNetwork(workOrders).pipe(
       tap(workOrders => {

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnDestroy, OnInit, ViewChild, NO_ERRORS_SCHEMA, TemplateRef, AfterViewInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, NO_ERRORS_SCHEMA, AfterViewInit } from '@angular/core';
 import { CommonModule, formatCurrency } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -9,138 +9,20 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatBadgeModule } from '@angular/material/badge';
-import { Sort, SortDirection } from '@angular/material/sort';
+import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { BehaviorSubject, Observable, Subject } from 'rxjs';
-import { map, takeUntil } from 'rxjs/operators';
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { Router, ActivatedRoute } from '@angular/router';
 
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
-import { DataTableCardComponent, TableAction, TableColumn } from '../../../../shared/components/data-table-card/data-table-card.component';
 import { WorkOrderService } from '../../services/work-order.service';
-import { WorkOrderStatus } from '../../models/work-order-status.enum';
-import { WorkOrder, workOrderDetail } from '../../models/work-order.model';
-import { Injectable } from '@angular/core';
+import { WorkOrder } from '../../models/work-order.model';
+import { WorkOrderStatusService } from '../../services/work-order-status.service';
 
 /**
  * Service for handling work order status display and management
  */
-@Injectable({
-  providedIn: 'root'
-})
-export class WorkOrderStatusService {
-  // Cache for status display names
-  private statusDisplayNameMap = new Map<string, string>();
-
-  constructor() {
-    this.initializeStatusDisplayNames();
-  }
-
-  /**
-   * Initialize the mapping of status values to display names
-   */
-  private initializeStatusDisplayNames(): void {
-    // For each status in the enum, generate a display name
-    for (const statusKey in WorkOrderStatus) {
-      const statusValue = WorkOrderStatus[statusKey as keyof typeof WorkOrderStatus];
-      if (typeof statusValue === 'string') {
-        // Some statuses already have a better display name in the enum value
-        if (statusValue.includes(' ')) {
-          this.statusDisplayNameMap.set(statusValue, statusValue);
-        } else {
-          // Convert enum key to display name (e.g., InProgress -> "In Progress")
-          const displayName = statusKey.replace(/([A-Z])/g, ' $1').trim();
-          this.statusDisplayNameMap.set(statusValue, displayName);
-        }
-      }
-    }
-  }
-
-  /**
-   * Get the display name for a status value
-   */
-  getDisplayName(statusValue: string): string {
-    // Check the cache first
-    if (this.statusDisplayNameMap.has(statusValue)) {
-      return this.statusDisplayNameMap.get(statusValue)!;
-    }
-
-    // Default to title case of the status value
-    return statusValue.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
-  }
-
-  /**
-   * Get all statuses with their display names
-   * @returns Array of status options with value and label
-   */
-  getAllStatusOptions(): { value: string; label: string }[] {
-    return [
-      { value: 'all', label: 'All Statuses' },
-      // Add all status values from the enum
-      ...Object.values(WorkOrderStatus).map(status => ({
-        value: status,
-        label: this.getDisplayName(status)
-      }))
-    ];
-  }
-
-  /**
-   * Get a category for a status (e.g., 'active', 'completed', 'waiting', etc.)
-   * Useful for styling or filtering by category
-   */
-  getStatusCategory(status: string): 'active' | 'completed' | 'waiting' | 'cancelled' | 'other' {
-    const lowerStatus = status.toLowerCase();
-
-    if (lowerStatus.includes('in-progress') ||
-        lowerStatus.includes('ready for') ||
-        lowerStatus === WorkOrderStatus.InProgress.toLowerCase()) {
-      return 'active';
-    }
-
-    if (lowerStatus.includes('completed') ||
-        lowerStatus.includes('closed') ||
-        lowerStatus === WorkOrderStatus.Completed.toLowerCase()) {
-      return 'completed';
-    }
-
-    if (lowerStatus.includes('waiting') ||
-        lowerStatus.includes('pending') ||
-        lowerStatus === WorkOrderStatus.Pending.toLowerCase() ||
-        lowerStatus === WorkOrderStatus.OnHold.toLowerCase()) {
-      return 'waiting';
-    }
-
-    if (lowerStatus.includes('cancel') ||
-        lowerStatus === WorkOrderStatus.Cancelled.toLowerCase()) {
-      return 'cancelled';
-    }
-
-    return 'other';
-  }
-}
-
-// Action for header
-export interface HeaderAction {
-  id: string;
-  label: string;
-  icon: string;
-  color?: "" | "warn" | "primary" | "accent";
-  callback: string;
-}
-
-// Interface for the component state
-interface WorkOrderListState {
-  allWorkOrders: WorkOrder[];
-  filteredWorkOrders: WorkOrder[];
-  loading: boolean;
-  error: boolean;
-  errorMessage: string;
-  searchText: string;
-  selectedStatus: string;
-  currentSort: { active: string; direction: SortDirection };
-  pageIndex: number;
-  pageSize: number;
-}
-
 @Component({
   selector: 'app-work-order-list',
   standalone: true,
@@ -156,8 +38,10 @@ interface WorkOrderListState {
     MatTooltipModule,
     MatBadgeModule,
     MatProgressBarModule,
-    PageHeaderComponent,
-    DataTableCardComponent
+    MatTableModule,
+    MatSortModule,
+    MatPaginatorModule,
+    PageHeaderComponent
   ],
   templateUrl: './work-order-list.component.html',
   styleUrls: ['./work-order-list.component.scss'],
@@ -165,29 +49,141 @@ interface WorkOrderListState {
   providers: [WorkOrderStatusService],
   schemas: [NO_ERRORS_SCHEMA]
 })
-export class WorkOrderListComponent {
+export class WorkOrderListComponent implements OnInit, AfterViewInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  @ViewChild(MatSort) sort!: MatSort;
+
   // Page title and header actions
   pageTitle = 'Work Orders';
-  headerActions: HeaderAction[] = [
+  headerActions: { id: string; label: string; icon: string; color: 'primary' | 'accent' | 'warn' | ''; callback: string }[] = [
     { id: 'new', label: 'New Work Order', icon: 'add', color: 'primary', callback: 'work-orders/new' }
   ];
 
+  // Table configuration
+  displayedColumns: string[] = [
+    'woNumber',
+    'receivedDate',
+    'category',
+    'status',
+    'estimationPrice',
+    'actualPrice',
+    'progress'
+  ];
+
+  dataSource = new MatTableDataSource<WorkOrder>();
+  searchText = '';
 
   constructor(
     private workOrderService: WorkOrderService,
-    private statusService: WorkOrderStatusService
+    public statusService: WorkOrderStatusService,
+    private router: Router,
+    private route: ActivatedRoute
   ) {}
 
-  /**
-   * Handle header action click (e.g., New Work Order)
-   */
-  onHeaderAction(actionId: string): void {
-    const action = this.headerActions.find(a => a.callback === actionId);
-    if (!action) return;
+  ngOnInit(): void {
+    this.loadWorkOrders();
+    this.setupSorting();
+    this.setupFilter();
+  }
 
-    if (action.id === 'new') {
-      console.log('Create new work order');
-      // TODO: Implement navigation to create view
+  ngAfterViewInit(): void {
+    this.dataSource.paginator = this.paginator;
+    this.dataSource.sort = this.sort;
+  }
+
+  private setupSorting(): void {
+    this.dataSource.sortingDataAccessor = (item: WorkOrder, property: string) => {
+      switch(property) {
+        case 'woNumber':
+          return item.details.workOrderNumber;
+        case 'receivedDate':
+          return new Date(item.details.receivedDate).getTime();
+        case 'category':
+          return item.details.category;
+        case 'status':
+          return item.details.status;
+        case 'estimationPrice':
+          return item.estimatedCost;
+        case 'actualPrice':
+          return (item.expenseBreakdown?.materials || 0) +
+                 (item.expenseBreakdown?.labor || 0) +
+                 (item.expenseBreakdown?.other || 0);
+        case 'progress':
+          return item.details.completionPercentage;
+        default:
+          return '';
+      }
+    };
+  }
+
+  private setupFilter(): void {
+    this.dataSource.filterPredicate = (data: WorkOrder, filter: string) => {
+      const searchStr = filter.toLowerCase();
+      return (
+        data.details.workOrderNumber.toLowerCase().includes(searchStr) ||
+        data.details.category.toLowerCase().includes(searchStr) ||
+        data.details.status.toLowerCase().includes(searchStr) ||
+        new Date(data.details.receivedDate).toLocaleDateString().toLowerCase().includes(searchStr) ||
+        data.estimatedCost.toString().includes(searchStr) ||
+        ((data.expenseBreakdown?.materials || 0) +
+         (data.expenseBreakdown?.labor || 0) +
+         (data.expenseBreakdown?.other || 0)).toString().includes(searchStr) ||
+        data.details.completionPercentage.toString().includes(searchStr)
+      );
+    };
+  }
+
+  private loadWorkOrders(): void {
+    this.workOrderService.getAllWorkOrders().subscribe({
+      next: (workOrders: WorkOrder[]) => {
+        this.dataSource.data = workOrders;
+      },
+      error: (error: Error) => {
+        console.error('Error loading work orders:', error);
+      }
+    });
+  }
+
+  applyFilter(event: Event): void {
+    const filterValue = (event.target as HTMLInputElement).value;
+    this.dataSource.filter = filterValue.trim().toLowerCase();
+
+    if (this.dataSource.paginator) {
+      this.dataSource.paginator.firstPage();
+    }
+  }
+
+  onRowClick(workOrder: WorkOrder): void {
+    this.router.navigate(['./details', workOrder.id], { relativeTo: this.route });
+  }
+
+  getStatusBadgeColor(status: string): string {
+    const category = this.statusService.getStatusCategory(status);
+    switch (category) {
+      case 'active':
+        return 'status-active';
+      case 'completed':
+        return 'status-completed';
+      case 'waiting':
+        return 'status-waiting';
+      case 'cancelled':
+        return 'status-cancelled';
+      default:
+        return 'status-default';
+    }
+  }
+
+  formatCurrency(amount: number): string {
+    return formatCurrency(amount || 0, 'en-US', 'SAR ');
+  }
+
+  calculateProgress(workOrder: WorkOrder): number {
+    return workOrder.details.completionPercentage || 0;
+  }
+
+  onHeaderAction(actionId: string): void {
+    if (actionId === 'work-orders/new') {
+      this.router.navigate(['/work-orders/new']);
     }
   }
 }

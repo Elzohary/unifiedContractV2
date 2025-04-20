@@ -18,7 +18,7 @@ export const routes: Routes = [
   // Default route
   {
     path: '',
-    redirectTo: 'dashboard',
+    redirectTo: 'dashboard/overview',
     pathMatch: 'full'
   },
 

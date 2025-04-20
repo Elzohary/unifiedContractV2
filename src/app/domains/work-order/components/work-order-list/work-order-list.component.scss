@@ -1,191 +1,101 @@
 @import 'src/styles.scss';
 
 .work-order-container {
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 1rem;
-  padding: 1rem;
-  height: 100%;
-  box-sizing: border-box;
+  gap: 16px;
 
-  // Filters container styles removed
-
-  // .status-filter styles might need adjustment if they relied on the old container
-  // Keep .status-filter styles if they are self-contained or adjust as needed.
-  .status-filter {
-      min-width: 200px;
-      width: auto;
-      
-      // Ensure form field width works correctly when projected
-      mat-form-field {
-          width: 100%;
-      }
-  }
-
-  // Table container styling remains to hold the card
-  .work-order-table-container {
-    flex: 1;
-    position: relative; 
-    min-height: 300px; // Keep min-height if desired for layout
-
-    // Enhanced hover effects for Angular Material tables
-    ::ng-deep {
-      // Apply to both the data-table-card internal table and direct mat-table
-      .mat-mdc-row, .mat-row {
-        position: relative;
-        transition: background-color 0.2s ease;
-        
-        &:hover {
-          background-color: var(--hover-color, rgba(0, 0, 0, 0.04)) !important;
-          cursor: pointer;
-        }
-        
-        /* Apply Material Design ripple effect */
-        &::after {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.03);
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.15s ease;
-        }
-        
-        &:active::after {
-          opacity: 1;
-        }
-      }
-      
-      // Ensure header row doesn't get hover effects
-      .mat-mdc-header-row, .mat-header-row {
-        &:hover {
-          background-color: inherit !important;
-          cursor: default;
-        }
-        
-        &::after {
-          display: none;
-        }
-      }
-
-      // Ensure table takes full width
-      table.mat-mdc-table, table.mat-table {
-        width: 100%;
-      }
-    }
-  }
-
-  // Styles for custom templates used within the data-table-card
-
-  // Progress cell styling (kept from original file)
-  .progress-cell {
-    min-width: 120px;
+  .search-container {
     display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
+    justify-content: flex-end;
 
-    .progress-text {
-      font-size: 0.75rem;
-      color: var(--text-secondary);
-      text-align: right;
+    .search-field {
+      width: 250px;
     }
   }
 
-  // Order number styling (can be removed if not needed, or applied via template)
-  // .order-number-cell {
-  //   font-weight: 500;
-  //   color: var(--primary-color);
-  // }
+  .table-container {
+    flex: 1;
+    overflow: auto;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.233);
 
-  // Status badge styling (kept from original file)
-  .status-badge {
-    display: inline-block;
-    padding: 0.25rem 0.75rem;
-    border-radius: 16px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    
-    &.pending {
-      background-color: var(--warning-light);
-      color: var(--warning-dark);
-    }
-    
-    &.in-progress {
-      background-color: var(--info-light);
-      color: var(--info-dark);
-    }
-    
-    &.completed {
-      background-color: var(--success-light);
-      color: var(--success-dark);
-    }
-    
-    &.cancelled {
-      background-color: var(--error-light);
-      color: var(--error-dark);
-    }
-    
-    &.on-hold {
-      background-color: var(--neutral-light);
-      color: var(--neutral-dark);
-    }
-  }
+    .work-order-table {
+      width: 100%;
 
-  // Actions needed badge styling (kept from original file)
-  .actions-badge {
-    display: inline-block;
-    text-align: center;
-    min-width: 24px;
-    padding: 0.25rem 0.5rem;
-    border-radius: 16px;
-    font-size: 0.75rem;
-    font-weight: 500;
-    
-    &.critical {
-      background-color: var(--error-light);
-      color: var(--error-dark);
-    }
-    
-    &.moderate {
-      background-color: var(--warning-light);
-      color: var(--warning-dark);
-    }
-    
-    &.none {
-      background-color: var(--success-light);
-      color: var(--success-dark);
-    }
-  }
-}
+      .mat-mdc-header-cell {
+        font-weight: 600;
+        color: rgba(0, 0, 0, 0.87);
+        background-color: #f5f5f5;
+        padding: 12px 16px;
+      }
 
-// Responsive styles
-@media (max-width: 768px) {
-  .work-order-container {
-    padding: 0.5rem;
-    
-    // Removed responsive styles for filters-container
-    
-    // Responsive styles for .status-filter if needed
-    .status-filter {
-      width: 100%; // Ensure it takes full width inside the header on small screens
+      .mat-mdc-cell {
+        padding: 12px 16px;
+      }
+
+      .mat-mdc-row {
+        cursor: pointer;
+        transition: background-color 0.2s;
+
+        &:hover {
+          background-color: #f5f5f5;
+        }
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 0;
+        min-width: 150px;
+
+        .mat-mdc-progress-bar {
+          flex: 1;
+        }
+
+        .progress-text {
+          min-width: 40px;
+          text-align: right;
+          font-weight: 500;
+        }
+      }
+
+      .status-badge {
+        padding: 4px 12px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 500;
+        text-transform: capitalize;
+
+        &.status-active {
+          background-color: #e3f2fd;
+          color: #1976d2;
+        }
+
+        &.status-completed {
+          background-color: #e8f5e9;
+          color: #2e7d32;
+        }
+
+        &.status-waiting {
+          background-color: #fff3e0;
+          color: #f57c00;
+        }
+
+        &.status-cancelled {
+          background-color: #ffebee;
+          color: #d32f2f;
+        }
+
+        &.status-default {
+          background-color: #f5f5f5;
+          color: #757575;
+        }
+      }
     }
   }
 }
 
-.debug-actions {
-  margin-bottom: 1rem;
-  padding: 0.5rem;
-  background-color: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  display: flex;
-  justify-content: flex-end;
-  
-  button {
-    margin-left: 0.5rem;
-  }
-}
