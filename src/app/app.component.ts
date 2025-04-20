@@ -34,7 +34,7 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
     <div class="dashboard-container">
       <mat-sidenav-container class="sidenav-container">
         <mat-sidenav #sidenav [mode]="isMobile ? 'over' : 'side'"
-                     [opened]="!isMobile"
+                     [opened]="!isMobile && !isLoginPage"
                      [fixedInViewport]="true"
                      class="app-sidenav">
           <div class="sidenav-header">
@@ -48,7 +48,7 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
         </mat-sidenav>
 
         <mat-sidenav-content class="main-content">
-          <mat-toolbar color="primary" class="app-toolbar">
+          <mat-toolbar color="primary" class="app-toolbar" *ngIf="!isLoginPage">
             <button mat-icon-button (click)="sidenav.toggle()" aria-label="Toggle menu">
               <mat-icon>menu</mat-icon>
             </button>
@@ -167,6 +167,7 @@ export class AppComponent implements OnInit {
   @ViewChild('sidenav') sidenav!: MatSidenav;
 
   isMobile = false;
+  isLoginPage = false;
 
   constructor(@Inject(PLATFORM_ID) private platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -174,14 +175,20 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     this.checkScreenSize();
+    this.checkCurrentRoute();
 
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
+      this.checkCurrentRoute();
       if (this.isMobile && this.sidenav?.opened) {
         this.sidenav.close();
       }
     });
+  }
+
+  private checkCurrentRoute() {
+    this.isLoginPage = this.router.url === '/' || this.router.url === '/login';
   }
 
   @HostListener('window:resize')
