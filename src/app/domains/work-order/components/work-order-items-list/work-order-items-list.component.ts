@@ -8,10 +8,14 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
+import { finalize, catchError } from 'rxjs/operators';
+import { EMPTY } from 'rxjs';
 import { WorkOrderItemService } from '../../services/work-order-item.service';
 import { Iitem } from '../../models/work-order-item.model';
-import { WorkOrderItemEditDialogComponent } from '../../components/work-order-item-edit-dialog/work-order-item-edit-dialog.component';
+import { WorkOrderItemDialogComponent } from '../work-order-item-dialog/work-order-item-dialog.component';
 import { NgCardComponent } from '../../../../shared/components/ng-card/ng-card.component';
 
 @Component({
@@ -30,6 +34,8 @@ import { NgCardComponent } from '../../../../shared/components/ng-card/ng-card.c
     MatIconModule,
     MatMenuModule,
     MatDialogModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule,
     NgCardComponent
   ]
 })
@@ -46,13 +52,15 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
   ];
 
   dataSource: MatTableDataSource<Iitem>;
+  isLoading = false;
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
   constructor(
     private workOrderItemService: WorkOrderItemService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private snackBar: MatSnackBar
   ) {
     this.dataSource = new MatTableDataSource();
   }
@@ -67,9 +75,21 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
   }
 
   loadItems(): void {
-    this.workOrderItemService.getItems().subscribe(items => {
-      this.dataSource.data = items;
-    });
+    this.isLoading = true;
+    this.workOrderItemService.getItems()
+      .pipe(
+        finalize(() => this.isLoading = false),
+        catchError(error => {
+          this.showErrorMessage('Failed to load items. Please try again.');
+          console.error('Error loading items:', error);
+          return EMPTY;
+        })
+      )
+      .subscribe(items => {
+        this.dataSource.data = items;
+        // Ensure table refreshes
+        this.dataSource._updateChangeSubscription();
+      });
   }
 
   applyFilter(event: Event) {
@@ -94,7 +114,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
       managementArea: ''
     };
 
-    const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
+    const dialogRef = this.dialog.open(WorkOrderItemDialogComponent, {
       width: '800px',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -108,15 +128,38 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.workOrderItemService.createItem(result).subscribe(() => {
-          this.loadItems();
-        });
+        // Optimistic UI update - add temporary item with loading state
+        const tempId = 'temp-' + new Date().getTime();
+        const tempItem: Iitem = { ...result, id: tempId };
+        
+        // Add to current data and update view
+        const currentData = [...this.dataSource.data];
+        currentData.unshift(tempItem);
+        this.dataSource.data = currentData;
+        
+        // Make actual API call
+        this.workOrderItemService.createItem(result)
+          .pipe(
+            catchError(error => {
+              // Remove temporary item on error
+              this.removeItemById(tempId);
+              this.showErrorMessage('Failed to create item. Please try again.');
+              console.error('Error creating item:', error);
+              return EMPTY;
+            })
+          )
+          .subscribe(createdItem => {
+            // Replace temp item with actual item
+            this.removeItemById(tempId);
+            this.dataSource.data = [createdItem, ...this.dataSource.data];
+            this.showSuccessMessage('Item created successfully');
+          });
       }
     });
   }
 
   openEditDialog(item: Iitem): void {
-    const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
+    const dialogRef = this.dialog.open(WorkOrderItemDialogComponent, {
       width: '800px',
       maxWidth: '100vw',
       maxHeight: '100vh',
@@ -130,10 +173,50 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        this.workOrderItemService.updateItem(result.id, result).subscribe(() => {
-          this.loadItems();
-        });
+        // Optimistic UI update - update item immediately
+        const updatedItems = this.dataSource.data.map(i => 
+          i.id === result.id ? { ...result } : i
+        );
+        this.dataSource.data = updatedItems;
+        
+        // Make actual API call
+        this.workOrderItemService.updateItem(result.id, result)
+          .pipe(
+            catchError(error => {
+              // Revert to original item on error
+              this.loadItems(); // Reload all data to ensure consistency
+              this.showErrorMessage('Failed to update item. Please try again.');
+              console.error('Error updating item:', error);
+              return EMPTY;
+            })
+          )
+          .subscribe(() => {
+            this.showSuccessMessage('Item updated successfully');
+          });
       }
+    });
+  }
+  
+  private removeItemById(id: string): void {
+    const currentData = this.dataSource.data.filter(item => item.id !== id);
+    this.dataSource.data = currentData;
+  }
+  
+  private showSuccessMessage(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: 'success-snackbar'
+    });
+  }
+  
+  private showErrorMessage(message: string): void {
+    this.snackBar.open(message, 'Close', {
+      duration: 5000,
+      horizontalPosition: 'center',
+      verticalPosition: 'bottom',
+      panelClass: 'error-snackbar'
     });
   }
 }

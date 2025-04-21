@@ -16,8 +16,8 @@ export interface WorkOrderItemDialogData {
 
 @Component({
   selector: 'app-work-order-item-edit-dialog',
-  templateUrl: './work-order-item-edit-dialog.component.html',
-  styleUrls: ['./work-order-item-edit-dialog.component.scss'],
+  templateUrl: './work-order-item-dialog.component.html',
+  styleUrls: ['./work-order-item-dialog.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -29,7 +29,7 @@ export interface WorkOrderItemDialogData {
     MatSelectModule
   ]
 })
-export class WorkOrderItemEditDialogComponent {
+export class WorkOrderItemDialogComponent {
   editForm: FormGroup;
   lineTypes = ['Description', 'Breakdown'];
   dialogMode: 'create' | 'edit';
@@ -37,7 +37,7 @@ export class WorkOrderItemEditDialogComponent {
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<WorkOrderItemEditDialogComponent>,
+    public dialogRef: MatDialogRef<WorkOrderItemDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: WorkOrderItemDialogData
   ) {
     this.dialogMode = data.dialogMode;
@@ -47,7 +47,7 @@ export class WorkOrderItemEditDialogComponent {
     this.editForm = this.fb.group({
       id: [data.item.id || null],
       itemNumber: [data.item.itemNumber || '', Validators.required],
-      lineType: [data.item.lineType || 'Construction', Validators.required],
+      lineType: [data.item.lineType || 'Description', Validators.required],
       shortDescription: [data.item.shortDescription || '', Validators.required],
       longDescription: [data.item.longDescription || '', Validators.required],
       UOM: [data.item.UOM || '', Validators.required],

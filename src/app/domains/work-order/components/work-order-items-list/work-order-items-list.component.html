@@ -18,7 +18,15 @@
     </div>
 
     <div class="table-container">
-      <table mat-table [dataSource]="dataSource" matSort>
+      <!-- Loading overlay -->
+      <div *ngIf="isLoading" class="loading-overlay">
+        <div class="loading-spinner">
+          <mat-spinner diameter="40"></mat-spinner>
+          <span>Loading...</span>
+        </div>
+      </div>
+
+      <table mat-table [dataSource]="dataSource" matSort class="items-table">
         <!-- Item Number Column -->
         <ng-container matColumnDef="itemNumber">
           <th mat-header-cell *matHeaderCellDef mat-sort-header>Item Number</th>
@@ -77,8 +85,16 @@
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-        <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="mat-header-row tableHeader"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
+            [class.new-item-row]="row.id.toString().startsWith('temp-')"></tr>
+
+        <!-- No data message -->
+        <tr class="mat-row no-data-row" *matNoDataRow>
+          <td class="mat-cell" colspan="8">
+            No work order items found
+          </td>
+        </tr>
       </table>
 
       <mat-paginator [pageSizeOptions]="[5, 10, 25, 100]" aria-label="Select page of items"></mat-paginator>
