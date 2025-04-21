@@ -1,15 +1,16 @@
 <div class="work-order-items-list-container">
-  <app-ng-card>
+  <app-ng-card class="work-order-items-list-card">
     <div class="header">
       <div class="title-search-row">
         <div class="title-actions">
           <h2>Work Order Items</h2>
-          <mat-form-field class="search-field">
-            <mat-label>Search</mat-label>
-            <input matInput (keyup)="applyFilter($event)" placeholder="Search items">
-            <mat-icon matSuffix>search</mat-icon>
-          </mat-form-field>
         </div>
+        
+        <mat-form-field class="search-field">
+          <mat-label>Search</mat-label>
+          <input matInput (keyup)="applyFilter($event)" placeholder="Search items">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
         <button mat-raised-button color="primary" (click)="openAddDialog()">
           <mat-icon>add</mat-icon>
           Add Item
@@ -81,11 +82,15 @@
                 <mat-icon>edit</mat-icon>
                 <span>Edit</span>
               </button>
+              <button mat-menu-item (click)="confirmDelete(item)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
             </mat-menu>
           </td>
         </ng-container>
 
-        <tr mat-header-row *matHeaderRowDef="displayedColumns" class="mat-header-row tableHeader"></tr>
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true" class="mat-header-row tableHeader"></tr>
         <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
             [class.new-item-row]="row.id.toString().startsWith('temp-')"></tr>
 

@@ -3,7 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { WorkOrderListComponent } from './domains/work-order/components/work-order-list/work-order-list.component';
 import { WorkOrderDetailsComponent } from './domains/work-order/components/work-order-details/work-order-details.component';
 import { WorkOrderFormComponent } from './domains/work-order/components/work-order-form/work-order-form.component';
-import { OverviewComponent } from './features/dashboards/overview/overview.component';
+import { OverviewComponent } from './domains/work-order/components/overview/overview.component';
 import { UnderConstructionComponent } from './shared/components/under-construction/under-construction.component';
 import { AllRemarksComponent } from './features/dashboards/dashboard-management/components/all-remarks/all-remarks.component';
 import { ActivityLogPageComponent } from './features/dashboards/dashboard-management/components/activity-log-page/activity-log-page.component';

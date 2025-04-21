@@ -5,10 +5,10 @@ import { MatGridListModule } from '@angular/material/grid-list';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTabsModule } from '@angular/material/tabs';
-import { StatsCardComponent } from '../../../shared/components/stats-card/stats-card.component';
-import { UnderConstructionComponent } from '../../../shared/components/under-construction/under-construction.component';
-import { WorkOrderService } from '../../../domains/work-order/services/work-order.service';
-import { ActivityLogService, ActivityLog } from '../../../shared/services/activity-log.service';
+import { StatsCardComponent } from '../../../../shared/components/stats-card/stats-card.component';
+import { UnderConstructionComponent } from '../../../../shared/components/under-construction/under-construction.component';
+import { WorkOrderService } from '../../services/work-order.service';
+import { ActivityLogService, ActivityLog } from '../../../../shared/services/activity-log.service';
 
 @Component({
   selector: 'app-overview',

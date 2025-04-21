@@ -17,7 +17,6 @@
     left: 0;
     width: 60px;
     height: 3px;
-    border-radius: var(--border-radius-pill);
   }
 
   .dashboard-title {
@@ -26,35 +25,6 @@
     font-weight: 500;
     color: var(--text-primary);
     letter-spacing: -0.5px;
-  }
-
-  .header-actions {
-    .action-button {
-      background-color: var(--primary);
-      color: white;
-      border-radius: var(--border-radius-md);
-      padding: 0 16px;
-      height: 42px;
-      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-      box-shadow: 0 2px 4px var(--card-shadow);
-
-      &:hover {
-        background-color: var(--btn-primary-hover);
-        box-shadow: 0 4px 8px var(--card-shadow);
-        transform: translateY(-2px);
-      }
-
-      &:active {
-        background-color: var(--btn-primary-active);
-        transform: translateY(0);
-      }
-
-      mat-icon {
-        font-size: 20px;
-        height: 20px;
-        width: 20px;
-      }
-    }
   }
 }
 
@@ -103,7 +73,7 @@
   justify-content: center;
   background-color: var(--dashboard-bg);
   border-radius: var(--border-radius-md);
-  border: 1px dashed var(--neutral-variant);
+  border: 1px dashed rgb(60, 15, 241);
   padding: 16px;
 }
 
@@ -161,7 +131,7 @@
   
   .activity-item {
     padding: 16px;
-    background-color: var(--dashboard-bg);
+    background-color: rgb(239, 239, 239);
     border-radius: var(--border-radius-md);
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     position: relative;
@@ -264,9 +234,10 @@
     gap: 16px;
     
     .quick-action-button {
-      background-color: var(--dashboard-bg);
+      background-color: rgb(240, 240, 240);
       border: none;
-      border-radius: var(--border-radius-md);
+      border-radius: 8px;
+      border: 1px solid rgb(220, 220, 220);
       padding: 24px 16px;
       cursor: pointer;
       transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
@@ -281,7 +252,7 @@
         transform: translateX(-50%);
         width: 0;
         height: 3px;
-        background-color: var(--primary);
+        background-color: rgb(60, 15, 241);
         transition: width 0.2s ease;
         border-radius: var(--border-radius-pill);
       }
@@ -325,7 +296,7 @@
   justify-content: center;
   background-color: var(--dashboard-bg);
   border-radius: var(--border-radius-md);
-  border: 1px dashed var(--neutral-variant);
+  border: 1px dashed rgb(156, 139, 250);
   padding: 16px;
 }
 

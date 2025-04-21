@@ -196,6 +196,35 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
       }
     });
   }
+
+  // Confirm delete with the user
+  confirmDelete(item: Iitem): void {
+    if (confirm(`Are you sure you want to delete item "${item.shortDescription}"?`)) {
+      this.deleteItem(item);
+    }
+  }
+
+  // Delete the item and update the table
+  deleteItem(item: Iitem): void {
+    // First remove from UI immediately for better UX
+    const currentData = this.dataSource.data.filter(i => i.id !== item.id);
+    this.dataSource.data = currentData;
+    
+    // Then actually delete from the backend
+    this.workOrderItemService.deleteItem(item.id)
+      .pipe(
+        catchError(error => {
+          // If deletion fails, reload the original data
+          this.loadItems();
+          this.showErrorMessage('Failed to delete item. Please try again.');
+          console.error('Error deleting item:', error);
+          return EMPTY;
+        })
+      )
+      .subscribe(() => {
+        this.showSuccessMessage('Item deleted successfully');
+      });
+  }
   
   private removeItemById(id: string): void {
     const currentData = this.dataSource.data.filter(item => item.id !== id);

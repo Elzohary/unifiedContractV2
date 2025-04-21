@@ -10,7 +10,7 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { WorkOrderDetailsComponent } from '../../../domains/work-order/components/work-order-details/work-order-details.component';
 import { ActivityLogPageComponent } from './components/activity-log-page/activity-log-page.component';
 import { AllRemarksComponent } from './components/all-remarks/all-remarks.component';
-import { OverviewComponent } from '../overview/overview.component';
+import { OverviewComponent } from '../../../domains/work-order/components/overview/overview.component';
 import { UnderConstructionComponent } from '../../../shared/components/under-construction/under-construction.component';
 import { WorkOrderFormComponent } from '../../../domains/work-order/components/work-order-form/work-order-form.component';
 
