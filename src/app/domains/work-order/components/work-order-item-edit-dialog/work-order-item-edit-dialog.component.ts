@@ -8,6 +8,12 @@ import { MatSelectModule } from '@angular/material/select';
 import { CommonModule } from '@angular/common';
 import { Iitem } from '../../models/work-order-item.model';
 
+export interface WorkOrderItemDialogData {
+  item: Iitem;
+  dialogMode: 'create' | 'edit';
+  title?: string;
+}
+
 @Component({
   selector: 'app-work-order-item-edit-dialog',
   templateUrl: './work-order-item-edit-dialog.component.html',
@@ -25,23 +31,29 @@ import { Iitem } from '../../models/work-order-item.model';
 })
 export class WorkOrderItemEditDialogComponent {
   editForm: FormGroup;
-  lineTypes = ['Construction', 'Maintenance'];
+  lineTypes = ['Description', 'Breakdown'];
+  dialogMode: 'create' | 'edit';
+  dialogTitle: string;
 
   constructor(
     private fb: FormBuilder,
     public dialogRef: MatDialogRef<WorkOrderItemEditDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: Iitem
+    @Inject(MAT_DIALOG_DATA) public data: WorkOrderItemDialogData
   ) {
+    this.dialogMode = data.dialogMode;
+    this.dialogTitle = data.title || (this.dialogMode === 'create' ? 'Create Work Order Item' : 'Edit Work Order Item');
+    
+    // Initialize form with values from the data or with empty values for create mode
     this.editForm = this.fb.group({
-      id: [data.id],
-      itemNumber: [data.itemNumber, Validators.required],
-      lineType: [data.lineType, Validators.required],
-      shortDescription: [data.shortDescription, Validators.required],
-      longDescription: [data.longDescription, Validators.required],
-      UOM: [data.UOM, Validators.required],
-      currency: [data.currency, Validators.required],
-      paymentType: [data.paymentType, Validators.required],
-      managementArea: [data.managementArea, Validators.required]
+      id: [data.item.id || null],
+      itemNumber: [data.item.itemNumber || '', Validators.required],
+      lineType: [data.item.lineType || 'Construction', Validators.required],
+      shortDescription: [data.item.shortDescription || '', Validators.required],
+      longDescription: [data.item.longDescription || '', Validators.required],
+      UOM: [data.item.UOM || '', Validators.required],
+      currency: [data.item.currency || '', Validators.required],
+      paymentType: [data.item.paymentType || '', Validators.required],
+      managementArea: [data.item.managementArea || '', Validators.required]
     });
   }
 
@@ -51,7 +63,15 @@ export class WorkOrderItemEditDialogComponent {
 
   onSubmit(): void {
     if (this.editForm.valid) {
-      this.dialogRef.close(this.editForm.value);
+      const formValue = this.editForm.value;
+      
+      // For create mode, return the form data without ID if it wasn't provided
+      if (this.dialogMode === 'create' && !formValue.id) {
+        const { id, ...dataWithoutId } = formValue;
+        this.dialogRef.close(dataWithoutId);
+      } else {
+        this.dialogRef.close(formValue);
+      }
     }
   }
 }

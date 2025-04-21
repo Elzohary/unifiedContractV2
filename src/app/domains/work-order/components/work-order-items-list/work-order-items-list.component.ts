@@ -82,21 +82,27 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
   }
 
   openAddDialog(): void {
+    const emptyItem: Iitem = {
+      id: '',
+      itemNumber: '',
+      lineType: 'Description',
+      shortDescription: '',
+      longDescription: '',
+      UOM: '',
+      currency: '',
+      paymentType: '',
+      managementArea: ''
+    };
+
     const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
       width: '800px',
       maxWidth: '100vw',
       maxHeight: '100vh',
       panelClass: 'full-screen-dialog',
       data: {
-        id: null,
-        itemNumber: '',
-        lineType: 'Construction',
-        shortDescription: '',
-        longDescription: '',
-        UOM: '',
-        currency: '',
-        paymentType: '',
-        managementArea: ''
+        item: emptyItem,
+        dialogMode: 'create',
+        title: 'Create New Work Order Item'
       }
     });
 
@@ -115,7 +121,11 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
       maxWidth: '100vw',
       maxHeight: '100vh',
       panelClass: 'full-screen-dialog',
-      data: { ...item }
+      data: {
+        item: { ...item },
+        dialogMode: 'edit',
+        title: `Edit Work Order Item #${item.itemNumber}`
+      }
     });
 
     dialogRef.afterClosed().subscribe(result => {
