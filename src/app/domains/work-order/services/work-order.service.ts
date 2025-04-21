@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError, Subject } from 'rxjs';
 import { map, catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { StateService } from '../../../core/services/state.service';
@@ -348,6 +348,10 @@ export class WorkOrderService {
   private workOrdersSubject = new BehaviorSubject<WorkOrder[]>(this.mockWorkOrders);
   workOrders$ = this.workOrdersSubject.asObservable();
 
+  // Add a new subject to notify when a new work order is created
+  private newWorkOrderSubject = new Subject<WorkOrder>();
+  newWorkOrder$ = this.newWorkOrderSubject.asObservable();
+
   private simulateNetwork<T>(data: T): Observable<T> {
     return of(data);
   }
@@ -522,6 +526,9 @@ export class WorkOrderService {
     const workOrders = [...this.workOrdersSubject.value, newWorkOrder];
     this.workOrdersSubject.next(workOrders);
     this.stateService.updateWorkOrders(workOrders);
+    
+    // Emit the new work order
+    this.newWorkOrderSubject.next(newWorkOrder);
 
     return this.simulateNetwork(newWorkOrder);
   }

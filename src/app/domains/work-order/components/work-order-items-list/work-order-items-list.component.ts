@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -11,8 +11,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CommonModule } from '@angular/common';
-import { finalize, catchError } from 'rxjs/operators';
-import { EMPTY } from 'rxjs';
+import { finalize, catchError, takeUntil } from 'rxjs/operators';
+import { EMPTY, Subject } from 'rxjs';
 import { WorkOrderItemService } from '../../services/work-order-item.service';
 import { Iitem } from '../../models/work-order-item.model';
 import { WorkOrderItemDialogComponent } from '../work-order-item-dialog/work-order-item-dialog.component';
@@ -39,7 +39,7 @@ import { NgCardComponent } from '../../../../shared/components/ng-card/ng-card.c
     NgCardComponent
   ]
 })
-export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
+export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDestroy {
   displayedColumns: string[] = [
     'itemNumber',
     'shortDescription',
@@ -53,6 +53,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
 
   dataSource: MatTableDataSource<Iitem>;
   isLoading = false;
+  private destroy$ = new Subject<void>();
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
@@ -66,6 +67,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit(): void {
+    // Subscribe to the items$ observable from the service
     this.loadItems();
   }
 
@@ -73,11 +75,17 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   loadItems(): void {
     this.isLoading = true;
-    this.workOrderItemService.getItems()
+    this.workOrderItemService.items$
       .pipe(
+        takeUntil(this.destroy$),
         finalize(() => this.isLoading = false),
         catchError(error => {
           this.showErrorMessage('Failed to load items. Please try again.');

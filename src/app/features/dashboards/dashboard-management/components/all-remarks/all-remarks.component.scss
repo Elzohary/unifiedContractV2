@@ -128,12 +128,12 @@
   margin-bottom: 32px;
 
   .remark-card {
-    background: var(--card-bg);
+    background: rgba(231, 231, 255, 0.162);
     border-radius: var(--border-radius-md);
     padding: 20px;
     transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: var(--card-shadow);
-    border: 1px solid var(--card-border);
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(199, 199, 199, 0.736);
 
     &:hover {
       transform: translateY(-2px);

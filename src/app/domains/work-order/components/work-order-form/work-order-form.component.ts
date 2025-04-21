@@ -358,8 +358,18 @@ export class WorkOrderFormComponent implements OnDestroy {
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (workOrder: WorkOrder) => {
+            // If there are items in the work order, create them in the item service
+            if (newWorkOrder.items && newWorkOrder.items.length > 0) {
+              this.workOrderItemService.createItemsFromWorkOrder(
+                newWorkOrder.items, 
+                workOrder.id
+              ).subscribe(createdItems => {
+                console.log(`Created ${createdItems.length} items for work order ${workOrder.id}`);
+              });
+            }
+            
             this.snackBar.open('Work order created successfully', 'Close', { duration: 3000 });
-            this.router.navigate(['/work-orders', workOrder.id]);
+            this.router.navigate(['/work-orders/details', workOrder.id]);
           },
           error: (error: Error) => {
             console.error('Error creating work order:', error);
@@ -386,8 +396,6 @@ export class WorkOrderFormComponent implements OnDestroy {
     const control = this.form.get(controlPath);
     return control ? control.hasError(errorName) && control.touched : false;
   }
-
-
 
   ngOnDestroy(): void {
     this.destroy$.next();

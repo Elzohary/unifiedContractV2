@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, OnInit, ViewChild, NO_ERRORS_SCHEMA, AfterViewInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, OnInit, ViewChild, NO_ERRORS_SCHEMA, AfterViewInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, formatCurrency } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
@@ -14,6 +14,8 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { Router, ActivatedRoute } from '@angular/router';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 import { PageHeaderComponent } from '../../../../shared/components/page-header/page-header.component';
 import { WorkOrderService } from '../../services/work-order.service';
@@ -49,7 +51,7 @@ import { WorkOrderStatusService } from '../../services/work-order-status.service
   providers: [WorkOrderStatusService],
   schemas: [NO_ERRORS_SCHEMA]
 })
-export class WorkOrderListComponent implements OnInit, AfterViewInit {
+export class WorkOrderListComponent implements OnInit, AfterViewInit, OnDestroy {
   @ViewChild(MatPaginator) paginator!: MatPaginator;
   @ViewChild(MatSort) sort!: MatSort;
 
@@ -72,23 +74,42 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit {
 
   dataSource = new MatTableDataSource<WorkOrder>();
   searchText = '';
+  private destroy$ = new Subject<void>();
 
   constructor(
     private workOrderService: WorkOrderService,
     public statusService: WorkOrderStatusService,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.loadWorkOrders();
     this.setupSorting();
     this.setupFilter();
+    
+    // Subscribe to new work orders
+    this.workOrderService.newWorkOrder$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(newWorkOrder => {
+        // Add new work order to the datasource without reloading everything
+        const currentData = this.dataSource.data;
+        this.dataSource.data = [newWorkOrder, ...currentData];
+        
+        // Trigger change detection
+        this.cdr.detectChanges();
+      });
   }
 
   ngAfterViewInit(): void {
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
+  }
+  
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   private setupSorting(): void {
@@ -141,6 +162,7 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit {
     this.workOrderService.getAllWorkOrders().subscribe({
       next: (workOrders: WorkOrder[]) => {
         this.dataSource.data = workOrders;
+        this.cdr.detectChanges();
       },
       error: (error: Error) => {
         console.error('Error loading work orders:', error);

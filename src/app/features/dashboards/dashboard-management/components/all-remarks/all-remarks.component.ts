@@ -22,6 +22,7 @@ import { WorkOrderService } from '../../../../../domains/work-order/services/wor
 import { TempUserService as UserService } from '../../../../../shared/services/temp-user.service';
 import { TempNotificationService as NotificationService } from '../../../../../shared/services/temp-notification.service';
 import { RemarkDialogComponent } from '../remark-dialog/remark-dialog.component';
+import { NgCardComponent } from '../../../../../shared/components/ng-card/ng-card.component';
 
 @Component({
   selector: 'app-all-remarks',
@@ -42,7 +43,8 @@ import { RemarkDialogComponent } from '../remark-dialog/remark-dialog.component'
     MatProgressSpinnerModule,
     MatCardModule,
     MatChipsModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    NgCardComponent
   ],
   providers: [
     UserService,

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
+import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
 import { Iitem } from '../models/work-order-item.model';
 
 @Injectable({
@@ -64,11 +64,15 @@ export class WorkOrderItemService {
       managementArea: 'Western Region'
     }
   ];
+  
+  // Subject to notify subscribers when items change
+  private itemsSubject = new BehaviorSubject<Iitem[]>(this.mockItems);
+  items$ = this.itemsSubject.asObservable();
 
   constructor(private http: HttpClient) {}
 
   getItems(): Observable<Iitem[]> {
-    return of(this.mockItems);
+    return this.items$;
   }
 
   getItemById(id: string): Observable<Iitem | null> {
@@ -82,6 +86,7 @@ export class WorkOrderItemService {
       id: (this.mockItems.length + 1).toString()
     } as Iitem;
     this.mockItems.push(newItem);
+    this.itemsSubject.next(this.mockItems);
     return of(newItem);
   }
 
@@ -92,6 +97,7 @@ export class WorkOrderItemService {
         ...this.mockItems[index],
         ...item
       };
+      this.itemsSubject.next(this.mockItems);
       return of(this.mockItems[index]);
     }
     return of({} as Iitem);
@@ -101,8 +107,41 @@ export class WorkOrderItemService {
     const index = this.mockItems.findIndex(item => item.id === id);
     if (index !== -1) {
       this.mockItems.splice(index, 1);
+      this.itemsSubject.next(this.mockItems);
       return of(true);
     }
     return of(false);
+  }
+  
+  // Create items from a work order
+  createItemsFromWorkOrder(workOrderItems: any[], workOrderId: string): Observable<Iitem[]> {
+    if (!workOrderItems || workOrderItems.length === 0) {
+      return of([]);
+    }
+    
+    const newItems: Iitem[] = [];
+    
+    workOrderItems.forEach((workOrderItem, index) => {
+      // Create a new item based on the work order item
+      const newItem: Iitem = {
+        id: (this.mockItems.length + index + 1).toString(),
+        itemNumber: `WOI-${workOrderId}-${String(index + 1).padStart(3, '0')}`,
+        lineType: 'Description',
+        shortDescription: workOrderItem.name || `Item ${index + 1}`,
+        longDescription: workOrderItem.description || '',
+        UOM: workOrderItem.uom || '',
+        currency: workOrderItem.currency || 'SAR',
+        paymentType: workOrderItem.paymentType || 'Fixed Price',
+        managementArea: workOrderItem.managementArea || ''
+      };
+      
+      this.mockItems.push(newItem);
+      newItems.push(newItem);
+    });
+    
+    // Notify subscribers of the changes
+    this.itemsSubject.next(this.mockItems);
+    
+    return of(newItems);
   }
 }
