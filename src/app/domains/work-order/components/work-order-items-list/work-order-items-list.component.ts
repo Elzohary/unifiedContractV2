@@ -81,6 +81,34 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
     }
   }
 
+  openAddDialog(): void {
+    const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
+      width: '800px',
+      maxWidth: '100vw',
+      maxHeight: '100vh',
+      panelClass: 'full-screen-dialog',
+      data: {
+        id: null,
+        itemNumber: '',
+        lineType: 'Construction',
+        shortDescription: '',
+        longDescription: '',
+        UOM: '',
+        currency: '',
+        paymentType: '',
+        managementArea: ''
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.workOrderItemService.createItem(result).subscribe(() => {
+          this.loadItems();
+        });
+      }
+    });
+  }
+
   openEditDialog(item: Iitem): void {
     const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
       width: '800px',

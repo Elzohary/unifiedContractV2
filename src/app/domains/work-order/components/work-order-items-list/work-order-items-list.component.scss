@@ -13,9 +13,22 @@
     justify-content: space-between;
     gap: 16px;
 
-    h2 {
-      margin: 0;
-      white-space: nowrap;
+    .title-actions {
+      display: flex;
+      align-items: center;
+
+      gap: 16px;
+
+      h2 {
+        margin: 0;
+        white-space: nowrap;
+      }
+
+      button {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
     }
 
     .search-field {
@@ -110,6 +123,16 @@ table {
       flex-direction: column;
       align-items: stretch;
       gap: 8px;
+
+      .title-actions {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
+
+        button {
+          width: 100%;
+        }
+      }
 
       .search-field {
         width: 100%;

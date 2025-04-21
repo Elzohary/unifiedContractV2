@@ -2,12 +2,18 @@
   <app-ng-card>
     <div class="header">
       <div class="title-search-row">
-        <h2>Work Order Items</h2>
-        <mat-form-field appearance="outline" class="search-field">
-          <mat-label>Search</mat-label>
-          <input matInput (keyup)="applyFilter($event)" placeholder="Search items">
-          <mat-icon matSuffix>search</mat-icon>
-        </mat-form-field>
+        <div class="title-actions">
+          <h2>Work Order Items</h2>
+          <mat-form-field appearance="outline" class="search-field">
+            <mat-label>Search</mat-label>
+            <input matInput (keyup)="applyFilter($event)" placeholder="Search items">
+            <mat-icon matSuffix>search</mat-icon>
+          </mat-form-field>
+        </div>
+        <button mat-raised-button color="primary" (click)="openAddDialog()">
+          <mat-icon>add</mat-icon>
+          Add Item
+        </button>
       </div>
     </div>
 
