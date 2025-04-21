@@ -8,9 +8,9 @@
   flex-direction: column;
 
   @media (max-width: 600px) {
-    padding: 0;
     max-width: 100%;
-    height: 100vh;
+    padding: 0;
+    margin: 0;
   }
 }
 
@@ -44,15 +44,14 @@
 }
 
 mat-dialog-content {
-  max-height: none;
   height: 100%;
   overflow-y: auto;
   padding: 0 24px;
   margin: 0;
+  flex: 1;
 
   @media (max-width: 600px) {
     padding: 0 16px;
-    height: calc(100vh - 120px);
   }
 }
 
@@ -79,15 +78,27 @@ mat-dialog-actions {
 
 // Full screen dialog styles
 ::ng-deep .full-screen-dialog {
-  @media (max-width: 599px) {
+  width: 40% !important;
+  height: 95% !important;
+  max-width: 100vw !important;
+  max-height: 100vh !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+
+  .mat-dialog-container {
+    padding: 0 !important;
+    border-radius: 0 !important;
+  }
+
+  @media (max-width: 1300px) {
     width: 100% !important;
     height: 100% !important;
     max-width: 100vw !important;
     max-height: 100vh !important;
-    border-radius: 0 !important;
-    margin: 0 !important;
   }
 }
+
 
 // Responsive form layout
 @media (max-width: 599px) {

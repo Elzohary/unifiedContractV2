@@ -1,9 +1,9 @@
 <div class="work-order-items-list-container">
   <app-ng-card>
     <div class="header">
-      <h2>Work Order Items</h2>
-      <div class="search-container">
-        <mat-form-field appearance="outline">
+      <div class="title-search-row">
+        <h2>Work Order Items</h2>
+        <mat-form-field appearance="outline" class="search-field">
           <mat-label>Search</mat-label>
           <input matInput (keyup)="applyFilter($event)" placeholder="Search items">
           <mat-icon matSuffix>search</mat-icon>

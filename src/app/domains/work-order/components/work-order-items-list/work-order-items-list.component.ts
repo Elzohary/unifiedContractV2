@@ -83,7 +83,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit {
 
   openEditDialog(item: Iitem): void {
     const dialogRef = this.dialog.open(WorkOrderItemEditDialogComponent, {
-      width: '500px',
+      width: '800px',
       maxWidth: '100vw',
       maxHeight: '100vh',
       panelClass: 'full-screen-dialog',

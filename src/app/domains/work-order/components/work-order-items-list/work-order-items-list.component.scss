@@ -1,9 +1,33 @@
-.table-container {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.work-order-items-list-container {
   width: 100%;
-  overflow: hidden;
+  height: 100%;
+}
+
+.header {
+  padding: 16px 24px;
+  margin-bottom: 16px;
+
+  .title-search-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    h2 {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .search-field {
+      width: 300px;
+      margin: 0;
+    }
+  }
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
 }
 
 .table-header {
@@ -75,5 +99,21 @@ table {
 
   .table-header {
     padding: 0 4px;
+  }
+}
+
+@media (max-width: 600px) {
+  .header {
+    padding: 16px;
+
+    .title-search-row {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 8px;
+
+      .search-field {
+        width: 100%;
+      }
+    }
   }
 }
