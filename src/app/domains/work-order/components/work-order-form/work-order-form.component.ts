@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -29,16 +29,7 @@ import {
   WorkOrder,
   WorkOrderStatus,
   WorkOrderPriority,
-  workOrderItem,
-  materialAssignment,
-  Task,
-  WorkOrderIssue,
-  Attachment,
-  WorkOrderRemark,
-  WorkOrderAction,
-  WorkOrderPhoto,
-  WorkOrderForm,
-  workOrderDetail
+  Iitem
 } from '../../models/work-order.model';
 
 @Component({
@@ -71,13 +62,13 @@ import {
     NotificationService
   ]
 })
-export class WorkOrderFormComponent implements OnInit, OnDestroy {
+export class WorkOrderFormComponent implements OnDestroy {
   form!: FormGroup;
   loading = false;
   private destroy$ = new Subject<void>();
 
   // Available items for dropdown
-  availableItems: workOrderItem[] = [];
+  availableItems: Iitem[] = [];
 
   // Priority options
   readonly priorityOptions: WorkOrderPriority[] = [
@@ -121,8 +112,7 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
         priority: ['medium', Validators.required],
         category: ['', Validators.required],
         startDate: [new Date(), Validators.required],
-        dueDate: ['', Validators.required],
-        estimatedCost: [0, [Validators.required, Validators.min(0)]]
+        dueDate: ['', Validators.required]
       }),
 
       // Work Order Items
@@ -311,7 +301,7 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
     this.workOrderItemService.getItems()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (items: workOrderItem[]) => {
+        next: (items: Iitem[]) => {
           this.availableItems = items;
         },
         error: (error: Error) => {
@@ -345,7 +335,7 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
           completionPercentage: 0,
           receivedDate: new Date().toISOString()
         },
-        estimatedCost: formValue.details.estimatedCost,
+        items: formValue.items || [],
         remarks: formValue.additionalSections.remarks || [],
         issues: formValue.additionalSections.issues || [],
         materials: formValue.materials || [],
@@ -397,7 +387,7 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
     return control ? control.hasError(errorName) && control.touched : false;
   }
 
-  ngOnInit(): void {}
+
 
   ngOnDestroy(): void {
     this.destroy$.next();

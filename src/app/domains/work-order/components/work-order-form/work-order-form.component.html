@@ -83,7 +83,7 @@
                     <mat-label>Select Item</mat-label>
                     <mat-select formControlName="itemId">
                       <mat-option *ngFor="let item of availableItems" [value]="item.id">
-                        {{ item.description }} ({{ item.itemNumber }})
+                        {{ item.shortDescription }} ({{ item.itemNumber }})
                       </mat-option>
                     </mat-select>
                   </mat-form-field>

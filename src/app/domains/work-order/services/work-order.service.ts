@@ -98,7 +98,7 @@ export class WorkOrderService {
         completionPercentage: 35,
         createdBy: 'Admin'
       },
-      estimatedCost: 50000,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -136,7 +136,7 @@ export class WorkOrderService {
         completionPercentage: 100,
         createdBy: 'Homeowner'
       },
-      estimatedCost: 15000,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -148,7 +148,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 5000, labor: 8000, other: 2000 }
+      expenseBreakdown: {
+        materials: 5000,
+        labor: 8000,
+        other: 2000
+      }
     },
     {
       id: 'wo3',
@@ -170,7 +174,7 @@ export class WorkOrderService {
         completionPercentage: 20,
         createdBy: 'Admin'
       },
-      estimatedCost: 30000,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -182,7 +186,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 10000, labor: 12000, other: 3000 }
+      expenseBreakdown: {
+        materials: 10000,
+        labor: 12000,
+        other: 3000
+      }
     },
     {
       id: 'wo4',
@@ -204,7 +212,7 @@ export class WorkOrderService {
         completionPercentage: 100,
         createdBy: 'System Alert'
       },
-      estimatedCost: 1000,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -216,7 +224,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 10000, labor: 12000, other: 3000 }
+      expenseBreakdown: {
+        materials: 10000,
+        labor: 12000,
+        other: 3000
+      }
     },
     {
       id: 'wo5',
@@ -238,7 +250,7 @@ export class WorkOrderService {
         completionPercentage: 50,
         createdBy: 'System Alert'
       },
-      estimatedCost: 1200,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -250,7 +262,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 300, labor: 800, other: 100 }
+      expenseBreakdown: {
+        materials: 300,
+        labor: 800,
+        other: 100
+      }
     },
     {
       id: 'wo6',
@@ -272,7 +288,7 @@ export class WorkOrderService {
         completionPercentage: 0,
         createdBy: 'Admin'
       },
-      estimatedCost: 2500,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -284,7 +300,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 100, labor: 2000, other: 400 }
+      expenseBreakdown: {
+        materials: 100,
+        labor: 2000,
+        other: 400
+      }
     },
     {
       id: 'wo7',
@@ -306,7 +326,7 @@ export class WorkOrderService {
         completionPercentage: 100,
         createdBy: 'User Three'
       },
-      estimatedCost: 8000,
+      items: [],
       remarks: [],
       issues: [],
       materials: [],
@@ -318,7 +338,11 @@ export class WorkOrderService {
       forms: [],
       expenses: [],
       invoices: [],
-      expenseBreakdown: { materials: 5000, labor: 2500, other: 500 }
+      expenseBreakdown: {
+        materials: 5000,
+        labor: 2500,
+        other: 500
+      }
     }
   ];
   private workOrdersSubject = new BehaviorSubject<WorkOrder[]>(this.mockWorkOrders);
@@ -476,7 +500,7 @@ export class WorkOrderService {
         receivedDate: workOrderData.details?.receivedDate || new Date().toISOString(),
         createdBy: workOrderData.details?.createdBy || 'System'
       },
-      estimatedCost: workOrderData.estimatedCost || 0,
+      items: workOrderData.items || [],
       remarks: workOrderData.remarks || [],
       issues: workOrderData.issues || [],
       materials: workOrderData.materials || [],

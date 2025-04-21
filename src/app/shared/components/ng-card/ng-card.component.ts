@@ -1,15 +1,13 @@
 import { Component } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
-import { ExpansionPanelComponent } from '../expansion-panel/expansion-panel.component';
-import { MatButtonModule } from '@angular/material/button';
-
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-ng-card',
+  standalone: true,
   imports: [
-    MatCardModule,
-    ExpansionPanelComponent,
-    MatButtonModule
+    CommonModule,
+    MatCardModule
   ],
   templateUrl: './ng-card.component.html',
   styleUrl: './ng-card.component.scss'

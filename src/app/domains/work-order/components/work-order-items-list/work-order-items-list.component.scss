@@ -1,0 +1,79 @@
+.table-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  overflow: hidden;
+}
+
+.table-header {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0 16px;
+}
+
+.search-field {
+  width: 100%;
+  max-width: 300px;
+}
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+table {
+  width: 100%;
+  min-width: 800px;
+}
+
+.mat-column-actions {
+  width: 80px;
+  text-align: center;
+}
+
+.mat-mdc-row .mat-mdc-cell {
+  border-bottom: 1px solid transparent;
+  border-top: 1px solid transparent;
+  cursor: pointer;
+}
+
+.mat-mdc-row:hover .mat-mdc-cell {
+  border-color: currentColor;
+}
+
+.demo-row-is-clicked {
+  font-weight: bold;
+}
+
+// Responsive styles
+@media (max-width: 959px) {
+  .table-header {
+    padding: 0 8px;
+  }
+
+  .search-field {
+    max-width: 100%;
+  }
+
+  // Hide less important columns on medium screens
+  .mat-column-unitPrice,
+  .mat-column-estimatedQuantity,
+  .mat-column-actualQuantity {
+    display: none;
+  }
+}
+
+@media (max-width: 599px) {
+  // Hide more columns on small screens
+  .mat-column-unit,
+  .mat-column-estimatedPrice,
+  .mat-column-actualPrice {
+    display: none;
+  }
+
+  .table-header {
+    padding: 0 4px;
+  }
+}

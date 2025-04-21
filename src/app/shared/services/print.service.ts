@@ -325,12 +325,6 @@ export class PrintService {
               <div class="detail-value">${workOrder.details.category}</div>
             </div>
 
-            <div class="detail-item">
-              <span class="detail-label">Estimated Cost</span>
-              <div class="detail-value">$${workOrder.estimatedCost?.toLocaleString() || '0'}</div>
-            </div>
-          </div>
-
           <div class="detail-item" style="margin-top: 15px;">
             <span class="detail-label">Completion</span>
             <div class="completion-bar">

@@ -103,7 +103,9 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit {
         case 'status':
           return item.details.status;
         case 'estimationPrice':
-          return item.estimatedCost;
+          return (item.expenseBreakdown?.materials || 0) +
+                 (item.expenseBreakdown?.labor || 0) +
+                 (item.expenseBreakdown?.other || 0);
         case 'actualPrice':
           return (item.expenseBreakdown?.materials || 0) +
                  (item.expenseBreakdown?.labor || 0) +
@@ -124,7 +126,9 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit {
         data.details.category.toLowerCase().includes(searchStr) ||
         data.details.status.toLowerCase().includes(searchStr) ||
         new Date(data.details.receivedDate).toLocaleDateString().toLowerCase().includes(searchStr) ||
-        data.estimatedCost.toString().includes(searchStr) ||
+        ((data.expenseBreakdown?.materials || 0) +
+         (data.expenseBreakdown?.labor || 0) +
+         (data.expenseBreakdown?.other || 0)).toString().includes(searchStr) ||
         ((data.expenseBreakdown?.materials || 0) +
          (data.expenseBreakdown?.labor || 0) +
          (data.expenseBreakdown?.other || 0)).toString().includes(searchStr) ||

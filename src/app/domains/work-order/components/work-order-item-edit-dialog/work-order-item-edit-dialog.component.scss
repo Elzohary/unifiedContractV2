@@ -1,0 +1,105 @@
+.edit-dialog-container {
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: 600px) {
+    padding: 0;
+    max-width: 100%;
+    height: 100vh;
+  }
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 0;
+  flex: 1;
+  overflow-y: auto;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 8px;
+  }
+}
+
+.form-field {
+  flex: 1;
+  min-width: 0;
+}
+
+mat-dialog-content {
+  max-height: none;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 24px;
+  margin: 0;
+
+  @media (max-width: 600px) {
+    padding: 0 16px;
+    height: calc(100vh - 120px);
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  position: sticky;
+  bottom: 0;
+  background: white;
+  z-index: 1;
+
+  @media (max-width: 600px) {
+    padding: 16px;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.half-width {
+  width: 48%;
+}
+
+// Full screen dialog styles
+::ng-deep .full-screen-dialog {
+  @media (max-width: 599px) {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+  }
+}
+
+// Responsive form layout
+@media (max-width: 599px) {
+  .half-width {
+    width: 100%;
+  }
+
+  .edit-form {
+    padding: 16px;
+  }
+
+  mat-dialog-actions {
+    padding: 16px;
+  }
+}

@@ -1,54 +1,108 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import { environment } from '../../../../environments/environment';
-import { workOrderItem } from '../models/work-order.model';
-
-interface ApiResponse<T> {
-  data: T;
-  message?: string;
-  status: number;
-}
+import { Iitem } from '../models/work-order-item.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class WorkOrderItemService {
-  private endpoint = 'work-order-items';
+  private mockItems: Iitem[] = [
+    {
+      id: '1',
+      itemNumber: 'WOI-001',
+      lineType: 'Description',
+      shortDescription: 'Concrete Mix',
+      longDescription: 'Concrete Mix - Grade 30 for foundation work',
+      UOM: 'm³',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Western Region'
+    },
+    {
+      id: '2',
+      itemNumber: 'WOI-002',
+      lineType: 'Description',
+      shortDescription: 'Steel Bars',
+      longDescription: 'Steel Reinforcement Bars - 12mm for structural support',
+      UOM: 'ton',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Western Region'
+    },
+    {
+      id: '3',
+      itemNumber: 'WOI-003',
+      lineType: 'Description',
+      shortDescription: 'Electrical Wiring',
+      longDescription: 'Electrical Wiring - 2.5mm² for power distribution',
+      UOM: 'm',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Western Region'
+    },
+    {
+      id: '4',
+      itemNumber: 'WOI-004',
+      lineType: 'Description',
+      shortDescription: 'PVC Pipes',
+      longDescription: 'PVC Pipes - 50mm for plumbing installation',
+      UOM: 'm',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Western Region'
+    },
+    {
+      id: '5',
+      itemNumber: 'WOI-005',
+      lineType: 'Description',
+      shortDescription: 'Interior Paint',
+      longDescription: 'Paint - Interior White for wall finishing',
+      UOM: 'L',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Western Region'
+    }
+  ];
 
   constructor(private http: HttpClient) {}
 
-  getItems(): Observable<workOrderItem[]> {
-    return this.http.get<ApiResponse<workOrderItem[]>>(`${environment.apiUrl}/${this.endpoint}`).pipe(
-      map(response => response.data),
-      catchError(() => of([]))
-    );
+  getItems(): Observable<Iitem[]> {
+    return of(this.mockItems);
   }
 
-  getItemById(id: string): Observable<workOrderItem | null> {
-    return this.http.get<ApiResponse<workOrderItem>>(`${environment.apiUrl}/${this.endpoint}/${id}`).pipe(
-      map(response => response.data),
-      catchError(() => of(null))
-    );
+  getItemById(id: string): Observable<Iitem | null> {
+    const item = this.mockItems.find(item => item.id === id);
+    return of(item || null);
   }
 
-  createItem(item: Partial<workOrderItem>): Observable<workOrderItem> {
-    return this.http.post<ApiResponse<workOrderItem>>(`${environment.apiUrl}/${this.endpoint}`, item).pipe(
-      map(response => response.data)
-    );
+  createItem(item: Partial<Iitem>): Observable<Iitem> {
+    const newItem: Iitem = {
+      ...item,
+      id: (this.mockItems.length + 1).toString()
+    } as Iitem;
+    this.mockItems.push(newItem);
+    return of(newItem);
   }
 
-  updateItem(id: string, item: Partial<workOrderItem>): Observable<workOrderItem> {
-    return this.http.put<ApiResponse<workOrderItem>>(`${environment.apiUrl}/${this.endpoint}/${id}`, item).pipe(
-      map(response => response.data)
-    );
+  updateItem(id: string, item: Partial<Iitem>): Observable<Iitem> {
+    const index = this.mockItems.findIndex(i => i.id === id);
+    if (index !== -1) {
+      this.mockItems[index] = {
+        ...this.mockItems[index],
+        ...item
+      };
+      return of(this.mockItems[index]);
+    }
+    return of({} as Iitem);
   }
 
   deleteItem(id: string): Observable<boolean> {
-    return this.http.delete<void>(`${environment.apiUrl}/${this.endpoint}/${id}`).pipe(
-      map(() => true),
-      catchError(() => of(false))
-    );
+    const index = this.mockItems.findIndex(item => item.id === id);
+    if (index !== -1) {
+      this.mockItems.splice(index, 1);
+      return of(true);
+    }
+    return of(false);
   }
-} 
+}

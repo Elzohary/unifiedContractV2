@@ -326,7 +326,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
         'Due Date': this.formatDate(this.workOrder.details.dueDate),
         'Completion': `${this.workOrder.details.completionPercentage}%`,
         'Category': this.workOrder.details.category,
-        'Estimated Cost': `$${this.workOrder.estimatedCost ? this.workOrder.estimatedCost.toLocaleString() : '0'}`,
+        'Estimated Cost': `$${this.workOrder.expenseBreakdown?.materials ? this.workOrder.expenseBreakdown?.materials.toLocaleString() : '0'}`,
         'Client': this.workOrder.details.client || 'N/A',
         'Location': this.workOrder.details.location || 'N/A',
         'Engineer In Charge': this.workOrder.engineerInCharge?.name || 'Not Assigned'

@@ -1,0 +1,92 @@
+<div class="edit-dialog-container">
+  <h2 mat-dialog-title>Edit Work Order Item</h2>
+
+  <mat-dialog-content>
+    <form [formGroup]="editForm" class="edit-form">
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Item Number</mat-label>
+          <input matInput formControlName="itemNumber" required>
+          <mat-error *ngIf="editForm.get('itemNumber')?.hasError('required')">
+            Item Number is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Line Type</mat-label>
+          <mat-select formControlName="lineType" required>
+            <mat-option *ngFor="let type of lineTypes" [value]="type">
+              {{ type }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="editForm.get('lineType')?.hasError('required')">
+            Line Type is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Short Description</mat-label>
+          <input matInput formControlName="shortDescription" required>
+          <mat-error *ngIf="editForm.get('shortDescription')?.hasError('required')">
+            Short Description is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Long Description</mat-label>
+          <textarea matInput formControlName="longDescription" rows="3" required></textarea>
+          <mat-error *ngIf="editForm.get('longDescription')?.hasError('required')">
+            Long Description is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Unit of Measure</mat-label>
+          <input matInput formControlName="UOM" required>
+          <mat-error *ngIf="editForm.get('UOM')?.hasError('required')">
+            Unit of Measure is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Currency</mat-label>
+          <input matInput formControlName="currency" required>
+          <mat-error *ngIf="editForm.get('currency')?.hasError('required')">
+            Currency is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Payment Type</mat-label>
+          <input matInput formControlName="paymentType" required>
+          <mat-error *ngIf="editForm.get('paymentType')?.hasError('required')">
+            Payment Type is required
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="form-field">
+          <mat-label>Management Area</mat-label>
+          <input matInput formControlName="managementArea" required>
+          <mat-error *ngIf="editForm.get('managementArea')?.hasError('required')">
+            Management Area is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="end">
+    <button mat-button (click)="onNoClick()">Cancel</button>
+    <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!editForm.valid">
+      Save
+    </button>
+  </mat-dialog-actions>
+</div>

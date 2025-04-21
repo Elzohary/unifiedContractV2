@@ -1,3 +1,6 @@
+import { Iitem } from './work-order-item.model';
+export type { Iitem };
+
 export interface User {
   id: string;
   name: string;
@@ -134,7 +137,7 @@ export {WorkOrderStatus} from './work-order-status.enum';
 export interface WorkOrder {
   id: string;
   details: workOrderDetail;
-  estimatedCost: number;  // Total amount of the Work Order "items"'s estimatedPrice
+  items: workOrderItem[];
   remarks: WorkOrderRemark[];
   engineerInCharge?: {
     id: string;
@@ -182,10 +185,7 @@ export interface workOrderDetail {
 
 export interface workOrderItem {
   id: string;
-  itemNumber: string;
-  description: string;
-  unit: string;
-  unitPrice: number;
+  itemDetail: Iitem;
   estimatedQuantity: number;
   estimatedPrice: number;
   estimatedPriceWithVAT: number;

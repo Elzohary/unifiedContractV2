@@ -10,7 +10,7 @@ import { ActivityLogPageComponent } from './features/dashboards/dashboard-manage
 import { EquipmentDashboardComponent } from './modules/resources/components/equipment-dashboard/equipment-dashboard.component';
 import { LoginComponent } from './auth/login/login.component';
 import { UserListComponent } from './users/user-list/user-list.component';
-
+import { WorkOrderItemsListComponent } from './domains/work-order/components/work-order-items-list/work-order-items-list.component';
 export const routes: Routes = [
   // Login route
   { path: 'login', component: LoginComponent },
@@ -131,6 +131,10 @@ export const routes: Routes = [
       message: 'The invoices section is currently under development.',
       category: 'work-orders'
     }
+  },
+  {
+    path: 'work-order/items-list',
+    component: WorkOrderItemsListComponent
   },
 
   // Resources routes - merge lazy and direct routes

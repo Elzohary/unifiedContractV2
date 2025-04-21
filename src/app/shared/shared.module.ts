@@ -103,4 +103,4 @@ const standaloneComponents = [
     ActivityMonitorModule
   ]
 })
-export class SharedModule { } 
+export class SharedModule { }
