@@ -24,6 +24,6 @@
   </ng-container>
 
   <mat-header-row class="fw-bold tableHeader" mat-header-row
-    *matHeaderRowDef="displayedColumns sticky: true"></mat-header-row>
+    *matHeaderRowDef="displayedColumns; sticky: true"></mat-header-row>
   <mat-row mat-row *matRowDef="let row; columns: displayedColumns;" routerLink="/portal/wo"></mat-row>
 </mat-table>

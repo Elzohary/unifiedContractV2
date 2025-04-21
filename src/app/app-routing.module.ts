@@ -133,8 +133,9 @@ export const routes: Routes = [
     }
   },
   {
-    path: 'work-order/items-list',
-    component: WorkOrderItemsListComponent
+    path: 'work-order-sections/items-list',
+    component: WorkOrderItemsListComponent,
+    pathMatch: 'full'
   },
 
   // Resources routes - merge lazy and direct routes

@@ -63,6 +63,11 @@ export const projectMenuItems = [
                 label: 'Invoices',
                 link: '/work-order-sections/invoices',
                 icon: 'receipt'
+            },
+            {
+                label: 'Items',
+                link: '/work-order-sections/items-list',
+                icon: 'list_alt'
             }
         ]
     },
