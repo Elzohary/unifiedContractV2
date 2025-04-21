@@ -39,8 +39,8 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
                      class="app-sidenav">
           <div class="sidenav-header">
             <div class="logo-container">
-              <img src="assets/logo.png" alt="Logo" class="logo-img" />
-              <h2 class="app-title">Work Order Management</h2>
+              <img src="../assets/Logo2.png" alt="Logo" class="logo-img" />
+              <h2 class="app-title">WO Manager</h2>
             </div>
           </div>
           <mat-divider></mat-divider>
@@ -82,7 +82,7 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
       width: 256px;
       border-right: none;
       box-shadow: var(--shadow-drawer);
-      background-color: var(--sidebar-background);
+      background-color: white;
       z-index: 1000;
       overflow: hidden;
       display: flex;
@@ -93,8 +93,9 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
       height: 64px;
       display: flex;
       align-items: center;
+      justify-content: center;
       padding: 0 16px;
-      background-color: var(--primary);
+      background-color: white;
       color: white;
       position: sticky;
       top: 0;
@@ -117,8 +118,9 @@ import { WORK_ORDER_PROVIDERS } from './domains/work-order/work-order.providers'
 
     .app-title {
       margin: 0;
+      color: #343a40;
       font-size: 18px;
-      font-weight: 500;
+      font-weight: 900;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
