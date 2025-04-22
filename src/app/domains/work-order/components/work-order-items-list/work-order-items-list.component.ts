@@ -75,7 +75,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
@@ -95,6 +95,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
       )
       .subscribe(items => {
         this.dataSource.data = items;
+        this.isLoading = false
         // Ensure table refreshes
         this.dataSource._updateChangeSubscription();
       });
@@ -139,12 +140,12 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
         // Optimistic UI update - add temporary item with loading state
         const tempId = 'temp-' + new Date().getTime();
         const tempItem: Iitem = { ...result, id: tempId };
-        
+
         // Add to current data and update view
         const currentData = [...this.dataSource.data];
         currentData.unshift(tempItem);
         this.dataSource.data = currentData;
-        
+
         // Make actual API call
         this.workOrderItemService.createItem(result)
           .pipe(
@@ -182,11 +183,11 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         // Optimistic UI update - update item immediately
-        const updatedItems = this.dataSource.data.map(i => 
+        const updatedItems = this.dataSource.data.map(i =>
           i.id === result.id ? { ...result } : i
         );
         this.dataSource.data = updatedItems;
-        
+
         // Make actual API call
         this.workOrderItemService.updateItem(result.id, result)
           .pipe(
@@ -217,7 +218,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
     // First remove from UI immediately for better UX
     const currentData = this.dataSource.data.filter(i => i.id !== item.id);
     this.dataSource.data = currentData;
-    
+
     // Then actually delete from the backend
     this.workOrderItemService.deleteItem(item.id)
       .pipe(
@@ -233,12 +234,12 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
         this.showSuccessMessage('Item deleted successfully');
       });
   }
-  
+
   private removeItemById(id: string): void {
     const currentData = this.dataSource.data.filter(item => item.id !== id);
     this.dataSource.data = currentData;
   }
-  
+
   private showSuccessMessage(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 3000,
@@ -247,7 +248,7 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
       panelClass: 'success-snackbar'
     });
   }
-  
+
   private showErrorMessage(message: string): void {
     this.snackBar.open(message, 'Close', {
       duration: 5000,
