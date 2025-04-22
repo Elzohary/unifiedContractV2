@@ -149,7 +149,7 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Item Number</mat-label>
                     <mat-select formControlName="itemNumber">
-                      <mat-option *ngFor="let item of availableItems" [value]="item.itemNumber">
+                      <mat-option *ngFor="let item of getUniqueItems()" [value]="item.itemNumber">
                         {{ item.itemNumber }}
                       </mat-option>
                     </mat-select>
@@ -159,7 +159,7 @@
                   <mat-form-field appearance="outline">
                     <mat-label>Short Description</mat-label>
                     <mat-select formControlName="shortDescription">
-                      <mat-option *ngFor="let item of availableItems" [value]="item.shortDescription">
+                      <mat-option *ngFor="let item of getUniqueDescriptions()" [value]="item.shortDescription">
                         {{ item.shortDescription }}
                       </mat-option>
                     </mat-select>

@@ -474,16 +474,38 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
     }, { emitEvent: false });
   }
 
+  // Get unique items for dropdowns
+  getUniqueItems(): Iitem[] {
+    const uniqueItems = new Map<string, Iitem>();
+    this.availableItems.forEach(item => {
+      if (!uniqueItems.has(item.itemNumber)) {
+        uniqueItems.set(item.itemNumber, item);
+      }
+    });
+    return Array.from(uniqueItems.values());
+  }
+
+  // Get unique short descriptions for dropdowns
+  getUniqueDescriptions(): Iitem[] {
+    const uniqueDescriptions = new Map<string, Iitem>();
+    this.availableItems.forEach(item => {
+      if (!uniqueDescriptions.has(item.shortDescription)) {
+        uniqueDescriptions.set(item.shortDescription, item);
+      }
+    });
+    return Array.from(uniqueDescriptions.values());
+  }
+
   // Get available management areas for an item
   getAvailableManagementAreas(itemNumber: string): string[] {
-    const item = this.availableItems.find(i => i.itemNumber === itemNumber);
-    return item ? [item.managementArea] : this.managementAreas;
+    const items = this.availableItems.filter(item => item.itemNumber === itemNumber);
+    return [...new Set(items.map(item => item.managementArea))];
   }
 
   // Check if management area should be disabled
   isManagementAreaDisabled(itemNumber: string): boolean {
-    const item = this.availableItems.find(i => i.itemNumber === itemNumber);
-    return item ? true : false;
+    const items = this.availableItems.filter(item => item.itemNumber === itemNumber);
+    return items.length <= 1;
   }
 
   ngOnDestroy(): void {

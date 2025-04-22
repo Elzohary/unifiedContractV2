@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, of, Subject, BehaviorSubject } from 'rxjs';
+import { Observable, of, BehaviorSubject } from 'rxjs';
 import { Iitem } from '../models/work-order-item.model';
 
 @Injectable({
@@ -16,6 +16,7 @@ export class WorkOrderItemService {
       longDescription: 'Concrete Mix - Grade 30 for foundation work',
       UOM: 'm³',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -27,6 +28,7 @@ export class WorkOrderItemService {
       longDescription: 'Steel Reinforcement Bars - 12mm for structural support',
       UOM: 'ton',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -38,6 +40,7 @@ export class WorkOrderItemService {
       longDescription: 'Electrical Wiring - 2.5mm² for power distribution',
       UOM: 'm',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -49,6 +52,7 @@ export class WorkOrderItemService {
       longDescription: 'PVC Pipes - 50mm for plumbing installation',
       UOM: 'm',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -60,6 +64,7 @@ export class WorkOrderItemService {
       longDescription: 'Paint - Interior White for wall finishing',
       UOM: 'L',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -71,6 +76,7 @@ export class WorkOrderItemService {
       longDescription: 'Paint - Interior White for wall finishing',
       UOM: 'L',
       currency: 'SAR',
+      unitPrice: 100,
       paymentType: 'Fixed Price',
       managementArea: 'Eastern Region'
     }
@@ -143,7 +149,8 @@ export class WorkOrderItemService {
         UOM: workOrderItem.uom || '',
         currency: workOrderItem.currency || 'SAR',
         paymentType: workOrderItem.paymentType || 'Fixed Price',
-        managementArea: workOrderItem.managementArea || ''
+        managementArea: workOrderItem.managementArea || '',
+        unitPrice: workOrderItem.unitPrice || 0
       };
 
       this.mockItems.push(newItem);

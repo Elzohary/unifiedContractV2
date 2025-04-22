@@ -120,7 +120,8 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
       UOM: '',
       currency: '',
       paymentType: '',
-      managementArea: ''
+      managementArea: '',
+      unitPrice: 0
     };
 
     const dialogRef = this.dialog.open(WorkOrderItemDialogComponent, {
