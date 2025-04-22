@@ -19,23 +19,18 @@
 
                 <mat-form-field appearance="outline">
                   <mat-label>Internal Order Number</mat-label>
-                  <input matInput formControlName="internalOrderNumber" placeholder="Enter internal order number">
-                  <mat-error *ngIf="hasError('details.internalOrderNumber', 'required')">Internal order number is required</mat-error>
+                  <input matInput formControlName="internalOrderNumber" readonly>
                 </mat-form-field>
               </div>
 
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Title</mat-label>
                 <input matInput formControlName="title" placeholder="Enter work order title">
-                <mat-error *ngIf="hasError('details.title', 'required')">Title is required</mat-error>
-                <mat-error *ngIf="hasError('details.title', 'minlength')">Title must be at least 5 characters</mat-error>
               </mat-form-field>
 
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Description</mat-label>
                 <textarea matInput formControlName="description" rows="4" placeholder="Describe the work order"></textarea>
-                <mat-error *ngIf="hasError('details.description', 'required')">Description is required</mat-error>
-                <mat-error *ngIf="hasError('details.description', 'minlength')">Description must be at least 20 characters</mat-error>
               </mat-form-field>
 
               <div class="form-row">
@@ -131,26 +126,14 @@
               <div class="form-row">
                 <mat-form-field appearance="outline">
                   <mat-label>Created By</mat-label>
-                  <input matInput formControlName="createdBy" placeholder="Enter creator name">
-                  <mat-error *ngIf="hasError('details.createdBy', 'required')">Creator name is required</mat-error>
+                  <input matInput formControlName="createdBy" readonly>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
                   <mat-label>Created Date</mat-label>
-                  <input matInput [matDatepicker]="createdPicker" formControlName="createdDate">
-                  <mat-datepicker-toggle matSuffix [for]="createdPicker"></mat-datepicker-toggle>
-                  <mat-datepicker #createdPicker></mat-datepicker>
-                  <mat-error *ngIf="hasError('details.createdDate', 'required')">Created date is required</mat-error>
+                  <input matInput formControlName="createdDate" readonly>
                 </mat-form-field>
               </div>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Estimated Cost</mat-label>
-                <input matInput type="number" formControlName="estimatedCost" min="0">
-                <span matPrefix>$&nbsp;</span>
-                <mat-error *ngIf="hasError('details.estimatedCost', 'required')">Estimated cost is required</mat-error>
-                <mat-error *ngIf="hasError('details.estimatedCost', 'min')">Cost cannot be negative</mat-error>
-              </mat-form-field>
             </div>
           </mat-tab>
 
