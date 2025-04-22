@@ -62,9 +62,20 @@ export class WorkOrderItemService {
       currency: 'SAR',
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
+    },
+    {
+      id: '6',
+      itemNumber: 'WOI-005',
+      lineType: 'Description',
+      shortDescription: 'Interior Paint',
+      longDescription: 'Paint - Interior White for wall finishing',
+      UOM: 'L',
+      currency: 'SAR',
+      paymentType: 'Fixed Price',
+      managementArea: 'Eastern Region'
     }
   ];
-  
+
   // Subject to notify subscribers when items change
   private itemsSubject = new BehaviorSubject<Iitem[]>(this.mockItems);
   items$ = this.itemsSubject.asObservable();
@@ -112,15 +123,15 @@ export class WorkOrderItemService {
     }
     return of(false);
   }
-  
+
   // Create items from a work order
   createItemsFromWorkOrder(workOrderItems: any[], workOrderId: string): Observable<Iitem[]> {
     if (!workOrderItems || workOrderItems.length === 0) {
       return of([]);
     }
-    
+
     const newItems: Iitem[] = [];
-    
+
     workOrderItems.forEach((workOrderItem, index) => {
       // Create a new item based on the work order item
       const newItem: Iitem = {
@@ -134,14 +145,14 @@ export class WorkOrderItemService {
         paymentType: workOrderItem.paymentType || 'Fixed Price',
         managementArea: workOrderItem.managementArea || ''
       };
-      
+
       this.mockItems.push(newItem);
       newItems.push(newItem);
     });
-    
+
     // Notify subscribers of the changes
     this.itemsSubject.next(this.mockItems);
-    
+
     return of(newItems);
   }
 }

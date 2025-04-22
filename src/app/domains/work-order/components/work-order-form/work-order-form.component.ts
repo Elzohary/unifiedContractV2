@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, FormArray, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -62,13 +62,19 @@ import {
     NotificationService
   ]
 })
-export class WorkOrderFormComponent implements OnDestroy {
+export class WorkOrderFormComponent implements OnInit, OnDestroy {
   form!: FormGroup;
   loading = false;
   private destroy$ = new Subject<void>();
 
   // Available items for dropdown
   availableItems: Iitem[] = [];
+
+  // Unique management areas
+  managementAreas: string[] = [...new Set(this.availableItems.map(item => item.managementArea))];
+
+  // VAT rate
+  readonly VAT_RATE = 0.15;
 
   // Priority options
   readonly priorityOptions: WorkOrderPriority[] = [
@@ -102,6 +108,9 @@ export class WorkOrderFormComponent implements OnDestroy {
     private dialog: MatDialog
   ) {
     this.initializeForm();
+  }
+
+  ngOnInit(): void {
     this.loadAvailableItems();
   }
 
@@ -187,9 +196,49 @@ export class WorkOrderFormComponent implements OnDestroy {
   // Add Methods
   addItem(): void {
     const itemGroup = this.fb.group({
-      itemId: ['', Validators.required],
-      quantity: [1, [Validators.required, Validators.min(1)]]
+      itemNumber: ['', Validators.required],
+      shortDescription: ['', Validators.required],
+      UOM: [{ value: '', disabled: true }],
+      managementArea: ['', Validators.required],
+      estimatedQuantity: [0, [Validators.required, Validators.min(0)]],
+      estimatedPrice: [0, [Validators.required, Validators.min(0)]],
+      estimatedPriceWithVAT: [{ value: 0, disabled: true }]
     });
+
+    // Subscribe to changes in item number and short description
+    itemGroup.get('itemNumber')?.valueChanges.subscribe(itemNumber => {
+      const selectedItem = this.availableItems.find(item => item.itemNumber === itemNumber);
+      if (selectedItem) {
+        itemGroup.patchValue({
+          shortDescription: selectedItem.shortDescription,
+          UOM: selectedItem.UOM,
+          managementArea: selectedItem.managementArea
+        }, { emitEvent: false });
+        this.updatePriceWithVAT(itemGroup);
+      }
+    });
+
+    itemGroup.get('shortDescription')?.valueChanges.subscribe(description => {
+      const selectedItem = this.availableItems.find(item => item.shortDescription === description);
+      if (selectedItem) {
+        itemGroup.patchValue({
+          itemNumber: selectedItem.itemNumber,
+          UOM: selectedItem.UOM,
+          managementArea: selectedItem.managementArea
+        }, { emitEvent: false });
+        this.updatePriceWithVAT(itemGroup);
+      }
+    });
+
+    // Subscribe to changes in estimated quantity and price
+    itemGroup.get('estimatedQuantity')?.valueChanges.subscribe(() => {
+      this.updatePriceWithVAT(itemGroup);
+    });
+
+    itemGroup.get('estimatedPrice')?.valueChanges.subscribe(() => {
+      this.updatePriceWithVAT(itemGroup);
+    });
+
     this.items.push(itemGroup);
   }
 
@@ -411,6 +460,30 @@ export class WorkOrderFormComponent implements OnDestroy {
   hasError(controlPath: string, errorName: string): boolean {
     const control = this.form.get(controlPath);
     return control ? control.hasError(errorName) && control.touched : false;
+  }
+
+  private updatePriceWithVAT(itemGroup: FormGroup): void {
+    const quantity = itemGroup.get('estimatedQuantity')?.value || 0;
+    const price = itemGroup.get('estimatedPrice')?.value || 0;
+    const total = quantity * price;
+    const vatAmount = total * this.VAT_RATE;
+    const totalWithVAT = total + vatAmount;
+
+    itemGroup.patchValue({
+      estimatedPriceWithVAT: totalWithVAT
+    }, { emitEvent: false });
+  }
+
+  // Get available management areas for an item
+  getAvailableManagementAreas(itemNumber: string): string[] {
+    const item = this.availableItems.find(i => i.itemNumber === itemNumber);
+    return item ? [item.managementArea] : this.managementAreas;
+  }
+
+  // Check if management area should be disabled
+  isManagementAreaDisabled(itemNumber: string): boolean {
+    const item = this.availableItems.find(i => i.itemNumber === itemNumber);
+    return item ? true : false;
   }
 
   ngOnDestroy(): void {
