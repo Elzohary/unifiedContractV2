@@ -10,6 +10,20 @@
           <!-- Work Order Details Tab -->
           <mat-tab label="Work Order Details">
             <div class="form-section" formGroupName="details">
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Work Order Number</mat-label>
+                  <input matInput formControlName="workOrderNumber" placeholder="Enter work order number">
+                  <mat-error *ngIf="hasError('details.workOrderNumber', 'required')">Work order number is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Internal Order Number</mat-label>
+                  <input matInput formControlName="internalOrderNumber" placeholder="Enter internal order number">
+                  <mat-error *ngIf="hasError('details.internalOrderNumber', 'required')">Internal order number is required</mat-error>
+                </mat-form-field>
+              </div>
+
               <mat-form-field appearance="outline" class="full-width">
                 <mat-label>Title</mat-label>
                 <input matInput formControlName="title" placeholder="Enter work order title">
@@ -26,12 +40,37 @@
 
               <div class="form-row">
                 <mat-form-field appearance="outline">
+                  <mat-label>Client</mat-label>
+                  <input matInput formControlName="client" placeholder="Enter client name">
+                  <mat-error *ngIf="hasError('details.client', 'required')">Client is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Location</mat-label>
+                  <input matInput formControlName="location" placeholder="Enter location">
+                  <mat-error *ngIf="hasError('details.location', 'required')">Location is required</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Status</mat-label>
+                  <mat-select formControlName="status">
+                    <mat-option *ngFor="let status of statusOptions" [value]="status">
+                      {{ status | titlecase }}
+                    </mat-option>
+                  </mat-select>
+                  <mat-error *ngIf="hasError('details.status', 'required')">Status is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
                   <mat-label>Priority</mat-label>
                   <mat-select formControlName="priority">
                     <mat-option *ngFor="let priority of priorityOptions" [value]="priority">
                       {{ priority | titlecase }}
                     </mat-option>
                   </mat-select>
+                  <mat-error *ngIf="hasError('details.priority', 'required')">Priority is required</mat-error>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -41,6 +80,25 @@
                       {{ category }}
                     </mat-option>
                   </mat-select>
+                  <mat-error *ngIf="hasError('details.category', 'required')">Category is required</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Completion Percentage</mat-label>
+                  <input matInput type="number" formControlName="completionPercentage" min="0" max="100">
+                  <mat-error *ngIf="hasError('details.completionPercentage', 'required')">Completion percentage is required</mat-error>
+                  <mat-error *ngIf="hasError('details.completionPercentage', 'min')">Percentage cannot be negative</mat-error>
+                  <mat-error *ngIf="hasError('details.completionPercentage', 'max')">Percentage cannot exceed 100</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Received Date</mat-label>
+                  <input matInput [matDatepicker]="receivedPicker" formControlName="receivedDate">
+                  <mat-datepicker-toggle matSuffix [for]="receivedPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #receivedPicker></mat-datepicker>
+                  <mat-error *ngIf="hasError('details.receivedDate', 'required')">Received date is required</mat-error>
                 </mat-form-field>
               </div>
 
@@ -50,6 +108,7 @@
                   <input matInput [matDatepicker]="startPicker" formControlName="startDate">
                   <mat-datepicker-toggle matSuffix [for]="startPicker"></mat-datepicker-toggle>
                   <mat-datepicker #startPicker></mat-datepicker>
+                  <mat-error *ngIf="hasError('details.startDate', 'required')">Start date is required</mat-error>
                 </mat-form-field>
 
                 <mat-form-field appearance="outline">
@@ -57,6 +116,31 @@
                   <input matInput [matDatepicker]="duePicker" formControlName="dueDate">
                   <mat-datepicker-toggle matSuffix [for]="duePicker"></mat-datepicker-toggle>
                   <mat-datepicker #duePicker></mat-datepicker>
+                  <mat-error *ngIf="hasError('details.dueDate', 'required')">Due date is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Target End Date</mat-label>
+                  <input matInput [matDatepicker]="targetEndPicker" formControlName="targetEndDate">
+                  <mat-datepicker-toggle matSuffix [for]="targetEndPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #targetEndPicker></mat-datepicker>
+                  <mat-error *ngIf="hasError('details.targetEndDate', 'required')">Target end date is required</mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-row">
+                <mat-form-field appearance="outline">
+                  <mat-label>Created By</mat-label>
+                  <input matInput formControlName="createdBy" placeholder="Enter creator name">
+                  <mat-error *ngIf="hasError('details.createdBy', 'required')">Creator name is required</mat-error>
+                </mat-form-field>
+
+                <mat-form-field appearance="outline">
+                  <mat-label>Created Date</mat-label>
+                  <input matInput [matDatepicker]="createdPicker" formControlName="createdDate">
+                  <mat-datepicker-toggle matSuffix [for]="createdPicker"></mat-datepicker-toggle>
+                  <mat-datepicker #createdPicker></mat-datepicker>
+                  <mat-error *ngIf="hasError('details.createdDate', 'required')">Created date is required</mat-error>
                 </mat-form-field>
               </div>
 

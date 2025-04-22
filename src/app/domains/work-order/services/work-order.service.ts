@@ -473,6 +473,7 @@ export class WorkOrderService {
     return this.simulateNetwork(workOrder).pipe(
       catchError(error => {
         this.stateService.setError(error.message);
+        console.log(error);
         return throwError(() => error);
       }),
       finalize(() => {
@@ -526,7 +527,7 @@ export class WorkOrderService {
     const workOrders = [...this.workOrdersSubject.value, newWorkOrder];
     this.workOrdersSubject.next(workOrders);
     this.stateService.updateWorkOrders(workOrders);
-    
+
     // Emit the new work order
     this.newWorkOrderSubject.next(newWorkOrder);
 

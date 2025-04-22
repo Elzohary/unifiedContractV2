@@ -89,6 +89,8 @@ export class WorkOrderFormComponent implements OnDestroy {
     'Other'
   ];
 
+  statusOptions = ['draft', 'pending', 'in_progress', 'completed', 'cancelled'];
+
   constructor(
     private fb: FormBuilder,
     private workOrderService: WorkOrderService,
@@ -107,12 +109,23 @@ export class WorkOrderFormComponent implements OnDestroy {
     this.form = this.fb.group({
       // Work Order Details
       details: this.fb.group({
+        workOrderNumber: ['', Validators.required],
+        internalOrderNumber: ['', Validators.required],
         title: ['', [Validators.required, Validators.minLength(5)]],
         description: ['', [Validators.required, Validators.minLength(20)]],
+        client: ['', Validators.required],
+        location: ['', Validators.required],
+        status: ['pending', Validators.required],
         priority: ['medium', Validators.required],
         category: ['', Validators.required],
+        completionPercentage: [0, [Validators.required, Validators.min(0), Validators.max(100)]],
+        receivedDate: [new Date(), Validators.required],
         startDate: [new Date(), Validators.required],
-        dueDate: ['', Validators.required]
+        dueDate: ['', Validators.required],
+        targetEndDate: ['', Validators.required],
+        createdDate: [new Date(), Validators.required],
+        createdBy: ['', Validators.required],
+        lastUpdated: [new Date()]
       }),
 
       // Work Order Items
@@ -361,13 +374,13 @@ export class WorkOrderFormComponent implements OnDestroy {
             // If there are items in the work order, create them in the item service
             if (newWorkOrder.items && newWorkOrder.items.length > 0) {
               this.workOrderItemService.createItemsFromWorkOrder(
-                newWorkOrder.items, 
+                newWorkOrder.items,
                 workOrder.id
               ).subscribe(createdItems => {
                 console.log(`Created ${createdItems.length} items for work order ${workOrder.id}`);
               });
             }
-            
+
             this.snackBar.open('Work order created successfully', 'Close', { duration: 3000 });
             this.router.navigate(['/work-orders/details', workOrder.id]);
           },

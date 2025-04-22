@@ -167,7 +167,7 @@ export interface workOrderDetail {
   workOrderNumber: string;
   internalOrderNumber: string;
   title: string;
-  description: string;
+  description?: string;
   client: string;
   location: string;
   status: WorkOrderStatus;
@@ -175,8 +175,8 @@ export interface workOrderDetail {
   category: string;
   completionPercentage: number;
   receivedDate: string | Date;
-  startDate: string | Date;
-  dueDate: string | Date;
+  startDate?: string | Date;
+  dueDate?: string | Date;
   targetEndDate?: string | Date;
   createdDate: string | Date;
   createdBy: string;
