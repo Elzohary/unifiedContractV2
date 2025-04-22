@@ -63,6 +63,10 @@
     border-radius: 4px;
     border: 1px solid var(--border-color);
     position: relative;
+    border: 0.5px solid rgb(197, 206, 233);
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    background-color: rgba(243, 243, 248, 0.24);
 
     button[color="warn"] {
       position: absolute;
