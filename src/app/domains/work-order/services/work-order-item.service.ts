@@ -28,7 +28,7 @@ export class WorkOrderItemService {
       longDescription: 'Steel Reinforcement Bars - 12mm for structural support',
       UOM: 'ton',
       currency: 'SAR',
-      unitPrice: 100,
+      unitPrice: 120,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -40,7 +40,7 @@ export class WorkOrderItemService {
       longDescription: 'Electrical Wiring - 2.5mm² for power distribution',
       UOM: 'm',
       currency: 'SAR',
-      unitPrice: 100,
+      unitPrice: 1250,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -52,7 +52,7 @@ export class WorkOrderItemService {
       longDescription: 'PVC Pipes - 50mm for plumbing installation',
       UOM: 'm',
       currency: 'SAR',
-      unitPrice: 100,
+      unitPrice: 300,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -64,7 +64,7 @@ export class WorkOrderItemService {
       longDescription: 'Paint - Interior White for wall finishing',
       UOM: 'L',
       currency: 'SAR',
-      unitPrice: 100,
+      unitPrice: 710,
       paymentType: 'Fixed Price',
       managementArea: 'Western Region'
     },
@@ -76,7 +76,7 @@ export class WorkOrderItemService {
       longDescription: 'Paint - Interior White for wall finishing',
       UOM: 'L',
       currency: 'SAR',
-      unitPrice: 100,
+      unitPrice: 582,
       paymentType: 'Fixed Price',
       managementArea: 'Eastern Region'
     }

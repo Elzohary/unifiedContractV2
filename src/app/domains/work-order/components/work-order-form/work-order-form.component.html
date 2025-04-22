@@ -188,17 +188,13 @@
                     <mat-error *ngIf="hasError('items.' + i + '.estimatedQuantity', 'min')">Quantity cannot be less than 1</mat-error>
                   </mat-form-field>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Unit Price</mat-label>
-                    <input matInput formControlName="unitPrice" readonly>
-                    <span matPrefix>SAR&nbsp;</span>
-                  </mat-form-field>
+                  <div class="price-display">
+                    <h3>Unit Price: <span>SAR {{ item.get('unitPrice')?.value | number:'1.2-2' }}</span></h3>
+                  </div>
 
-                  <mat-form-field appearance="outline">
-                    <mat-label>Estimated Price</mat-label>
-                    <input matInput formControlName="estimatedPrice" readonly>
-                    <span matPrefix>SAR&nbsp;</span>
-                  </mat-form-field>
+                  <div class="price-display">
+                    <h3>Estimated Price: <span>SAR {{ item.get('estimatedPrice')?.value | number:'1.2-2' }}</span></h3>
+                  </div>
                 </div>
 
                 <button type="button" mat-icon-button color="warn" (click)="removeItem(i)">
