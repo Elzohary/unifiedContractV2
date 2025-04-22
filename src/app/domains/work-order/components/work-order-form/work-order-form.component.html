@@ -189,16 +189,14 @@
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Estimated Price</mat-label>
-                    <input matInput type="number" formControlName="estimatedPrice" min="1">
+                    <mat-label>Unit Price</mat-label>
+                    <input matInput formControlName="unitPrice" readonly>
                     <span matPrefix>SAR&nbsp;</span>
-                    <mat-error *ngIf="hasError('items.' + i + '.estimatedPrice', 'required')">Price is required</mat-error>
-                    <mat-error *ngIf="hasError('items.' + i + '.estimatedPrice', 'min')">Price cannot be less than 1</mat-error>
                   </mat-form-field>
 
                   <mat-form-field appearance="outline">
-                    <mat-label>Estimated Price with VAT</mat-label>
-                    <input matInput formControlName="estimatedPriceWithVAT" readonly>
+                    <mat-label>Estimated Price</mat-label>
+                    <input matInput formControlName="estimatedPrice" readonly>
                     <span matPrefix>SAR&nbsp;</span>
                   </mat-form-field>
                 </div>

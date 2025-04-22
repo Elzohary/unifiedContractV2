@@ -200,8 +200,9 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
       shortDescription: ['', Validators.required],
       UOM: [{ value: '', disabled: true }],
       managementArea: ['', Validators.required],
-      estimatedQuantity: [0, [Validators.required, Validators.min(0)]],
-      estimatedPrice: [0, [Validators.required, Validators.min(0)]],
+      estimatedQuantity: [0, [Validators.required, Validators.min(1)]],
+      unitPrice: [{ value: 0, disabled: true }],
+      estimatedPrice: [{ value: 0, disabled: true }],
       estimatedPriceWithVAT: [{ value: 0, disabled: true }]
     });
 
@@ -212,9 +213,10 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
         itemGroup.patchValue({
           shortDescription: selectedItem.shortDescription,
           UOM: selectedItem.UOM,
-          managementArea: selectedItem.managementArea
+          managementArea: selectedItem.managementArea,
+          unitPrice: selectedItem.unitPrice
         }, { emitEvent: false });
-        this.updatePriceWithVAT(itemGroup);
+        this.updatePrices(itemGroup);
       }
     });
 
@@ -224,19 +226,16 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
         itemGroup.patchValue({
           itemNumber: selectedItem.itemNumber,
           UOM: selectedItem.UOM,
-          managementArea: selectedItem.managementArea
+          managementArea: selectedItem.managementArea,
+          unitPrice: selectedItem.unitPrice
         }, { emitEvent: false });
-        this.updatePriceWithVAT(itemGroup);
+        this.updatePrices(itemGroup);
       }
     });
 
-    // Subscribe to changes in estimated quantity and price
+    // Subscribe to changes in estimated quantity
     itemGroup.get('estimatedQuantity')?.valueChanges.subscribe(() => {
-      this.updatePriceWithVAT(itemGroup);
-    });
-
-    itemGroup.get('estimatedPrice')?.valueChanges.subscribe(() => {
-      this.updatePriceWithVAT(itemGroup);
+      this.updatePrices(itemGroup);
     });
 
     this.items.push(itemGroup);
@@ -462,14 +461,15 @@ export class WorkOrderFormComponent implements OnInit, OnDestroy {
     return control ? control.hasError(errorName) && control.touched : false;
   }
 
-  private updatePriceWithVAT(itemGroup: FormGroup): void {
+  private updatePrices(itemGroup: FormGroup): void {
     const quantity = itemGroup.get('estimatedQuantity')?.value || 0;
-    const price = itemGroup.get('estimatedPrice')?.value || 0;
-    const total = quantity * price;
+    const unitPrice = itemGroup.get('unitPrice')?.value || 0;
+    const total = quantity * unitPrice;
     const vatAmount = total * this.VAT_RATE;
     const totalWithVAT = total + vatAmount;
 
     itemGroup.patchValue({
+      estimatedPrice: total,
       estimatedPriceWithVAT: totalWithVAT
     }, { emitEvent: false });
   }
