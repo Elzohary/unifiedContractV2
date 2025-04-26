@@ -12,6 +12,11 @@ export const projectMenuItems = [
                 label: 'Analytics',
                 link: '/dashboard/analytics',
                 icon: 'analytics'
+            },
+            {
+                label: 'Projects',
+                link: '/dashboard/projects',
+                icon: 'work'
             }
         ]
     },

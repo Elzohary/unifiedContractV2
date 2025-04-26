@@ -37,6 +37,11 @@ export const routes: Routes = [
     component: UnderConstructionComponent,
     data: { title: 'Analytics Dashboard', message: 'The analytics dashboard is currently under development.' }
   },
+  {
+    path: 'dashboard/projects',
+    component: UnderConstructionComponent,
+    data: { title: 'Projects Dashboard', message: 'The projects dashboard is currently under development.' }
+  },
 
   // Work Order routes - direct component routes for better performance
   {
