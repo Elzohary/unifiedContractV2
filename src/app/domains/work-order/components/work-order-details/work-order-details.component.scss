@@ -2614,3 +2614,35 @@ mat-card-title {
 
   /* ... existing code ... */
 }
+
+/* Dates tab styles */
+.dates-table-container {
+  margin: 1rem 0;
+}
+
+.dates-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dates-table tr {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dates-table tr:last-child {
+  border-bottom: none;
+}
+
+.dates-table td {
+  padding: 0.75rem 0.5rem;
+}
+
+.date-label {
+  font-weight: 500;
+  color: var(--text-secondary);
+  width: 35%;
+}
+
+.date-value {
+  color: var(--text-primary);
+}

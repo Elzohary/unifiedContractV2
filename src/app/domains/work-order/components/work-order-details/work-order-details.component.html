@@ -114,7 +114,34 @@
                   <span>Dates</span>
                 </ng-template>
                 <div class="tab-content">
-                  
+                  <div class="dates-table-container">
+                    <table class="dates-table">
+                      <tr>
+                        <td class="date-label">Created Date</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.createdDate) }}</td>
+                      </tr>
+                      <tr>
+                        <td class="date-label">Received Date</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.receivedDate) }}</td>
+                      </tr>
+                      <tr>
+                        <td class="date-label">Start Date</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.startDate) || 'Not Specified' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="date-label">Due Date</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.dueDate) || 'Not Specified' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="date-label">Target End Date</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.targetEndDate) || 'Not Specified' }}</td>
+                      </tr>
+                      <tr>
+                        <td class="date-label">Last Updated</td>
+                        <td class="date-value">{{ formatDate(workOrder.details.lastUpdated) || 'Not Specified' }}</td>
+                      </tr>
+                    </table>
+                  </div>
                 </div>
               </mat-tab>
 

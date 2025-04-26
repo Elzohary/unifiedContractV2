@@ -98,7 +98,52 @@ export class WorkOrderService {
         completionPercentage: 35,
         createdBy: 'Admin'
       },
-      items: [],
+      items: [
+        {
+          id: 'item1',
+          itemDetail: {
+            id: 'item1',
+            itemNumber: '123456',
+            lineType: 'Description',
+            shortDescription: 'Renovation of the 3rd floor office space at Downtown Business Center',
+            longDescription: 'Renovation of the 3rd floor office space at Downtown Business Center',
+            UOM: 'm2',
+            currency: 'SAR',
+            unitPrice: 100,
+            paymentType: 'Cash',
+            managementArea: 'Ras Tanura'
+          },
+          estimatedQuantity: 100,
+          estimatedPrice: 100000,
+          estimatedPriceWithVAT: 115000,
+          actualQuantity: 100,
+          actualPrice: 100000,
+          actualPriceWithVAT: 115000,
+          reasonForFinalQuantity: 'Renovation of the 3rd floor office space at Downtown Business Center'
+        },
+        {
+          id: 'item2',
+          itemDetail: {
+            id: 'item2',
+            itemNumber: '342432',
+            lineType: 'Description',
+            shortDescription: 'Renovation of the 3rd floor office space at Downtown Business Center',
+            longDescription: 'Renovation of the 3rd floor office space at Downtown Business Center',
+            UOM: 'm2',
+            currency: 'SAR',
+            unitPrice: 100,
+            paymentType: 'Cash',
+            managementArea: 'Ras Tanura'
+          },
+          estimatedQuantity: 100,
+          estimatedPrice: 100000,
+          estimatedPriceWithVAT: 115000,
+          actualQuantity: 100,
+          actualPrice: 100000,
+          actualPriceWithVAT: 115000,
+          reasonForFinalQuantity: 'Renovation of the 3rd floor office space at Downtown Business Center'
+        }
+      ],
       remarks: [],
       issues: [],
       materials: [],
