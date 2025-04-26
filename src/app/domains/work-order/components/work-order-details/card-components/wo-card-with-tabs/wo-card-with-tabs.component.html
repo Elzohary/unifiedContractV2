@@ -1,0 +1,127 @@
+<mat-card class="tasks-card" appearance="outlined">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>{{ cardIcon }}</mat-icon>
+      <span>{{ cardTitle }}</span>
+    </mat-card-title>
+    <div class="header-actions">
+      <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+        <mat-icon>add</mat-icon>
+        <span>Add Task</span>
+      </button>
+    </div>
+  </mat-card-header>
+  <mat-card-content>
+    <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start">
+      <!-- Tasks List Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">check_box</mat-icon>
+          <span>Task List</span>
+        </ng-template>
+        <div class="tab-content tasks-tab">
+          <div class="tasks-container">
+            <ng-container *ngIf="tasks && tasks.length > 0; else noTasks">
+              <div class="task-item" *ngFor="let task of tasks; let i = index" [ngClass]="{'completed': task.completed}">
+                <div class="task-header">
+                  <div class="task-status">
+                    <mat-checkbox
+                      [checked]="task.completed"
+                      (change)="toggleTaskStatus(i)"
+                      color="primary">
+                    </mat-checkbox>
+                  </div>
+                  <div class="task-title">{{ task.title }}</div>
+                  <div class="task-actions">
+                    <button mat-icon-button (click)="editTask(i, task)" matTooltip="Edit">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+                    <button mat-icon-button (click)="deleteTask(i)" matTooltip="Delete">
+                      <mat-icon>delete</mat-icon>
+                    </button>
+                  </div>
+                </div>
+                <div class="task-details" *ngIf="task.description">
+                  <div class="task-description">{{ task.description }}</div>
+                </div>
+                <div class="task-footer">
+                  <div class="task-meta">
+                    <span class="task-due-date" *ngIf="task.dueDate">
+                      <mat-icon>event</mat-icon>
+                      {{ task.dueDate | date:'MMM d, y' }}
+                    </span>
+                    <span class="task-assigned" *ngIf="task.manpower">
+                      <mat-icon>person</mat-icon>
+                      {{ task.manpower }}
+                    </span>
+                    <span class="task-priority" [ngClass]="'priority-' + task.priority">
+                      <mat-icon>flag</mat-icon>
+                      {{ task.priority }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+
+            <ng-template #noTasks>
+              <div class="no-data-container">
+                <mat-icon>assignment</mat-icon>
+                <p>No tasks created for this work order</p>
+                <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                  <mat-icon>add</mat-icon>
+                  <span>Create First Task</span>
+                </button>
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Gantt Chart Tab -->
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon class="tab-icon">stacked_bar_chart</mat-icon>
+          <span>Gantt Chart</span>
+        </ng-template>
+        <div class="tab-content gantt-tab">
+          <div *ngIf="tasks && tasks.length > 0; else noTasksForGantt">
+            <p class="coming-soon-text">Gantt chart view coming soon</p>
+            <!-- Placeholder for Gantt chart -->
+            <div class="gantt-placeholder">
+              <div class="gantt-timeline">
+                <div class="gantt-days">
+                  <div class="gantt-day" *ngFor="let day of [1,2,3,4,5,6,7,8,9,10,11,12,13,14]">
+                    Day {{ day }}
+                  </div>
+                </div>
+                <div class="gantt-tasks">
+                  <div class="gantt-task-row" *ngFor="let task of tasks; let i = index">
+                    <div class="gantt-task-label">{{ task.title }}</div>
+                    <div class="gantt-task-bar"
+                      [ngStyle]="{
+                        'left': (i * 5) + '%',
+                        'width': '20%',
+                        'background-color': task.completed ? 'var(--success)' : 'var(--primary)'
+                      }">
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #noTasksForGantt>
+            <div class="no-data-container">
+              <mat-icon>stacked_bar_chart</mat-icon>
+              <p>No tasks available to display in Gantt chart</p>
+              <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                <mat-icon>add</mat-icon>
+                <span>Add Tasks to View Chart</span>
+              </button>
+            </div>
+          </ng-template>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+  </mat-card-content>
+</mat-card>

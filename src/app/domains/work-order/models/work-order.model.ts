@@ -147,7 +147,6 @@ export interface WorkOrder {
   issues: WorkOrderIssue[];
   materials?: materialAssignment[];
   permits?: Permit[];
-
   // Additional properties used in services and mock data
   tasks?: Task[];
   manpower?: ManpowerAssignment[];

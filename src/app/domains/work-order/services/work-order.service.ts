@@ -103,7 +103,41 @@ export class WorkOrderService {
       issues: [],
       materials: [],
       permits: [],
-      tasks: [],
+      tasks: [
+        {
+          id: 'task1',
+          title: 'Prepare site and materials',
+          description: 'Clear the site and gather all required materials for the first phase.',
+          dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          startDate: new Date().toISOString(),
+          priority: 'high',
+          status: 'in-progress',
+          completed: false,
+          workOrderId: 'wo1'
+        },
+        {
+          id: 'task2',
+          title: 'Demolition of existing structures',
+          description: 'Safely demolish and remove the specified interior walls.',
+          dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+          startDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString(),
+          priority: 'medium',
+          status: 'pending',
+          completed: false,
+          workOrderId: 'wo1'
+        },
+        {
+          id: 'task3',
+          title: 'Framing and structural work',
+          description: 'Complete the framing for the new office layout.',
+          dueDate: new Date(Date.now() + 20 * 24 * 60 * 60 * 1000).toISOString(),
+          startDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000).toISOString(),
+          priority: 'high',
+          status: 'pending',
+          completed: false,
+          workOrderId: 'wo1'
+        }
+      ],
       manpower: [],
       actions: [],
       photos: [],
