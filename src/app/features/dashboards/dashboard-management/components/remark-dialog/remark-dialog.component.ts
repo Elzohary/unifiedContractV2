@@ -547,7 +547,8 @@ export class RemarkDialogComponent implements OnInit {
     const filterValue = value.toLowerCase();
     return this.data.workOrders.filter(workOrder =>
       workOrder.details.workOrderNumber.toLowerCase().includes(filterValue) ||
-      workOrder.details.title.toLowerCase().includes(filterValue)
+      workOrder.details.title?.toLowerCase().includes(filterValue) ||
+      workOrder.details.description?.toLowerCase().includes(filterValue)
     );
   }
 

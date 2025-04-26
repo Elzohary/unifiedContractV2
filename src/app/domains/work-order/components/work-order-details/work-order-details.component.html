@@ -46,13 +46,10 @@
         <!-- Title Card -->
         <mat-card class="detail-card title-card" appearance="outlined">
           <mat-card-content>
-            <div class="card-title-row">
-              <h2 class="card-title">{{ workOrder.details.title }}</h2>
-              <div class="status-chip" [ngClass]="getStatusClass(workOrder.details.status)">
-                {{ workOrder.details.status | titlecase }}
+              <div class="card-title-row">
+                <h2 *ngIf="workOrder.details.title" class="card-title">{{ workOrder.details.title }}</h2>
               </div>
-            </div>
-            <p class="work-order-description">{{ workOrder.details.description }}</p>
+              <p *ngIf="workOrder.details.description" class="work-order-description">{{ workOrder.details.description }}</p>
 
             <!-- Tabs inside title card -->
             <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start" class="info-tabs">
@@ -68,6 +65,11 @@
                     <div class="info-item">
                       <span class="info-label">Order Number</span>
                       <span class="info-value">{{ workOrder.details.workOrderNumber }}</span>
+                    </div>
+
+                    <div class="info-item">
+                      <span class="info-label">Internal Number</span>
+                      <span class="info-value">{{ workOrder.details.internalOrderNumber }}</span>
                     </div>
 
                     <div class="info-item">
@@ -88,11 +90,7 @@
                       <span class="info-label">Category</span>
                       <span class="info-value">{{ workOrder.details.category }}</span>
                     </div>
-
-                    <div class="info-item">
-                      <span class="info-label">Category</span>
-                      <span class="info-value">{{ workOrder.details.category }}</span>
-                    </div>
+        
 
                     <div class="info-item">
                       <span class="info-label">Location</span>
@@ -105,11 +103,6 @@
                       <span class="info-value">{{ workOrder.details.createdBy || 'System' }}</span>
                     </div>
 
-                    <div class="info-item">
-                      <span class="info-label">Estimated Cost</span>
-                      <span class="info-value cost-value">${{ workOrder.expenseBreakdown ? workOrder.expenseBreakdown.toLocaleString() : '0' }}</span>
-                    </div>
-
                   </div>
                 </div>
               </mat-tab>
@@ -118,15 +111,12 @@
               <mat-tab>
                 <ng-template mat-tab-label>
                   <mat-icon class="tab-icon">business</mat-icon>
-                  <span>Client</span>
+                  <span>Project Details</span>
                 </ng-template>
                 <div class="tab-content client-tab">
-                  <h3>Client Information</h3>
+                  <!-- <h3>Client Information</h3> -->
 
                   <div class="client-info">
-                    <div class="client-logo-placeholder">
-                      {{ workOrder.details.client.charAt(0).toUpperCase() }}
-                    </div>
 
                     <div class="client-details">
                       <h4 class="client-name">{{ workOrder.details.client }}</h4>

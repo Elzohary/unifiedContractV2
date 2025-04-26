@@ -94,7 +94,7 @@ export class WorkOrderService {
         location: 'Ras Tanura',
         category: 'Renovation',
         receivedDate: new Date().toISOString(),
-        client: 'Acme Corporation',
+        client: 'Saudi Electricity Company',
         completionPercentage: 35,
         createdBy: 'Admin'
       },
@@ -121,7 +121,6 @@ export class WorkOrderService {
       details: {
         workOrderNumber: 'WO-2024-002',
         internalOrderNumber: 'INT-2024-002',
-        title: 'Residential Renovation',
         description: 'Renovation of the kitchen and bathroom at 456 Elm St.',
         status: 'completed' as WorkOrderStatus,
         priority: 'medium' as WorkOrderPriority,
@@ -160,7 +159,6 @@ export class WorkOrderService {
         workOrderNumber: 'WO-2024-003',
         internalOrderNumber: 'INT-2024-003',
         title: 'Office Space Renovation',
-        description: 'Renovation of the 2nd floor office space at Downtown Business Center',
         status: 'on-hold' as WorkOrderStatus,
         priority: 'high' as WorkOrderPriority,
         createdDate: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString(),
@@ -197,8 +195,6 @@ export class WorkOrderService {
       details: {
         workOrderNumber: 'WO-2024-004',
         internalOrderNumber: 'INT-2024-004',
-        title: 'Emergency Electrical Repair',
-        description: 'Fix blown fuse in main electrical panel at 10 Downing St.',
         status: 'completed' as WorkOrderStatus,
         priority: 'high' as WorkOrderPriority,
         createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),

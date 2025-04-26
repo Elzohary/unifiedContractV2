@@ -166,7 +166,7 @@ export interface WorkOrder {
 export interface workOrderDetail {
   workOrderNumber: string;
   internalOrderNumber: string;
-  title: string;
+  title?: string;
   description?: string;
   client: string;
   location: string;

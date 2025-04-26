@@ -33,6 +33,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RemarkService } from '../../../../shared/services/remark.service';
 import Chart, { TooltipItem } from 'chart.js/auto';
+import { WoCardWithTabsComponent } from "./card-components/wo-card-with-tabs/wo-card-with-tabs.component";
 
 interface IssueDialogData {
   title: string;
@@ -104,8 +105,9 @@ class ConfirmDialogComponent {
     MatMenuModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatCheckboxModule
-  ]
+    MatCheckboxModule,
+    WoCardWithTabsComponent
+]
 })
 export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   public workOrder: WorkOrder | null = null;
