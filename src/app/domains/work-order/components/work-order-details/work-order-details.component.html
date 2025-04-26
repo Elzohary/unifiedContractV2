@@ -26,7 +26,7 @@
         </button>
         <h1>Work Order #{{ workOrder.details.workOrderNumber }}</h1>
       </div>
-
+      
       <div class="header-actions">
         <button mat-stroked-button color="primary" class="action-button" matTooltip="Print this work order" (click)="printWorkOrder()">
           <mat-icon>print</mat-icon>
@@ -107,6 +107,51 @@
                 </div>
               </mat-tab>
 
+              <!-- Dates Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">calendar_month</mat-icon>
+                  <span>Dates</span>
+                </ng-template>
+                <div class="tab-content">
+                  
+                </div>
+              </mat-tab>
+
+              <!-- Progress Tab (moved from separate card) -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">trending_up</mat-icon>
+                  <span>Progress</span>
+                </ng-template>
+                <div class="tab-content progress-tab">
+                  <h3>Work Order Progress</h3>
+
+                  <div class="completion-row">
+                    <span>Completion</span>
+                    <span class="completion-percentage">{{ workOrder.details.completionPercentage }}%</span>
+                  </div>
+                  <mat-progress-bar mode="determinate" [value]="workOrder.details.completionPercentage"
+                                   [color]="workOrder.details.completionPercentage < 50 ? 'warn' : 'primary'">
+                  </mat-progress-bar>
+
+                  <div class="progress-details">
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Start Date</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.startDate) }}</span>
+                    </div>
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Due Date</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.targetEndDate || workOrder.details.dueDate) }}</span>
+                    </div>
+                    <div class="progress-detail-item">
+                      <span class="detail-label">Created</span>
+                      <span class="detail-value">{{ formatDate(workOrder.details.createdDate) }}</span>
+                    </div>
+                  </div>
+                </div>
+              </mat-tab>
+
               <!-- Client Tab -->
               <mat-tab>
                 <ng-template mat-tab-label>
@@ -142,40 +187,6 @@
                           <span>{{ workOrder.details.location }}</span>
                         </div>
                       </div>
-                    </div>
-                  </div>
-                </div>
-              </mat-tab>
-
-              <!-- Progress Tab (moved from separate card) -->
-              <mat-tab>
-                <ng-template mat-tab-label>
-                  <mat-icon class="tab-icon">trending_up</mat-icon>
-                  <span>Progress</span>
-                </ng-template>
-                <div class="tab-content progress-tab">
-                  <h3>Work Order Progress</h3>
-
-                  <div class="completion-row">
-                    <span>Completion</span>
-                    <span class="completion-percentage">{{ workOrder.details.completionPercentage }}%</span>
-                  </div>
-                  <mat-progress-bar mode="determinate" [value]="workOrder.details.completionPercentage"
-                                   [color]="workOrder.details.completionPercentage < 50 ? 'warn' : 'primary'">
-                  </mat-progress-bar>
-
-                  <div class="progress-details">
-                    <div class="progress-detail-item">
-                      <span class="detail-label">Start Date</span>
-                      <span class="detail-value">{{ formatDate(workOrder.details.startDate) }}</span>
-                    </div>
-                    <div class="progress-detail-item">
-                      <span class="detail-label">Due Date</span>
-                      <span class="detail-value">{{ formatDate(workOrder.details.targetEndDate || workOrder.details.dueDate) }}</span>
-                    </div>
-                    <div class="progress-detail-item">
-                      <span class="detail-label">Created</span>
-                      <span class="detail-value">{{ formatDate(workOrder.details.createdDate) }}</span>
                     </div>
                   </div>
                 </div>
@@ -917,88 +928,7 @@
   </div>
 </div>
 
-<!-- Style fixes for layout issues -->
-<style>
-  /* Global fixes for the entire component */
-  :host {
-    display: block;
-    width: 100%;
-    height: 100%;
-    overflow-x: hidden;
-  }
 
-  /* Fix card layouts and spacing */
-  mat-card {
-    margin-bottom: 16px;
-    overflow: hidden;
-  }
-
-  mat-card-header {
-    padding: 16px;
-    background-color: rgba(var(--primary-rgb), 0.05);
-  }
-
-  .card-header-container {
-    display: flex;
-    width: 100%;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  mat-card-content {
-    padding: 16px !important;
-  }
-
-  /* Fix all tab label spacing */
-  ::ng-deep mat-tab-group .mat-mdc-tab .mdc-tab__content .mdc-tab__text-label {
-    display: flex;
-    align-items: center;
-  }
-
-  ::ng-deep mat-tab-group .mat-mdc-tab .mdc-tab__content .mdc-tab__text-label mat-icon {
-    margin-right: 8px;
-  }
-
-  /* Fix side menu when it's open */
-  .details-container {
-    padding: 16px;
-    box-sizing: border-box;
-  }
-
-  /* Ensure proper spacing around actions needed card */
-  .actions-needed-card .no-data-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 24px;
-  }
-
-  /* Fix alignment in pie chart and expenses card */
-  .expenses-summary {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .expenses-chart-container {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-
-  .pie-chart-container {
-    width: 200px;
-    height: 200px;
-    position: relative;
-  }
-
-  /* Fix button icon spacing */
-  button .mat-icon {
-    margin-right: 8px;
-  }
-</style>
 
 
 
