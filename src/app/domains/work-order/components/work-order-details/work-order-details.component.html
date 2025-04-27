@@ -26,7 +26,7 @@
         </button>
         <h1>Work Order #{{ workOrder.details.workOrderNumber }}</h1>
       </div>
-      
+
       <div class="header-actions">
         <button mat-stroked-button color="primary" class="action-button" matTooltip="Print this work order" (click)="printWorkOrder()">
           <mat-icon>print</mat-icon>
@@ -90,7 +90,7 @@
                       <span class="info-label">Category</span>
                       <span class="info-value">{{ workOrder.details.category }}</span>
                     </div>
-        
+
 
                     <div class="info-item">
                       <span class="info-label">Location</span>
@@ -114,33 +114,84 @@
                   <span>Dates</span>
                 </ng-template>
                 <div class="tab-content">
-                  <div class="dates-table-container">
-                    <table class="dates-table">
-                      <tr>
-                        <td class="date-label">Created Date</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.createdDate) }}</td>
-                      </tr>
-                      <tr>
-                        <td class="date-label">Received Date</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.receivedDate) }}</td>
-                      </tr>
-                      <tr>
-                        <td class="date-label">Start Date</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.startDate) || 'Not Specified' }}</td>
-                      </tr>
-                      <tr>
-                        <td class="date-label">Due Date</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.dueDate) || 'Not Specified' }}</td>
-                      </tr>
-                      <tr>
-                        <td class="date-label">Target End Date</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.targetEndDate) || 'Not Specified' }}</td>
-                      </tr>
-                      <tr>
-                        <td class="date-label">Last Updated</td>
-                        <td class="date-value">{{ formatDate(workOrder.details.lastUpdated) || 'Not Specified' }}</td>
-                      </tr>
-                    </table>
+                  <div class="dates-grid">
+                    <!-- Created Date Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>event_available</mat-icon>
+                          Created Date
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.createdDate) }}</div>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Received Date Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>event_repeat</mat-icon>
+                          Received Date
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.receivedDate) }}</div>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Start Date Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>play_circle</mat-icon>
+                          Start Date
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.startDate) || 'Not Specified' }}</div>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Due Date Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>event_busy</mat-icon>
+                          Due Date
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.dueDate) || 'Not Specified' }}</div>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Target End Date Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>event_note</mat-icon>
+                          Target End Date
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.targetEndDate) || 'Not Specified' }}</div>
+                      </mat-card-content>
+                    </mat-card>
+
+                    <!-- Last Updated Card -->
+                    <mat-card class="date-card">
+                      <mat-card-header>
+                        <mat-card-title>
+                          <mat-icon>update</mat-icon>
+                          Last Updated
+                        </mat-card-title>
+                      </mat-card-header>
+                      <mat-card-content>
+                        <div class="date-value">{{ formatDate(workOrder.details.lastUpdated) || 'Not Specified' }}</div>
+                      </mat-card-content>
+                    </mat-card>
                   </div>
                 </div>
               </mat-tab>

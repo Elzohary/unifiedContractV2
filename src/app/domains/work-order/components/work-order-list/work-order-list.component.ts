@@ -88,7 +88,7 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.loadWorkOrders();
     this.setupSorting();
     this.setupFilter();
-    
+
     // Subscribe to new work orders
     this.workOrderService.newWorkOrder$
       .pipe(takeUntil(this.destroy$))
@@ -96,7 +96,7 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit, OnDestroy 
         // Add new work order to the datasource without reloading everything
         const currentData = this.dataSource.data;
         this.dataSource.data = [newWorkOrder, ...currentData];
-        
+
         // Trigger change detection
         this.cdr.detectChanges();
       });
@@ -106,7 +106,7 @@ export class WorkOrderListComponent implements OnInit, AfterViewInit, OnDestroy 
     this.dataSource.paginator = this.paginator;
     this.dataSource.sort = this.sort;
   }
-  
+
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
