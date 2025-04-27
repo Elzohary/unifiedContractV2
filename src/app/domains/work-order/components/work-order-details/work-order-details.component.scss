@@ -2657,6 +2657,7 @@ mat-card-title {
 .date-card {
   height: 100%;
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.123) !important;
 
   &:hover {
     transform: translateY(-2px);
