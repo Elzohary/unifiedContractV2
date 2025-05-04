@@ -11,6 +11,7 @@ import { EquipmentDashboardComponent } from './modules/resources/components/equi
 import { LoginComponent } from './auth/login/login.component';
 import { UserListComponent } from './users/user-list/user-list.component';
 import { WorkOrderItemsListComponent } from './domains/work-order/components/work-order-items-list/work-order-items-list.component';
+import { MaterialsManagementComponent } from './domains/materials/components/materials-management/materials-management.component';
 export const routes: Routes = [
   // Login route
   { path: 'login', component: LoginComponent },
@@ -94,7 +95,7 @@ export const routes: Routes = [
   },
   {
     path: 'work-order-sections/materials',
-    component: UnderConstructionComponent,
+    component: MaterialsManagementComponent,
     data: {
       title: 'Work Order Materials',
       message: 'The materials section is currently under development.',

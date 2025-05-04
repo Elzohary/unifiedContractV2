@@ -1,0 +1,64 @@
+<div class="material-details-container">
+  <h2>Material Details</h2>
+
+  <div class="details-card">
+    <!-- Common Material Information -->
+    <div class="details-section">
+      <h3>Basic Information</h3>
+      <div class="details-row">
+        <span class="label">Code:</span>
+        <span class="value">{{ material.code }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Description:</span>
+        <span class="value">{{ material.description }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Unit:</span>
+        <span class="value">{{ material.unit }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Type:</span>
+        <span class="value">{{ material.materialType }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Client:</span>
+        <span class="value">{{ material.clientType }}</span>
+      </div>
+    </div>
+
+    <!-- SEC-specific information section -->
+    <div *ngIf="isSecMaterial" class="details-section">
+      <h3>SEC-specific Information</h3>
+      <div class="details-row">
+        <span class="label">Group Code:</span>
+        <span class="value">{{ getSecMaterial().groupCode }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Group Description:</span>
+        <span class="value">{{ getSecMaterial().groupCodeDescription }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">SEQ:</span>
+        <span class="value">{{ getSecMaterial().SEQ }}</span>
+      </div>
+      <div class="details-row">
+        <span class="label">Master Code:</span>
+        <span class="value">{{ getSecMaterial().materialMasterCode }}</span>
+      </div>
+    </div>
+    <!-- Attributes section for custom properties -->
+    <div *ngIf="material.attributes && Object.keys(material.attributes).length > 0" class="details-section">
+      <h3>Additional Attributes</h3>
+      <div *ngFor="let key of Object.keys(material.attributes)" class="details-row">
+        <span class="label">{{ key }}:</span>
+        <span class="value">{{ material.attributes[key] }}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="action-buttons">
+    <button class="edit-button">Edit Material</button>
+    <button class="assign-button">Assign to Work Order</button>
+  </div>
+</div>
