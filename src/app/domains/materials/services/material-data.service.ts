@@ -44,6 +44,94 @@ export class MaterialDataService {
   }
 
   /**
+   * Add a new material
+   */
+  addMaterial(material: BaseMaterial): Observable<BaseMaterial> {
+    if (this.apiConfig.useRealApi) {
+      // Use real API
+      return this.http.post<BaseMaterial>(this.apiConfig.baseUrl, material);
+    } else {
+      // Create a new ID for the material in mock data
+      const newMaterial: BaseMaterial = {
+        ...material,
+        id: `${Date.now()}` // Generate a timestamp-based ID
+      };
+
+      // Add to mock data
+      mockMaterials.push(newMaterial);
+
+      // If it's a SEC material, add to SEC materials as well
+      if (newMaterial.clientType === ClientType.SEC) {
+        mockSecMaterials.push(newMaterial as SecMaterial);
+      }
+
+      // Simulate network delay
+      return of(newMaterial).pipe(delay(500));
+    }
+  }
+
+  /**
+   * Update an existing material
+   */
+  updateMaterial(material: BaseMaterial): Observable<BaseMaterial> {
+    if (this.apiConfig.useRealApi) {
+      // Use real API
+      const endpoint = `${this.apiConfig.baseUrl}/${material.id}`;
+      return this.http.put<BaseMaterial>(endpoint, material);
+    } else {
+      // Update in mock data
+      const index = mockMaterials.findIndex(m => m.id === material.id);
+
+      if (index !== -1) {
+        mockMaterials[index] = {...material};
+
+        // If it's a SEC material, update in SEC materials as well
+        if (material.clientType === ClientType.SEC) {
+          const secIndex = mockSecMaterials.findIndex(m => m.id === material.id);
+          if (secIndex !== -1) {
+            mockSecMaterials[secIndex] = {...material} as SecMaterial;
+          } else {
+            mockSecMaterials.push(material as SecMaterial);
+          }
+        }
+      }
+
+      // Simulate network delay
+      return of(material).pipe(delay(500));
+    }
+  }
+
+  /**
+   * Delete a material by ID
+   */
+  deleteMaterial(id: string): Observable<boolean> {
+    if (this.apiConfig.useRealApi) {
+      // Use real API
+      const endpoint = `${this.apiConfig.baseUrl}/${id}`;
+      return this.http.delete<boolean>(endpoint);
+    } else {
+      // Delete from mock data
+      const index = mockMaterials.findIndex(m => m.id === id);
+
+      if (index !== -1) {
+        const material = mockMaterials[index];
+        mockMaterials.splice(index, 1);
+
+        // If it's a SEC material, delete from SEC materials as well
+        if (material.clientType === ClientType.SEC) {
+          const secIndex = mockSecMaterials.findIndex(m => m.id === id);
+          if (secIndex !== -1) {
+            mockSecMaterials.splice(secIndex, 1);
+          }
+        }
+      }
+
+      // Simulate network delay and always return success
+      return of(true).pipe(delay(500));
+    }
+  }
+
+  /**
    * Get materials by material type
    */
   getMaterialsByType(materialType: MaterialType): Observable<BaseMaterial[]> {

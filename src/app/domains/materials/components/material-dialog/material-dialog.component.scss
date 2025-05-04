@@ -1,0 +1,70 @@
+:host {
+  display: block;
+}
+
+mat-dialog-content {
+  min-width: 500px;
+  max-width: 800px;
+  padding-top: 16px;
+}
+
+.material-type-selection {
+  margin-bottom: 24px;
+}
+
+.client-field {
+  margin-bottom: 16px;
+}
+
+h3 {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 16px 0;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+
+  mat-form-field {
+    flex: 1;
+  }
+}
+
+.full-width {
+  width: 100%;
+}
+
+.sec-fields {
+  margin-top: 24px;
+
+  h3 {
+    margin: 16px 0;
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+}
+
+// Transition animations for fields
+form {
+  .client-field, .form-row, .full-width, .sec-fields {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,100 @@
+<h2 mat-dialog-title>{{ data.isEdit ? 'Edit' : 'Add' }} Material</h2>
+
+<mat-dialog-content>
+  <!-- Step 1: Choose Material Type first -->
+  <div class="material-type-selection">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Material Type</mat-label>
+      <mat-select [(ngModel)]="selectedMaterialType" (selectionChange)="onMaterialTypeChange()" [disabled]="data.isEdit">
+        <mat-option [value]="materialTypes.RECEIVABLE">Receivable</mat-option>
+        <mat-option [value]="materialTypes.PURCHASABLE">Purchasable</mat-option>
+      </mat-select>
+      <mat-hint *ngIf="!selectedMaterialType">Please select a material type to continue</mat-hint>
+    </mat-form-field>
+  </div>
+
+  <!-- Only show the rest of the form once material type is selected -->
+  <ng-container *ngIf="selectedMaterialType">
+    <form [formGroup]="materialForm">
+      <!-- Show client dropdown only for receivable materials -->
+      <mat-form-field *ngIf="selectedMaterialType === materialTypes.RECEIVABLE" appearance="outline" class="full-width client-field">
+        <mat-label>Client</mat-label>
+        <mat-select formControlName="clientType" required>
+          <mat-option [value]="clientTypes.SEC">SEC</mat-option>
+          <mat-option [value]="clientTypes.OTHER">Other</mat-option>
+        </mat-select>
+        <mat-error *ngIf="materialForm.get('clientType')?.invalid">Client type is required</mat-error>
+      </mat-form-field>
+
+      <!-- Basic Material Information - only shown after material type and (if applicable) client is selected -->
+      <ng-container *ngIf="shouldShowBasicFields">
+        <h3>Basic Information</h3>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline">
+            <mat-label>Code</mat-label>
+            <input matInput formControlName="code" required>
+            <mat-error *ngIf="materialForm.get('code')?.invalid">Code is required</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Unit</mat-label>
+            <input matInput formControlName="unit" required>
+            <mat-error *ngIf="materialForm.get('unit')?.invalid">Unit is required</mat-error>
+          </mat-form-field>
+        </div>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Description</mat-label>
+          <input matInput formControlName="description" required>
+          <mat-error *ngIf="materialForm.get('description')?.invalid">Description is required</mat-error>
+        </mat-form-field>
+
+        <!-- SEC Specific Fields -->
+        <div *ngIf="isSecMaterial" [formGroup]="secSpecificForm" class="sec-fields">
+          <mat-divider></mat-divider>
+          <h3>SEC Specific Information</h3>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Group Code</mat-label>
+              <input matInput formControlName="groupCode" required>
+              <mat-error *ngIf="secSpecificForm.get('groupCode')?.invalid">Group code is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>SEQ</mat-label>
+              <input matInput type="number" formControlName="SEQ" required>
+              <mat-error *ngIf="secSpecificForm.get('SEQ')?.invalid">SEQ is required</mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Group Description</mat-label>
+              <input matInput formControlName="groupCodeDescription" required>
+              <mat-error *ngIf="secSpecificForm.get('groupCodeDescription')?.invalid">Group description is required</mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Master Code</mat-label>
+              <input matInput formControlName="materialMasterCode" required>
+              <mat-error *ngIf="secSpecificForm.get('materialMasterCode')?.invalid">Master code is required</mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+      </ng-container>
+    </form>
+  </ng-container>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSave()"
+    [disabled]="!selectedMaterialType ||
+    !shouldShowBasicFields ||
+    materialForm.invalid ||
+    (isSecMaterial && secSpecificForm.invalid)">
+    {{ data.isEdit ? 'Update' : 'Save' }}
+  </button>
+</mat-dialog-actions>

@@ -95,7 +95,7 @@ export const routes: Routes = [
   },
   {
     path: 'work-order-sections/materials',
-    component: MaterialsManagementComponent,
+    component: UnderConstructionComponent,
     data: {
       title: 'Work Order Materials',
       message: 'The materials section is currently under development.',
@@ -161,8 +161,8 @@ export const routes: Routes = [
   },
   {
     path: 'resources/materials',
-    component: UnderConstructionComponent,
-    data: { title: 'Materials Management', message: 'The materials management page is currently under development.' }
+    component: MaterialsManagementComponent,
+    pathMatch: 'full'
   },
 
   // HR routes - keep lazy loading

@@ -27,6 +27,27 @@ export class MaterialService {
   }
 
   /**
+   * Add a new material to the system
+   */
+  addMaterial(material: BaseMaterial): Observable<BaseMaterial> {
+    return this.materialDataService.addMaterial(material);
+  }
+
+  /**
+   * Update an existing material
+   */
+  updateMaterial(material: BaseMaterial): Observable<BaseMaterial> {
+    return this.materialDataService.updateMaterial(material);
+  }
+
+  /**
+   * Delete a material by ID
+   */
+  deleteMaterial(id: string): Observable<boolean> {
+    return this.materialDataService.deleteMaterial(id);
+  }
+
+  /**
    * Format materials based on client type
    */
   private formatMaterialsByClientType(materials: any[], clientType?: ClientType): BaseMaterial[] {
