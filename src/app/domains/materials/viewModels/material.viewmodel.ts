@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, combineLatest } from 'rxjs';
-import { map, tap, finalize } from 'rxjs/operators';
+import { map, finalize } from 'rxjs/operators';
 import { BaseMaterial, ClientType, MaterialType } from '../models/material.model';
 import { MaterialService } from '../services/material.service';
 
@@ -52,10 +52,6 @@ export class MaterialViewModel {
   addMaterial(material: BaseMaterial): Observable<BaseMaterial> {
     this.loadingSubject.next(true);
     return this.materialService.addMaterial(material).pipe(
-      tap(() => {
-        // Refresh materials list
-        this.materialService.loadMaterials();
-      }),
       finalize(() => this.loadingSubject.next(false))
     );
   }
@@ -66,10 +62,6 @@ export class MaterialViewModel {
   updateMaterial(material: BaseMaterial): Observable<BaseMaterial> {
     this.loadingSubject.next(true);
     return this.materialService.updateMaterial(material).pipe(
-      tap(() => {
-        // Refresh materials list
-        this.materialService.loadMaterials();
-      }),
       finalize(() => this.loadingSubject.next(false))
     );
   }
@@ -80,12 +72,6 @@ export class MaterialViewModel {
   deleteMaterial(id: string): Observable<boolean> {
     this.loadingSubject.next(true);
     return this.materialService.deleteMaterial(id).pipe(
-      tap(success => {
-        if (success) {
-          // Refresh materials list
-          this.materialService.loadMaterials();
-        }
-      }),
       finalize(() => this.loadingSubject.next(false))
     );
   }

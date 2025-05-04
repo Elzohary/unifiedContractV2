@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { BaseMaterial, ClientType, MaterialType, SecMaterial, convertLegacySecMaterial } from '../models/material.model';
 import { MaterialDataService } from './material-data.service';
 
@@ -30,21 +30,47 @@ export class MaterialService {
    * Add a new material to the system
    */
   addMaterial(material: BaseMaterial): Observable<BaseMaterial> {
-    return this.materialDataService.addMaterial(material);
+    return this.materialDataService.addMaterial(material).pipe(
+      tap(() => {
+        // Refresh the materials list after adding
+        this.refreshMaterials();
+      })
+    );
   }
 
   /**
    * Update an existing material
    */
   updateMaterial(material: BaseMaterial): Observable<BaseMaterial> {
-    return this.materialDataService.updateMaterial(material);
+    return this.materialDataService.updateMaterial(material).pipe(
+      tap(() => {
+        // Refresh the materials list after updating
+        this.refreshMaterials();
+      })
+    );
   }
 
   /**
    * Delete a material by ID
    */
   deleteMaterial(id: string): Observable<boolean> {
-    return this.materialDataService.deleteMaterial(id);
+    return this.materialDataService.deleteMaterial(id).pipe(
+      tap(() => {
+        // Refresh the materials list after deleting
+        this.refreshMaterials();
+      })
+    );
+  }
+
+  /**
+   * Refresh the materials list from the data service
+   */
+  private refreshMaterials(): void {
+    console.log('[DEBUG] Refreshing materials list');
+    this.materialDataService.getAllMaterials().subscribe(materials => {
+      console.log('[DEBUG] Got updated materials list. Count:', materials.length);
+      this.materialsSubject.next(materials);
+    });
   }
 
   /**

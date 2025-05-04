@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { delay } from 'rxjs/operators';
 import { BaseMaterial, ClientType, MaterialType, SecMaterial } from '../models/material.model';
 import { MaterialEnvironmentConfig } from '../config/material-env.config';
 import { mockMaterials, mockSecMaterials } from '../data/mock-materials';
@@ -31,15 +30,14 @@ export class MaterialDataService {
 
       return this.http.get<BaseMaterial[]>(`${endpoint}${queryParams}`);
     } else {
-      // Use mock data with simulated delay
+      // Use mock data without delay
       let filteredMaterials = [...mockMaterials];
 
       if (clientType) {
         filteredMaterials = filteredMaterials.filter(m => m.clientType === clientType);
       }
 
-      // Simulate network delay
-      return of(filteredMaterials).pipe(delay(500));
+      return of(filteredMaterials);
     }
   }
 
@@ -59,14 +57,17 @@ export class MaterialDataService {
 
       // Add to mock data
       mockMaterials.push(newMaterial);
+      console.log('[DEBUG] Added to mockMaterials. Current count:', mockMaterials.length);
+      console.log('[DEBUG] New material:', newMaterial);
 
       // If it's a SEC material, add to SEC materials as well
       if (newMaterial.clientType === ClientType.SEC) {
         mockSecMaterials.push(newMaterial as SecMaterial);
+        console.log('[DEBUG] Added to mockSecMaterials. Current count:', mockSecMaterials.length);
       }
 
-      // Simulate network delay
-      return of(newMaterial).pipe(delay(500));
+      // Return without delay
+      return of(newMaterial);
     }
   }
 
@@ -96,8 +97,8 @@ export class MaterialDataService {
         }
       }
 
-      // Simulate network delay
-      return of(material).pipe(delay(500));
+      // Return without delay
+      return of(material);
     }
   }
 
@@ -126,8 +127,8 @@ export class MaterialDataService {
         }
       }
 
-      // Simulate network delay and always return success
-      return of(true).pipe(delay(500));
+      // Return without delay
+      return of(true);
     }
   }
 
@@ -142,11 +143,9 @@ export class MaterialDataService {
 
       return this.http.get<BaseMaterial[]>(endpoint);
     } else {
-      // Use mock data with simulated delay
+      // Use mock data without delay
       const filteredMaterials = mockMaterials.filter(m => m.materialType === materialType);
-
-      // Simulate network delay
-      return of(filteredMaterials).pipe(delay(500));
+      return of(filteredMaterials);
     }
   }
 
@@ -161,8 +160,8 @@ export class MaterialDataService {
 
       return this.http.get<SecMaterial[]>(endpoint);
     } else {
-      // Use mock data with simulated delay
-      return of(mockSecMaterials).pipe(delay(500));
+      // Use mock data without delay
+      return of(mockSecMaterials);
     }
   }
 
@@ -180,9 +179,9 @@ export class MaterialDataService {
         quantity
       });
     } else {
-      // Just return success with delay for mock
+      // Just return success without delay
       console.log(`[MOCK] Assigned material ${materialId} to work order ${workOrderId} with quantity ${quantity}`);
-      return of(true).pipe(delay(500));
+      return of(true);
     }
   }
 
@@ -200,9 +199,9 @@ export class MaterialDataService {
         quantity
       });
     } else {
-      // Just return success with delay for mock
+      // Just return success without delay
       console.log(`[MOCK] Tracked usage of material ${materialId} in work order ${workOrderId} with quantity ${quantity}`);
-      return of(true).pipe(delay(500));
+      return of(true);
     }
   }
 }

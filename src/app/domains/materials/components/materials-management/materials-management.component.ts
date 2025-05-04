@@ -65,6 +65,11 @@ export class MaterialsManagementComponent implements OnInit {
   ) {
     this.materials$ = this.materialViewModel.filteredMaterials$;
     this.loading$ = this.materialViewModel.loading$;
+
+    // Subscribe to materials changes for debugging
+    this.materials$.subscribe(materials => {
+      console.log('[DEBUG] Materials in component updated. Count:', materials.length);
+    });
   }
 
   ngOnInit(): void {
