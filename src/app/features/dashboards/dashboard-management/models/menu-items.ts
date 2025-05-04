@@ -45,11 +45,6 @@ export const projectMenuItems = [
                 icon: 'assignment'
             },
             {
-                label: 'Materials',
-                link: '/work-order-sections/materials',
-                icon: 'inventory'
-            },
-            {
                 label: 'Photos',
                 link: '/work-order-sections/photos',
                 icon: 'photo_library'
@@ -93,7 +88,7 @@ export const projectMenuItems = [
             {
                 label: 'Materials',
                 link: '/resources/materials',
-                icon: 'category'
+                icon: 'warehouse'
             }
         ]
     },
