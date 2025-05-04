@@ -273,6 +273,92 @@
           </mat-card-content>
         </mat-card>
 
+        <!-- Items Details Card -->
+        <mat-card class="tasks-card" appearance="outlined">
+          <mat-card-header>
+            <mat-card-title>
+              <mat-icon>list</mat-icon>
+              <span>Items Details</span>
+            </mat-card-title>
+            <!-- <div class="header-actions">
+              <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                <mat-icon>add</mat-icon>
+                <span>Add Task</span>
+              </button>
+            </div> -->
+          </mat-card-header>
+          <mat-card-content>
+            <mat-tab-group animationDuration="300ms" mat-stretch-tabs="false" mat-align-tabs="start">
+              <!-- Tasks List Tab -->
+              <mat-tab>
+                <ng-template mat-tab-label>
+                  <mat-icon class="tab-icon">check_box</mat-icon>
+                  <span>Task List</span>
+                </ng-template>
+                <div class="tab-content tasks-tab">
+                  <div class="tasks-container">
+                    <ng-container *ngIf="workOrder.tasks && workOrder.tasks.length > 0; else noTasks">
+                      <div class="task-item" *ngFor="let task of workOrder.tasks; let i = index" [ngClass]="{'completed': task.completed}">
+                        <div class="task-header">
+                          <div class="task-status">
+                            <mat-checkbox
+                              [checked]="task.completed"
+                              (change)="toggleTaskStatus(i)"
+                              color="primary">
+                            </mat-checkbox>
+                          </div>
+                          <div class="task-title">{{ task.title }}</div>
+                          <div class="task-actions">
+                            <button mat-icon-button (click)="editTask(i, task)" matTooltip="Edit">
+                              <mat-icon>edit</mat-icon>
+                            </button>
+                            <button mat-icon-button (click)="deleteTask(i)" matTooltip="Delete">
+                              <mat-icon>delete</mat-icon>
+                            </button>
+                          </div>
+                        </div>
+                        <div class="task-details" *ngIf="task.description">
+                          <div class="task-description">{{ task.description }}</div>
+                        </div>
+                        <div class="task-footer">
+                          <div class="task-meta">
+                            <span class="task-due-date" *ngIf="task.dueDate">
+                              <mat-icon>event</mat-icon>
+                              {{ task.dueDate | date:'MMM d, y' }}
+                            </span>
+                            <span class="task-assigned" *ngIf="task.manpower">
+                              <mat-icon>person</mat-icon>
+                              {{ task.manpower }}
+                            </span>
+                            <span class="task-priority" [ngClass]="'priority-' + task.priority">
+                              <mat-icon>flag</mat-icon>
+                              {{ task.priority }}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </ng-container>
+
+                    <ng-template #noTasks>
+                      <div class="no-data-container">
+                        <mat-icon>assignment</mat-icon>
+                        <p>No Details Available</p>
+                        <button mat-stroked-button color="primary" (click)="openAddTaskDialog()">
+                          <mat-icon>add</mat-icon>
+                          <span>Create First Task</span>
+                        </button>
+                      </div>
+                    </ng-template>
+                  </div>
+                </div>
+              </mat-tab>
+
+              <!-- Gantt Chart Tab -->
+              
+            </mat-tab-group>
+          </mat-card-content>
+        </mat-card>
+
         <!-- Tasks Card -->
         <mat-card class="tasks-card" appearance="outlined">
           <mat-card-header>
