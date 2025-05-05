@@ -16,8 +16,6 @@
 body {
   /* Base colors shared by both themes */
   --card-shadow: rgba(0, 0, 0, 0.2);
-
-
 }
 
 /* Base styles for light and dark themes */
@@ -84,48 +82,6 @@ body {
 /* Global Material overrides */
 
 
-/* .mat-mdc-raised-button.mat-primary:hover {
-  background-color: var(--btn-primary-hover) !important;
-}
-
-.mat-mdc-raised-button.mat-primary:active {
-  background-color: var(--btn-primary-active) !important;
-} */
-
-// Define the typography config (this resolves the original error source)
-/* $custom-typography: mat.define-typography-config();
- */
-// Define a light theme palette (e.g., indigo-pink)
-/* $light-primary: mat.define-palette(mat.$indigo-palette);
-$light-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-$light-theme: mat.define-light-theme((
-  color: (
-    primary: $light-primary,
-    accent: $light-accent,
-  ),
-  typography: $custom-typography,
-));
-
-// Define a dark theme palette (optional)
-$dark-primary: mat.define-palette(mat.$blue-grey-palette);
-$dark-accent: mat.define-palette(mat.$amber-palette, A200, A100, A400);
-$dark-theme: mat.define-dark-theme((
-  color: (
-    primary: $dark-primary,
-    accent: $dark-accent,
-  ),
-  typography: $custom-typography,
-)); */
-
-// Apply the light theme by default
-/* @include mat.core-theme($light-theme);
-@include mat.all-component-themes($light-theme); */
-
-// Apply the dark theme when the .dark-theme class is present on the body
-/* .dark-theme {
-  @include mat.core-color($dark-theme);
-  @include mat.all-component-colors($dark-theme);
-} */
 
 // Include density styles (optional, default is 0)
 @include mat.core-density(-1); // Example: Make components slightly smaller
