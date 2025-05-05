@@ -65,19 +65,19 @@ import { NgTableSearchComponent } from '../ng-table-search/ng-table-search.compo
   `]
 })
 export class NgTableHeaderComponent {
-  @Input() title: string = '';
-  @Input() showSearch: boolean = true;
-  @Input() showAddButton: boolean = false;
-  @Input() addButtonText: string = 'Add';
+  @Input() title = '';
+  @Input() showSearch = true;
+  @Input() showAddButton = false;
+  @Input() addButtonText = 'Add';
 
   @Output() addClick = new EventEmitter<void>();
   @Output() filterChange = new EventEmitter<string>();
 
-  onAddClick() {
+  onAddClick(): void {
     this.addClick.emit();
   }
 
-  onFilterChange(filterValue: string) {
+  onFilterChange(filterValue: string): void {
     this.filterChange.emit(filterValue);
   }
 }

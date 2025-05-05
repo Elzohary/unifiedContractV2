@@ -9,7 +9,7 @@
     (addClick)="onAddClick()"
     (filterChange)="onFilterChange($event)">
     <!-- Slot for custom header content -->
-    <ng-content select="[header]"></ng-content>
+    <ng-content select="[ngTableHeader]"></ng-content>
   </app-ng-table-header>
 
   <!-- Main Table -->
@@ -69,13 +69,15 @@
       (page)="onPageChange($event)">
     </mat-paginator>
   </div>
+
+  <!-- Table Footer -->
+  <div class="ng-table-footer" *ngIf="hasFooterContent">
+    <ng-content select="[ngTableFooter]"></ng-content>
+  </div>
 </div>
 
-<!-- Declare content projection templates for additional flexibility -->
-<ng-template #headerTemplate>
-  <ng-content select="[header]"></ng-content>
-</ng-template>
+<!-- Additional header content that will be shown in the table header -->
+<ng-content select="[header]"></ng-content>
 
-<ng-template #footerTemplate>
-  <ng-content select="[footer]"></ng-content>
-</ng-template>
+<!-- Additional footer content that will be shown after the table -->
+<ng-content select="[footer]"></ng-content>

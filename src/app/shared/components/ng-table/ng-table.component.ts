@@ -25,7 +25,7 @@ export interface TableColumn {
   isFilterable?: boolean; // Whether the column is filterable (default: true)
   format?: string;    // Optional format (for dates, currency, etc.)
   width?: string;     // Optional width (e.g., '100px', '10%')
-  cellTemplate?: any; // Optional custom cell template
+  cellTemplate?: unknown; // Optional custom cell template
 }
 
 export interface TableAction {
@@ -34,7 +34,7 @@ export interface TableAction {
   action: 'add' | 'edit' | 'delete' | 'view' | 'custom';
   color?: 'primary' | 'accent' | 'warn';
   tooltip?: string;
-  isVisible?: (item: any) => boolean; // Function to determine if action is visible for a specific item
+  isVisible?: (item: unknown) => boolean; // Function to determine if action is visible for a specific item
 }
 
 @Component({
@@ -60,56 +60,57 @@ export interface TableAction {
   templateUrl: './ng-table.component.html',
   styleUrl: './ng-table.component.scss'
 })
-export class NgTableComponent implements OnInit, OnChanges {
-  @Input() title: string = '';
-  @Input() data: any[] = [];
+export class NgTableComponent<T = Record<string, unknown>> implements OnInit, OnChanges {
+  @Input() title = '';
+  @Input() data: T[] = [];
   @Input() columns: TableColumn[] = [];
   @Input() actions: TableAction[] = [];
-  @Input() showActionColumn: boolean = true;
-  @Input() showSearch: boolean = true;
-  @Input() showPaginator: boolean = true;
-  @Input() pageSize: number = 10;
+  @Input() showActionColumn = true;
+  @Input() showSearch = true;
+  @Input() showPaginator = true;
+  @Input() pageSize = 10;
   @Input() pageSizeOptions: number[] = [5, 10, 25, 50];
-  @Input() allowMultiSelect: boolean = false;
-  @Input() emptyMessage: string = 'No data available';
-  @Input() rowIdField: string = 'id'; // Field to use as unique identifier
-  @Input() showHeader: boolean = true;
-  @Input() showAddButton: boolean = true;
-  @Input() addButtonText: string = 'Add';
+  @Input() allowMultiSelect = false;
+  @Input() emptyMessage = 'No data available';
+  @Input() rowIdField = 'id'; // Field to use as unique identifier
+  @Input() showHeader = true;
+  @Input() showAddButton = true;
+  @Input() addButtonText = 'Add';
+  @Input() hasFooterContent = false;
 
-  @Output() rowClick = new EventEmitter<any>();
-  @Output() actionClick = new EventEmitter<{action: TableAction, item: any}>();
+  @Output() rowClick = new EventEmitter<T>();
+  @Output() actionClick = new EventEmitter<{action: TableAction, item: T}>();
   @Output() addItem = new EventEmitter<void>();
-  @Output() editItem = new EventEmitter<any>();
-  @Output() deleteItem = new EventEmitter<any>();
-  @Output() viewItem = new EventEmitter<any>();
-  @Output() selectionChange = new EventEmitter<any[]>();
+  @Output() editItem = new EventEmitter<T>();
+  @Output() deleteItem = new EventEmitter<T>();
+  @Output() viewItem = new EventEmitter<T>();
+  @Output() selectionChange = new EventEmitter<T[]>();
   @Output() pageChange = new EventEmitter<PageEvent>();
 
   @ViewChild(MatSort) sort!: MatSort;
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  dataSource = new MatTableDataSource<any>([]);
+  dataSource = new MatTableDataSource<T>([]);
   displayedColumns: string[] = [];
-  selectedItems: any[] = [];
-  filterValue: string = '';
+  selectedItems: T[] = [];
+  filterValue = '';
 
   // Getter for visible columns
   get visibleColumns(): TableColumn[] {
     return this.columns.filter(column => column.isVisible !== false);
   }
 
-  ngOnInit() {
+  ngOnInit(): void {
     this.initializeTable();
   }
 
-  ngOnChanges(changes: SimpleChanges) {
+  ngOnChanges(changes: SimpleChanges): void {
     if (changes['data'] || changes['columns']) {
       this.initializeTable();
     }
   }
 
-  private initializeTable() {
+  private initializeTable(): void {
     // Set displayed columns based on visible columns + action column if needed
     this.displayedColumns = this.visibleColumns.map(col => col.name);
 
@@ -130,7 +131,7 @@ export class NgTableComponent implements OnInit, OnChanges {
     }
 
     // Custom filter predicate to search across all searchable columns
-    this.dataSource.filterPredicate = (item: any, filter: string) => {
+    this.dataSource.filterPredicate = (item: T, filter: string) => {
       const searchTerms = filter.trim().toLowerCase().split(' ');
       return searchTerms.every(term => {
         return this.columns.some(column => {
@@ -146,7 +147,7 @@ export class NgTableComponent implements OnInit, OnChanges {
   }
 
   // Handler for global search filter
-  applyFilter(event: Event) {
+  applyFilter(event: Event): void {
     const filterValue = (event.target as HTMLInputElement).value;
     this.filterValue = filterValue.trim().toLowerCase();
     this.dataSource.filter = this.filterValue;
@@ -157,7 +158,7 @@ export class NgTableComponent implements OnInit, OnChanges {
   }
 
   // Update filter from header search component
-  onFilterChange(filterValue: string) {
+  onFilterChange(filterValue: string): void {
     this.filterValue = filterValue;
     this.dataSource.filter = filterValue;
 
@@ -177,19 +178,19 @@ export class NgTableComponent implements OnInit, OnChanges {
   }
 
   // Get nested property value using dot notation (e.g., "user.address.city")
-  getPropertyValue(obj: any, path: string): any {
-    return path.split('.').reduce((prev, curr) => {
-      return prev ? prev[curr] : null;
-    }, obj);
+  getPropertyValue(obj: unknown, path: string): unknown {
+    return path.split('.').reduce((prev: Record<string, unknown> | null, curr: string) => {
+      return prev ? prev[curr] as Record<string, unknown> | null : null;
+    }, obj as Record<string, unknown> | null);
   }
 
   // Handle row clicks
-  onRowClick(row: any) {
+  onRowClick(row: T): void {
     this.rowClick.emit(row);
   }
 
   // Handle action clicks
-  onActionClick(action: TableAction, item: any) {
+  onActionClick(action: TableAction, item: T): void {
     this.actionClick.emit({ action, item });
 
     // Also emit specific events based on action type
@@ -210,22 +211,22 @@ export class NgTableComponent implements OnInit, OnChanges {
   }
 
   // Handle add button click
-  onAddClick() {
+  onAddClick(): void {
     this.addItem.emit();
   }
 
   // Check if action should be visible for an item
-  isActionVisible(action: TableAction, item: any): boolean {
+  isActionVisible(action: TableAction, item: T): boolean {
     return action.isVisible ? action.isVisible(item) : true;
   }
 
   // Handle page events
-  onPageChange(event: PageEvent) {
+  onPageChange(event: PageEvent): void {
     this.pageChange.emit(event);
   }
 
   // Get display value for a cell, applying formatting if needed
-  getCellValue(item: any, column: TableColumn): any {
+  getCellValue(item: T, column: TableColumn): string {
     const value = this.getPropertyValue(item, column.name);
 
     if (value === undefined || value === null) {
@@ -235,14 +236,14 @@ export class NgTableComponent implements OnInit, OnChanges {
     switch (column.type) {
       case 'date':
         // Simple date formatting - in real app you'd use a proper date pipe
-        return value ? new Date(value).toLocaleDateString() : '';
+        return value instanceof Date ? value.toLocaleDateString() : '';
       case 'boolean':
         return value ? 'Yes' : 'No';
       case 'currency':
         // Simple currency formatting - in real app you'd use a proper currency pipe
-        return value ? `$${value.toFixed(2)}` : '';
+        return typeof value === 'number' ? `$${value.toFixed(2)}` : '';
       default:
-        return value;
+        return String(value);
     }
   }
 }

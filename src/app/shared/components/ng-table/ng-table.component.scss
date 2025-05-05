@@ -1,0 +1,127 @@
+.ng-table-container {
+  width: 100%;
+}
+
+.ng-table-wrapper {
+  overflow-x: auto;
+  border-radius: 4px;
+}
+
+.ng-table {
+  width: 100%;
+
+  th.mat-header-cell {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.75);
+  }
+
+  .table-row {
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+
+  .mat-column-actions {
+    width: 48px;
+    text-align: right;
+  }
+}
+
+.no-data-message {
+  padding: 24px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    opacity: 0.6;
+  }
+}
+
+// Status badge styles
+.material-type-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  text-transform: capitalize;
+  font-weight: 500;
+
+  &.receivable {
+    background-color: #e3f2fd;
+    color: #0d47a1;
+  }
+
+  &.purchasable {
+    background-color: #f1f8e9;
+    color: #33691e;
+  }
+}
+
+// Table filter and search styles
+.filters-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 16px;
+  align-items: center;
+
+  .search-field {
+    flex: 1;
+    min-width: 150px;
+    max-width: 400px;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .ng-table-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+
+    .ng-table-actions {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+
+  .filters-section {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-field {
+      max-width: 100%;
+    }
+  }
+}
+
+// Dark theme support
+.dark-theme {
+  .ng-table {
+    th.mat-header-cell {
+      color: rgba(255, 255, 255, 0.85);
+    }
+
+    .table-row:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  .no-data-message {
+    color: rgba(255, 255, 255, 0.7);
+  }
+}
+
+.ng-table-footer {
+  margin-top: 16px;
+  padding: 8px 0;
+}

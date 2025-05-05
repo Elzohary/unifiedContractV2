@@ -48,17 +48,17 @@ import { TableAction } from '../ng-table.component';
   `,
   styles: []
 })
-export class NgTableActionsComponent {
+export class NgTableActionsComponent<T = Record<string, unknown>> {
   @Input() actions: TableAction[] = [];
-  @Input() rowData: any;
+  @Input() rowData!: T;
 
-  @Output() actionClick = new EventEmitter<{action: TableAction, item: any}>();
+  @Output() actionClick = new EventEmitter<{action: TableAction, item: T}>();
 
-  onActionClick(action: TableAction, item: any): void {
+  onActionClick(action: TableAction, item: T): void {
     this.actionClick.emit({ action, item });
   }
 
-  isActionVisible(action: TableAction, item: any): boolean {
+  isActionVisible(action: TableAction, item: T): boolean {
     return action.isVisible ? action.isVisible(item) : true;
   }
 }
