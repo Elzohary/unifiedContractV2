@@ -51,6 +51,7 @@ export class WorkOrderService {
     [WorkOrderStatus.Completed]: [WorkOrderStatus.InProgress], // Allow reopening if needed
     [WorkOrderStatus.Cancelled]: [WorkOrderStatus.Pending] // Allow reactivation
     ,
+
     [WorkOrderStatus.UpdatedAlreadyUDSProblem]: [],
     [WorkOrderStatus.ReadyForCompleteCertificateWithRequirement]: [],
     [WorkOrderStatus.ReadyForUpdatingUDISProblem]: [],
@@ -60,7 +61,7 @@ export class WorkOrderService {
     [WorkOrderStatus.UpdatedAlreadyRTIAndReceivingInProcess]: [],
     [WorkOrderStatus.NeedDP]: [],
     [WorkOrderStatus.ReadyForCheckingNeedPrepareDocuments]: [],
-    [WorkOrderStatus.UpdatedAlreadyEngSectionForApproval]: [],
+    [WorkOrderStatus.UpdatedAlreadySecEngForApproval]: [],
     [WorkOrderStatus.WaitingShutdown]: [],
     [WorkOrderStatus.InProgressForPermission]: [],
     [WorkOrderStatus.CancelWorkOrder]: [],
@@ -74,7 +75,7 @@ export class WorkOrderService {
     [WorkOrderStatus.ClosedWithMustakhlasNeed2ndApproval]: [],
     [WorkOrderStatus.MaterialsReceivedNeed155]: [],
     [WorkOrderStatus.ReadyForCompleteCertificateWithoutRequirement]: [],
-    [WorkOrderStatus.ClosedWithMustakhlasNeed1stApprovalNeedReturnScSrap]: []
+    [WorkOrderStatus.ClosedWithMustakhlasNeed1stApprovalNeedReturnScSrap]: [],
   };
 
   private mockWorkOrders: WorkOrder[] = [

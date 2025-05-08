@@ -5,7 +5,7 @@ export enum WorkOrderStatus {
   Completed = 'completed',
   Cancelled = 'cancelled',
   OnHold = 'on-hold',
-  
+
   // Extended statuses
   UpdatedAlreadyUDSProblem = 'Updated already UDS-problem',
   ReadyForCompleteCertificateWithRequirement = 'Ready to complete certificate with requirement',
@@ -16,7 +16,7 @@ export enum WorkOrderStatus {
   UpdatedAlreadyRTIAndReceivingInProcess = 'Updated already RTI-receiving in process',
   NeedDP = 'need DP',
   ReadyForCheckingNeedPrepareDocuments = 'Ready for checking need prepare documents',
-  UpdatedAlreadyEngSectionForApproval = 'Updated already Engr. section for approval',
+  UpdatedAlreadySecEngForApproval = 'Updated already SEC Engr. for approval',
   WaitingShutdown = 'Waiting Shutdown',
   InProgressForPermission = 'In progress for permission',
   CancelWorkOrder = 'Cancel work-order',
@@ -31,10 +31,10 @@ export enum WorkOrderStatus {
   MaterialsReceivedNeed155 = 'Materials received need 155',
   ReadyForCompleteCertificateWithoutRequirement = 'Ready for complete certificate without requirement',
   ClosedWithMustakhlasNeed1stApprovalNeedReturnScSrap = 'Closed with mustakhlas need 1st approval return scrap'
-} 
+}
 
 // Display names for statuses can be provided via a mapping function or object if needed
-/* 
+/*
 UPDATED ALREADY "UDS PROBLEM"
 READY FOR COMPLETE CERTIFICATE WITH REQUIRMENT
 READY FOR UPDATING " UDIS PROBLEM "
