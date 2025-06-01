@@ -7,7 +7,7 @@
       <mat-radio-button value="purchasable">Purchasable Material</mat-radio-button>
       <mat-radio-button value="receivable">Receivable Material</mat-radio-button>
     </mat-radio-group>
-    
+
     <!-- Material Selection with Autocomplete -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Select Material</mat-label>
@@ -16,7 +16,7 @@
              [matAutocomplete]="auto"
              placeholder="Search for a material">
       <mat-icon matSuffix>search</mat-icon>
-      <mat-autocomplete #auto="matAutocomplete" 
+      <mat-autocomplete #auto="matAutocomplete"
                         [displayWith]="displayMaterial"
                         (optionSelected)="onMaterialSelected($event)">
         <mat-option *ngFor="let material of filteredMaterials$ | async" [value]="material">
@@ -35,7 +35,7 @@
         Please select a material
       </mat-error>
     </mat-form-field>
-    
+
     <!-- Quantity -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Quantity</mat-label>
@@ -48,7 +48,58 @@
         Quantity must be at least 1
       </mat-error>
     </mat-form-field>
-    
+
+    <!-- Availability Status -->
+    <div class="availability-status" *ngIf="selectedMaterial">
+      <div class="status-loading" *ngIf="checkingAvailability">
+        <mat-spinner diameter="24"></mat-spinner>
+        <span>Checking availability...</span>
+      </div>
+
+      <div class="status-info" *ngIf="!checkingAvailability && materialAvailability">
+        <mat-chip [color]="getStockStatusColor()" selected>
+          <mat-icon>{{ getStockStatusIcon() }}</mat-icon>
+          {{ getStockStatusMessage() }}
+        </mat-chip>
+
+        <button mat-button
+                *ngIf="canAssignPartialQuantity()"
+                (click)="assignPartialQuantity()"
+                color="accent">
+          <mat-icon>update</mat-icon>
+          Assign Available Quantity
+        </button>
+      </div>
+
+      <!-- Warehouse Selection -->
+      <mat-form-field appearance="outline" class="full-width" *ngIf="materialAvailability?.warehouseAvailability?.length">
+        <mat-label>Select Warehouse</mat-label>
+        <mat-select formControlName="warehouse">
+          <mat-option *ngFor="let warehouse of materialAvailability?.warehouseAvailability"
+                      [value]="warehouse.warehouseId"
+                      [disabled]="warehouse.available <= 0">
+            <div class="warehouse-option">
+              <div class="warehouse-info">
+                <span class="warehouse-name">{{ warehouse.warehouseName }}</span>
+                <span class="warehouse-distance" *ngIf="warehouse.distance !== undefined && warehouse.distance !== null">
+                  {{ warehouse.distance.toFixed(1) }} km
+                </span>
+              </div>
+              <div class="stock-info">
+                <span class="available">{{ warehouse.available }} available</span>
+                <span class="reserved" *ngIf="warehouse.reserved !== undefined && warehouse.reserved > 0">
+                  ({{ warehouse.reserved }} reserved)
+                </span>
+              </div>
+            </div>
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('warehouse')?.hasError('required')">
+          Please select a warehouse
+        </mat-error>
+      </mat-form-field>
+    </div>
+
     <!-- Purchasable Material Fields -->
     <ng-container *ngIf="materialType === 'purchasable'">
       <div class="row">
@@ -63,7 +114,7 @@
             Unit cost cannot be negative
           </mat-error>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="half-width">
           <mat-label>Supplier</mat-label>
           <input matInput formControlName="supplier">
@@ -72,7 +123,7 @@
           </mat-error>
         </mat-form-field>
       </div>
-      
+
       <div class="row">
         <mat-form-field appearance="outline" class="half-width">
           <mat-label>Order Date</mat-label>
@@ -80,7 +131,7 @@
           <mat-datepicker-toggle matIconSuffix [for]="orderPicker"></mat-datepicker-toggle>
           <mat-datepicker #orderPicker></mat-datepicker>
         </mat-form-field>
-        
+
         <mat-form-field appearance="outline" class="half-width">
           <mat-label>Expected Delivery Date</mat-label>
           <input matInput [matDatepicker]="deliveryPicker" formControlName="deliveryDate">
@@ -89,13 +140,13 @@
         </mat-form-field>
       </div>
     </ng-container>
-    
+
     <!-- Notes -->
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Notes (Optional)</mat-label>
       <textarea matInput formControlName="notes" rows="3"></textarea>
     </mat-form-field>
-    
+
     <!-- Total Cost Display for Purchasable Materials -->
     <div class="total-cost" *ngIf="materialType === 'purchasable' && form.get('quantity')?.value && form.get('unitCost')?.value">
       <strong>Total Cost:</strong> SAR {{ (form.get('quantity')?.value * form.get('unitCost')?.value).toFixed(2) }}
@@ -105,10 +156,10 @@
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button 
-          color="primary" 
+  <button mat-raised-button
+          color="primary"
           (click)="onSubmit()"
           [disabled]="form.invalid || !selectedMaterial">
     Assign Material
   </button>
-</mat-dialog-actions> 
+</mat-dialog-actions>

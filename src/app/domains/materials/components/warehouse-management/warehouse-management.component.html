@@ -1,0 +1,183 @@
+<div class="warehouse-management">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>warehouse</mat-icon>
+        Warehouse Management
+      </mat-card-title>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="addWarehouse()">
+          <mat-icon>add</mat-icon>
+          Add Warehouse
+        </button>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Add/Edit Warehouse Form -->
+      <div class="warehouse-form-container" *ngIf="isEditing">
+        <h3>{{ editingWarehouseId ? 'Edit' : 'Add New' }} Warehouse</h3>
+        <form [formGroup]="warehouseForm" class="warehouse-form">
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Warehouse Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter warehouse name">
+              <mat-error *ngIf="warehouseForm.get('name')?.hasError('required')">
+                Name is required
+              </mat-error>
+              <mat-error *ngIf="warehouseForm.get('name')?.hasError('minlength')">
+                Name must be at least 3 characters
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Type</mat-label>
+              <mat-select formControlName="type">
+                <mat-option *ngFor="let type of warehouseTypes" [value]="type.value">
+                  <mat-icon>{{ getWarehouseTypeIcon(type.value) }}</mat-icon>
+                  {{ type.label }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Address</mat-label>
+            <textarea matInput formControlName="address" rows="2" placeholder="Enter warehouse address"></textarea>
+            <mat-error *ngIf="warehouseForm.get('address')?.hasError('required')">
+              Address is required
+            </mat-error>
+          </mat-form-field>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline">
+              <mat-label>Manager ID</mat-label>
+              <input matInput formControlName="managerId" placeholder="Enter manager ID">
+              <mat-error *ngIf="warehouseForm.get('managerId')?.hasError('required')">
+                Manager ID is required
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Manager Name</mat-label>
+              <input matInput formControlName="managerName" placeholder="Enter manager name">
+              <mat-error *ngIf="warehouseForm.get('managerName')?.hasError('required')">
+                Manager name is required
+              </mat-error>
+            </mat-form-field>
+          </div>
+
+          <div class="form-actions">
+            <button mat-button (click)="cancelEdit()">Cancel</button>
+            <button mat-raised-button color="primary" (click)="saveWarehouse()"
+                    [disabled]="!warehouseForm.valid">
+              {{ editingWarehouseId ? 'Update' : 'Add' }} Warehouse
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Warehouses Table -->
+      <div class="warehouses-table-container">
+        <table mat-table [dataSource]="warehouses" class="warehouses-table">
+
+          <!-- Name Column -->
+          <ng-container matColumnDef="name">
+            <th mat-header-cell *matHeaderCellDef>Name</th>
+            <td mat-cell *matCellDef="let warehouse">
+              <div class="warehouse-name">
+                <mat-icon>{{ getWarehouseTypeIcon(warehouse.type) }}</mat-icon>
+                {{ warehouse.name }}
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Type Column -->
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let warehouse">
+              <mat-chip [color]="'primary'" selected>
+                {{ warehouse.type | titlecase }}
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Address Column -->
+          <ng-container matColumnDef="address">
+            <th mat-header-cell *matHeaderCellDef>Address</th>
+            <td mat-cell *matCellDef="let warehouse">{{ warehouse.address }}</td>
+          </ng-container>
+
+          <!-- Manager Column -->
+          <ng-container matColumnDef="manager">
+            <th mat-header-cell *matHeaderCellDef>Manager</th>
+            <td mat-cell *matCellDef="let warehouse">
+              <div class="manager-info">
+                <span class="manager-name">{{ warehouse.managerName }}</span>
+                <small>{{ warehouse.managerId }}</small>
+              </div>
+            </td>
+          </ng-container>
+
+          <!-- Total Materials Column -->
+          <ng-container matColumnDef="totalMaterials">
+            <th mat-header-cell *matHeaderCellDef>Materials</th>
+            <td mat-cell *matCellDef="let warehouse">
+              {{ warehouse.totalMaterials || 0 }}
+            </td>
+          </ng-container>
+
+          <!-- Utilization Column -->
+          <ng-container matColumnDef="utilization">
+            <th mat-header-cell *matHeaderCellDef>Utilization</th>
+            <td mat-cell *matCellDef="let warehouse">
+              <mat-chip [color]="getUtilizationColor(warehouse.utilizationPercentage || 0)" selected>
+                {{ warehouse.utilizationPercentage || 0 }}%
+              </mat-chip>
+            </td>
+          </ng-container>
+
+          <!-- Actions Column -->
+          <ng-container matColumnDef="actions">
+            <th mat-header-cell *matHeaderCellDef></th>
+            <td mat-cell *matCellDef="let warehouse">
+              <button mat-icon-button [matMenuTriggerFor]="menu">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <button mat-menu-item (click)="viewWarehouseDetails(warehouse)">
+                  <mat-icon>visibility</mat-icon>
+                  View Details
+                </button>
+                <button mat-menu-item (click)="editWarehouse(warehouse)">
+                  <mat-icon>edit</mat-icon>
+                  Edit
+                </button>
+                <button mat-menu-item (click)="manageLocations(warehouse)">
+                  <mat-icon>location_on</mat-icon>
+                  Manage Locations
+                </button>
+                <mat-divider></mat-divider>
+                <button mat-menu-item (click)="deleteWarehouse(warehouse)" class="delete-action">
+                  <mat-icon>delete</mat-icon>
+                  Delete
+                </button>
+              </mat-menu>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+
+        <div *ngIf="warehouses.length === 0" class="no-data">
+          <mat-icon>warehouse</mat-icon>
+          <p>No warehouses found</p>
+          <button mat-raised-button color="primary" (click)="addWarehouse()">
+            Add First Warehouse
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

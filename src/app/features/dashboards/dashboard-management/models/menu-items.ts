@@ -86,7 +86,12 @@ export const projectMenuItems = [
                 icon: 'build'
             },
             {
-                label: 'Materials',
+              label: 'Material Dashboard',
+              link: '/materials/dashboard',
+              icon: 'dashboard'
+            },
+            {
+                label: 'Materials Catalouge',
                 link: '/resources/materials',
                 icon: 'warehouse'
             }

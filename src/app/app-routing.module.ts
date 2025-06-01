@@ -13,6 +13,7 @@ import { UserListComponent } from './users/user-list/user-list.component';
 import { WorkOrderItemsListComponent } from './domains/work-order/components/work-order-items-list/work-order-items-list.component';
 import { MaterialsManagementComponent } from './domains/materials/components/materials-management/materials-management.component';
 import { WorkOrderDetailsRefactoredComponent } from './domains/work-order/components/work-order-details/work-order-details-refactored.component';
+import { MaterialInventoryDashboardComponent } from './domains/materials/components/material-inventory-dashboard/material-inventory-dashboard.component';
 export const routes: Routes = [
   // Login route
   { path: 'login', component: LoginComponent },
@@ -159,6 +160,10 @@ export const routes: Routes = [
   {
     path: 'resources/equipment',
     component: EquipmentDashboardComponent
+  },
+  {
+    path: 'materials/dashboard',
+    component: MaterialInventoryDashboardComponent,
   },
   {
     path: 'resources/materials',

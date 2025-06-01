@@ -1,0 +1,298 @@
+<mat-card class="material-category-manager">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>category</mat-icon>
+      Material Categories
+    </mat-card-title>
+    <div class="header-actions">
+      <button mat-button (click)="addCategory()" color="primary">
+        <mat-icon>add</mat-icon>
+        Add Category
+      </button>
+      <button mat-button (click)="exportCategories()">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="category-container">
+      <!-- Category Tree -->
+      <div class="category-tree">
+        <mat-tree [dataSource]="dataSource" [treeControl]="treeControl">
+          <mat-tree-node *matTreeNodeDef="let node" matTreeNodePadding
+                         [class.selected]="selectedCategory?.id === node.id"
+                         (click)="selectCategory(node)">
+            <button mat-icon-button disabled>
+              <span class="visually-hidden">No expand</span>
+            </button>
+            <mat-icon class="category-icon">{{ getCategoryIcon(node) }}</mat-icon>
+            <span class="category-name">{{ node.name }}</span>
+            <mat-chip *ngIf="!node.isActive" color="warn" selected>Inactive</mat-chip>
+
+            <span class="spacer"></span>
+
+            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="editCategory(node, $event)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="addCategory(node)">
+                <mat-icon>add</mat-icon>
+                <span>Add Subcategory</span>
+              </button>
+              <button mat-menu-item (click)="toggleCategoryStatus(node, $event)">
+                <mat-icon>{{ node.isActive ? 'block' : 'check_circle' }}</mat-icon>
+                <span>{{ node.isActive ? 'Deactivate' : 'Activate' }}</span>
+              </button>
+              <button mat-menu-item (click)="bulkAssignMaterials(node)">
+                <mat-icon>inventory_2</mat-icon>
+                <span>Bulk Assign Materials</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="deleteCategory(node, $event)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </mat-tree-node>
+
+          <mat-tree-node *matTreeNodeDef="let node; when: hasChild" matTreeNodePadding
+                         [class.selected]="selectedCategory?.id === node.id"
+                         (click)="selectCategory(node)">
+            <button mat-icon-button matTreeNodeToggle
+                    [attr.aria-label]="'Toggle ' + node.name">
+              <mat-icon class="mat-icon-rtl-mirror">
+                {{treeControl.isExpanded(node) ? 'expand_more' : 'chevron_right'}}
+              </mat-icon>
+            </button>
+            <mat-icon class="category-icon">{{ getCategoryIcon(node) }}</mat-icon>
+            <span class="category-name">{{ node.name }}</span>
+            <mat-chip *ngIf="!node.isActive" color="warn" selected>Inactive</mat-chip>
+
+            <span class="spacer"></span>
+
+            <button mat-icon-button [matMenuTriggerFor]="menu" (click)="$event.stopPropagation()">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="editCategory(node, $event)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="addCategory(node)">
+                <mat-icon>add</mat-icon>
+                <span>Add Subcategory</span>
+              </button>
+              <button mat-menu-item (click)="toggleCategoryStatus(node, $event)">
+                <mat-icon>{{ node.isActive ? 'block' : 'check_circle' }}</mat-icon>
+                <span>{{ node.isActive ? 'Deactivate' : 'Activate' }}</span>
+              </button>
+              <button mat-menu-item (click)="bulkAssignMaterials(node)">
+                <mat-icon>inventory_2</mat-icon>
+                <span>Bulk Assign Materials</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="deleteCategory(node, $event)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </mat-tree-node>
+        </mat-tree>
+      </div>
+
+      <!-- Category Details/Edit Panel -->
+      <div class="category-details">
+        <!-- Edit Form -->
+        <mat-expansion-panel *ngIf="isEditing" expanded="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              {{ editingCategory ? 'Edit Category' : 'New Category' }}
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <form [formGroup]="categoryForm">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Category Name</mat-label>
+              <input matInput formControlName="name" placeholder="Enter category name">
+              <mat-error *ngIf="categoryForm.get('name')?.hasError('required')">
+                Name is required
+              </mat-error>
+              <mat-error *ngIf="categoryForm.get('name')?.hasError('minlength')">
+                Name must be at least 2 characters
+              </mat-error>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Description</mat-label>
+              <textarea matInput formControlName="description" rows="3"
+                        placeholder="Enter category description"></textarea>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Parent Category</mat-label>
+              <mat-select formControlName="parentId">
+                <mat-option [value]="null">None (Top Level)</mat-option>
+                <mat-option *ngFor="let cat of categories" [value]="cat.id">
+                  {{ cat.name }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="half-width">
+              <mat-label>Sort Order</mat-label>
+              <input matInput type="number" formControlName="sortOrder" min="0">
+            </mat-form-field>
+
+            <mat-checkbox formControlName="isActive" class="checkbox-field">
+              Active
+            </mat-checkbox>
+
+            <div class="form-actions">
+              <button mat-button (click)="cancelEdit()">Cancel</button>
+              <button mat-raised-button color="primary" (click)="saveCategory()"
+                      [disabled]="!categoryForm.valid">
+                {{ editingCategory ? 'Update' : 'Create' }}
+              </button>
+            </div>
+          </form>
+        </mat-expansion-panel>
+
+        <!-- Selected Category Details -->
+        <mat-expansion-panel *ngIf="selectedCategory && !isEditing" expanded="true">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Category Details
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+          <div class="category-info">
+            <h3>{{ selectedCategory.name }}</h3>
+            <p *ngIf="selectedCategory.description">{{ selectedCategory.description }}</p>
+
+            <div class="info-grid">
+              <div class="info-item">
+                <strong>Status:</strong>
+                <mat-chip [color]="selectedCategory.isActive ? 'primary' : 'warn'" selected>
+                  {{ selectedCategory.isActive ? 'Active' : 'Inactive' }}
+                </mat-chip>
+              </div>
+              <div class="info-item">
+                <strong>Level:</strong> {{ selectedCategory.level }}
+              </div>
+              <div class="info-item">
+                <strong>Sort Order:</strong> {{ selectedCategory.sortOrder }}
+              </div>
+              <div class="info-item">
+                <strong>Created:</strong> {{ selectedCategory.createdAt | date }}
+              </div>
+            </div>
+
+            <!-- Custom Fields -->
+            <div class="custom-fields-section">
+              <h4>
+                <mat-icon>text_fields</mat-icon>
+                Custom Fields
+              </h4>
+
+              <div class="custom-fields-list" *ngIf="selectedCategory.customFields?.length; else noCustomFields">
+                <div class="custom-field-item" *ngFor="let field of selectedCategory.customFields; let i = index">
+                  <mat-icon>{{ getFieldTypeIcon(field.fieldType) }}</mat-icon>
+                  <div class="field-info">
+                    <strong>{{ field.fieldName }}</strong>
+                    <small>Type: {{ field.fieldType }} | Required: {{ field.required ? 'Yes' : 'No' }}</small>
+                  </div>
+                  <button mat-icon-button (click)="removeCustomField(selectedCategory, i, $event)">
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+              </div>
+
+              <ng-template #noCustomFields>
+                <p class="no-data">No custom fields defined</p>
+              </ng-template>
+
+              <!-- Add Custom Field Form -->
+              <mat-expansion-panel>
+                <mat-expansion-panel-header>
+                  <mat-panel-title>
+                    Add Custom Field
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <form [formGroup]="customFieldForm">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Field Name</mat-label>
+                    <input matInput formControlName="fieldName" placeholder="e.g., voltage_rating">
+                    <mat-hint>Use lowercase with underscores</mat-hint>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Field Type</mat-label>
+                    <mat-select formControlName="fieldType" (selectionChange)="onFieldTypeChange()">
+                      <mat-option *ngFor="let type of fieldTypes" [value]="type.value">
+                        <mat-icon>{{ getFieldTypeIcon(type.value) }}</mat-icon>
+                        {{ type.label }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-checkbox formControlName="required">Required Field</mat-checkbox>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Default Value</mat-label>
+                    <input matInput formControlName="defaultValue">
+                  </mat-form-field>
+
+                  <!-- Conditional fields based on type -->
+                  <mat-form-field appearance="outline" class="full-width"
+                                  *ngIf="customFieldForm.get('fieldType')?.value === 'select'">
+                    <mat-label>Options (comma-separated)</mat-label>
+                    <input matInput formControlName="options" placeholder="Option1, Option2, Option3">
+                  </mat-form-field>
+
+                  <div class="validation-fields" *ngIf="customFieldForm.get('fieldType')?.value === 'number'">
+                    <mat-form-field appearance="outline" class="half-width">
+                      <mat-label>Min Value</mat-label>
+                      <input matInput type="number" formControlName="minValue">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline" class="half-width">
+                      <mat-label>Max Value</mat-label>
+                      <input matInput type="number" formControlName="maxValue">
+                    </mat-form-field>
+                  </div>
+
+                  <mat-form-field appearance="outline" class="full-width"
+                                  *ngIf="customFieldForm.get('fieldType')?.value === 'text'">
+                    <mat-label>Validation Pattern (RegEx)</mat-label>
+                    <input matInput formControlName="pattern">
+                  </mat-form-field>
+
+                  <button mat-raised-button color="primary" (click)="addCustomField()"
+                          [disabled]="!customFieldForm.valid">
+                    <mat-icon>add</mat-icon>
+                    Add Field
+                  </button>
+                </form>
+              </mat-expansion-panel>
+            </div>
+          </div>
+        </mat-expansion-panel>
+
+        <!-- Empty State -->
+        <div class="empty-state" *ngIf="!selectedCategory && !isEditing">
+          <mat-icon>category</mat-icon>
+          <h3>Select a Category</h3>
+          <p>Choose a category from the tree to view details or click "Add Category" to create a new one.</p>
+        </div>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>

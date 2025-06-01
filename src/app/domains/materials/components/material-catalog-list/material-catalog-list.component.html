@@ -1,0 +1,392 @@
+<mat-card class="material-catalog-list">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>inventory_2</mat-icon>
+      Material Catalog
+      <mat-chip *ngIf="dataSource.data.length > 0" [matBadge]="dataSource.data.length" matBadgeOverlap="false">
+        Total
+      </mat-chip>
+    </mat-card-title>
+    <div class="header-actions">
+      <button mat-button color="primary" (click)="isFilterExpanded = !isFilterExpanded">
+        <mat-icon>filter_list</mat-icon>
+        Filters
+        <mat-chip *ngIf="activeFilterCount > 0" color="accent" selected>{{ activeFilterCount }}</mat-chip>
+      </button>
+      <button mat-button [matMenuTriggerFor]="presetMenu">
+        <mat-icon>bookmark</mat-icon>
+        Presets
+      </button>
+      <button mat-button [matMenuTriggerFor]="exportMenu">
+        <mat-icon>download</mat-icon>
+        Export
+      </button>
+      <button mat-raised-button color="primary">
+        <mat-icon>add</mat-icon>
+        New Material
+      </button>
+    </div>
+  </mat-card-header>
+
+  <!-- Filter Preset Menu -->
+  <mat-menu #presetMenu="matMenu">
+    <button mat-menu-item (click)="saveFilterPreset()">
+      <mat-icon>save</mat-icon>
+      <span>Save Current Filters</span>
+    </button>
+    <mat-divider></mat-divider>
+    <div *ngFor="let preset of filterPresets">
+      <button mat-menu-item (click)="loadFilterPreset(preset)">
+        <mat-icon>bookmark</mat-icon>
+        <span>{{ preset.name }}</span>
+        <mat-icon *ngIf="!preset.isDefault" class="delete-icon"
+                  (click)="deleteFilterPreset(preset); $event.stopPropagation()">delete</mat-icon>
+      </button>
+    </div>
+    <div *ngIf="filterPresets.length === 0" class="no-presets">
+      <span>No saved presets</span>
+    </div>
+  </mat-menu>
+
+  <!-- Export Menu -->
+  <mat-menu #exportMenu="matMenu">
+    <button mat-menu-item (click)="exportSelected()" [disabled]="selection.selected.length === 0">
+      <mat-icon>check_box</mat-icon>
+      <span>Export Selected ({{ selection.selected.length }})</span>
+    </button>
+    <button mat-menu-item (click)="exportAll()">
+      <mat-icon>cloud_download</mat-icon>
+      <span>Export All ({{ dataSource.data.length }})</span>
+    </button>
+  </mat-menu>
+
+  <mat-card-content>
+    <!-- Search Bar -->
+    <div class="search-container">
+      <form [formGroup]="searchForm" class="search-form">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-label>Search materials</mat-label>
+          <mat-icon matPrefix>search</mat-icon>
+          <input matInput formControlName="searchTerm"
+                 placeholder="Search by code, description, or barcode">
+          <button mat-icon-button matSuffix *ngIf="searchForm.get('searchTerm')?.value"
+                  (click)="searchForm.get('searchTerm')?.setValue('')">
+            <mat-icon>clear</mat-icon>
+          </button>
+        </mat-form-field>
+      </form>
+    </div>
+
+    <!-- Advanced Filters -->
+    <mat-expansion-panel [expanded]="isFilterExpanded" class="filter-panel">
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          Advanced Filters
+          <mat-chip *ngIf="activeFilterCount > 0" color="accent" selected>
+            {{ activeFilterCount }} active
+          </mat-chip>
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+
+      <form [formGroup]="filterForm" (change)="onFilterFormChange()">
+        <div class="filter-grid">
+          <!-- Categories -->
+          <mat-form-field appearance="outline">
+            <mat-label>Categories</mat-label>
+            <mat-select formControlName="categories" multiple>
+              <mat-option *ngFor="let category of categories" [value]="category.id">
+                {{ category.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Stock Status -->
+          <mat-form-field appearance="outline">
+            <mat-label>Stock Status</mat-label>
+            <mat-select formControlName="stockStatus" multiple>
+              <mat-option *ngFor="let status of stockStatuses" [value]="status">
+                <mat-icon>{{ getStockStatusIcon(status) }}</mat-icon>
+                {{ status | titlecase }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Warehouses -->
+          <mat-form-field appearance="outline">
+            <mat-label>Warehouses</mat-label>
+            <mat-select formControlName="warehouses" multiple>
+              <mat-option *ngFor="let warehouse of warehouses" [value]="warehouse.id">
+                {{ warehouse.name }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Material Type -->
+          <mat-form-field appearance="outline">
+            <mat-label>Material Type</mat-label>
+            <mat-select formControlName="materialType" multiple>
+              <mat-option *ngFor="let type of materialTypes" [value]="type">
+                {{ type | titlecase }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Client Type -->
+          <mat-form-field appearance="outline">
+            <mat-label>Client Type</mat-label>
+            <mat-select formControlName="clientType" multiple>
+              <mat-option *ngFor="let type of clientTypes" [value]="type">
+                {{ type | uppercase }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <!-- Date Range -->
+          <mat-form-field appearance="outline">
+            <mat-label>Date Field</mat-label>
+            <mat-select formControlName="dateRangeField">
+              <mat-option *ngFor="let option of dateRangeOptions" [value]="option.value">
+                {{ option.label }}
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date From</mat-label>
+            <input matInput [matDatepicker]="dateFrom" formControlName="dateRangeStart">
+            <mat-datepicker-toggle matSuffix [for]="dateFrom"></mat-datepicker-toggle>
+            <mat-datepicker #dateFrom></mat-datepicker>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Date To</mat-label>
+            <input matInput [matDatepicker]="dateTo" formControlName="dateRangeEnd">
+            <mat-datepicker-toggle matSuffix [for]="dateTo"></mat-datepicker-toggle>
+            <mat-datepicker #dateTo></mat-datepicker>
+          </mat-form-field>
+
+          <!-- Price Range -->
+          <mat-form-field appearance="outline">
+            <mat-label>Min Price</mat-label>
+            <input matInput type="number" formControlName="priceMin" placeholder="0">
+            <span matPrefix>SAR&nbsp;</span>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Max Price</mat-label>
+            <input matInput type="number" formControlName="priceMax" placeholder="Any">
+            <span matPrefix>SAR&nbsp;</span>
+          </mat-form-field>
+
+          <!-- Boolean Filters -->
+          <div class="checkbox-group">
+            <mat-checkbox formControlName="hazardous" [indeterminate]="filterForm.get('hazardous')?.value === null">
+              Hazardous Materials Only
+            </mat-checkbox>
+            <mat-checkbox formControlName="hasBarcode" [indeterminate]="filterForm.get('hasBarcode')?.value === null">
+              Has Barcode
+            </mat-checkbox>
+          </div>
+        </div>
+
+        <div class="filter-actions">
+          <button mat-button (click)="clearFilters()">
+            <mat-icon>clear</mat-icon>
+            Clear All
+          </button>
+        </div>
+      </form>
+    </mat-expansion-panel>
+
+    <!-- Bulk Actions -->
+    <div class="bulk-actions" *ngIf="selection.hasValue()">
+      <mat-chip color="primary" selected>
+        {{ selection.selected.length }} selected
+      </mat-chip>
+      <button mat-button [matMenuTriggerFor]="bulkMenu">
+        <mat-icon>more_horiz</mat-icon>
+        Bulk Actions
+      </button>
+      <button mat-button (click)="selection.clear()">
+        <mat-icon>clear</mat-icon>
+        Clear Selection
+      </button>
+    </div>
+
+    <!-- Bulk Actions Menu -->
+    <mat-menu #bulkMenu="matMenu">
+      <button mat-menu-item (click)="bulkOperation('update-category')">
+        <mat-icon>category</mat-icon>
+        <span>Update Category</span>
+      </button>
+      <button mat-menu-item (click)="bulkOperation('update-warehouse')">
+        <mat-icon>warehouse</mat-icon>
+        <span>Update Warehouse</span>
+      </button>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="bulkOperation('delete')" class="delete-action">
+        <mat-icon>delete</mat-icon>
+        <span>Delete Selected</span>
+      </button>
+    </mat-menu>
+
+    <!-- Materials Table -->
+    <div class="table-container">
+      <table mat-table [dataSource]="dataSource" matSort class="materials-table">
+        <!-- Selection Column -->
+        <ng-container matColumnDef="select">
+          <th mat-header-cell *matHeaderCellDef>
+            <mat-checkbox (change)="$event ? masterToggle() : null"
+                          [checked]="selection.hasValue() && isAllSelected()"
+                          [indeterminate]="selection.hasValue() && !isAllSelected()">
+            </mat-checkbox>
+          </th>
+          <td mat-cell *matCellDef="let row">
+            <mat-checkbox (click)="$event.stopPropagation()"
+                          (change)="$event ? selection.toggle(row) : null"
+                          [checked]="selection.isSelected(row)">
+            </mat-checkbox>
+          </td>
+        </ng-container>
+
+        <!-- Code Column -->
+        <ng-container matColumnDef="code">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Code</th>
+          <td mat-cell *matCellDef="let material">
+            <div class="code-cell">
+              <strong>{{ material.code }}</strong>
+              <mat-icon *ngIf="material.barcode" matTooltip="Has barcode: {{ material.barcode }}"
+                        class="barcode-icon">qr_code_2</mat-icon>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Description Column -->
+        <ng-container matColumnDef="description">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Description</th>
+          <td mat-cell *matCellDef="let material">
+            <div class="description-cell">
+              {{ material.description }}
+              <mat-icon *ngIf="material.hazardous" color="warn"
+                        matTooltip="Hazardous material" class="hazard-icon">warning</mat-icon>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Category Column -->
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+          <td mat-cell *matCellDef="let material">
+            {{ getCategoryName(material.categoryId) }}
+          </td>
+        </ng-container>
+
+        <!-- Stock Status Column -->
+        <ng-container matColumnDef="stockStatus">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
+          <td mat-cell *matCellDef="let material">
+            <mat-chip [color]="getStockStatusColor(material.stockStatus)" selected>
+              <mat-icon>{{ getStockStatusIcon(material.stockStatus) }}</mat-icon>
+              {{ material.stockStatus | titlecase }}
+            </mat-chip>
+          </td>
+        </ng-container>
+
+        <!-- Available Stock Column -->
+        <ng-container matColumnDef="availableStock">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Available</th>
+          <td mat-cell *matCellDef="let material">
+            <div class="stock-info">
+              <span class="available">{{ material.availableStock || 0 }}</span>
+              <span class="total">/ {{ material.totalStock || 0 }}</span>
+              <span class="unit">{{ material.unit }}</span>
+            </div>
+          </td>
+        </ng-container>
+
+        <!-- Warehouse Column -->
+        <ng-container matColumnDef="warehouse">
+          <th mat-header-cell *matHeaderCellDef>Warehouse</th>
+          <td mat-cell *matCellDef="let material">
+            {{ getWarehouseName(material.primaryWarehouseId) }}
+          </td>
+        </ng-container>
+
+        <!-- Unit Column -->
+        <ng-container matColumnDef="unit">
+          <th mat-header-cell *matHeaderCellDef>Unit</th>
+          <td mat-cell *matCellDef="let material">{{ material.unit }}</td>
+        </ng-container>
+
+        <!-- Average Cost Column -->
+        <ng-container matColumnDef="averageCost">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Avg. Cost</th>
+          <td mat-cell *matCellDef="let material">
+            {{ formatCurrency(material.averageCost) }}
+          </td>
+        </ng-container>
+
+        <!-- Last Used Column -->
+        <ng-container matColumnDef="lastUsed">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Last Used</th>
+          <td mat-cell *matCellDef="let material">
+            {{ material.lastUsedAt ? (material.lastUsedAt | date:'shortDate') : '-' }}
+          </td>
+        </ng-container>
+
+        <!-- Actions Column -->
+        <ng-container matColumnDef="actions">
+          <th mat-header-cell *matHeaderCellDef>Actions</th>
+          <td mat-cell *matCellDef="let material">
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="viewMaterial(material)">
+                <mat-icon>visibility</mat-icon>
+                <span>View Details</span>
+              </button>
+              <button mat-menu-item (click)="editMaterial(material)">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="checkStock(material)">
+                <mat-icon>inventory</mat-icon>
+                <span>Check Stock</span>
+              </button>
+              <button mat-menu-item (click)="assignToWorkOrder(material)">
+                <mat-icon>assignment</mat-icon>
+                <span>Assign to Work Order</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="deleteMaterial(material)" class="delete-action">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+        <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+            [class.selected]="selection.isSelected(row)"></tr>
+
+        <!-- No data row -->
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data" [attr.colspan]="displayedColumns.length">
+            <div class="empty-state">
+              <mat-icon>inventory_2</mat-icon>
+              <h3>No materials found</h3>
+              <p>Try adjusting your search or filters</p>
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <mat-paginator [pageSizeOptions]="[10, 25, 50, 100]"
+                     showFirstLastButtons
+                     aria-label="Select page of materials">
+      </mat-paginator>
+    </div>
+  </mat-card-content>
+</mat-card>
