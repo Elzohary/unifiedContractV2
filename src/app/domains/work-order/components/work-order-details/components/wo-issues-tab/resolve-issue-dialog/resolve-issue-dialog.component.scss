@@ -12,6 +12,7 @@ mat-dialog-title {
 mat-dialog-content {
   padding-top: 20px !important;
   min-width: 500px;
+  padding: 16px;
   
   @media (max-width: 600px) {
     min-width: unset;
@@ -60,6 +61,7 @@ mat-dialog-content {
 .resolve-form {
   .full-width {
     width: 100%;
+    padding: 16px;
   }
 }
 
