@@ -1,0 +1,108 @@
+<div class="work-order-details-container">
+  <!-- Loading State -->
+  <div class="loading-container" *ngIf="loading$ | async">
+    <mat-spinner diameter="60"></mat-spinner>
+    <p>Loading work order details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-container" *ngIf="error$ | async as error">
+    <mat-icon>error_outline</mat-icon>
+    <h3>Error loading work order</h3>
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Go Back
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content" *ngIf="(workOrder$ | async) as workOrder">
+    <!-- Header -->
+    <app-wo-header 
+      [workOrder]="workOrder"
+      (edit)="editWorkOrder($event)"
+      (statusChange)="updateStatus($event.workOrderId, $event.status)"
+      (print)="onPrint()"
+      (export)="onExport()"
+      (duplicate)="onDuplicate()">
+    </app-wo-header>
+
+    <!-- Tab Navigation -->
+    <mat-tab-group 
+      [(selectedIndex)]="selectedTabIndex"
+      (selectedIndexChange)="onTabChange($event)">
+      
+      <!-- Overview Tab -->
+      <mat-tab label="Overview">
+        <ng-template matTabContent>
+          <app-wo-overview-tab [workOrder]="workOrder"></app-wo-overview-tab>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Remarks Tab -->
+      <!-- <mat-tab label="Remarks">
+        <ng-template matTabContent>
+          <app-wo-remarks-tab [workOrderId]="workOrder.id"></app-wo-remarks-tab>
+        </ng-template>
+      </mat-tab> -->
+
+      <!-- Tasks Tab -->
+      <mat-tab label="Tasks">
+        <ng-template matTabContent>
+          <app-wo-tasks-tab 
+            [workOrderId]="workOrder.id"
+            [tasks]="tasks$ | async"
+            (taskAdded)="onTaskAdded($event, workOrder.id)"
+            (taskUpdated)="onTaskUpdated($event)"
+            (taskDeleted)="onTaskDeleted($event)">
+          </app-wo-tasks-tab>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Activity Log Tab -->
+      <!-- <mat-tab label="Activity">
+        <ng-template matTabContent>
+          <app-wo-activity-tab [activityLogs]="activityLogs$ | async"></app-wo-activity-tab>
+        </ng-template>
+      </mat-tab> -->
+
+      <!-- Issues Tab (To be implemented) -->
+      <mat-tab label="Issues">
+        <ng-template matTabContent>
+          <app-wo-issues-tab [workOrderId]="workOrder.id"></app-wo-issues-tab>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Materials Tab (To be implemented) -->
+      <mat-tab label="Materials">
+        <ng-template matTabContent>
+          <app-wo-materials-tab 
+            [workOrderId]="workOrder.id"
+            [workOrderClient]="workOrder.details.client">
+          </app-wo-materials-tab>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Documents Tab (To be implemented) -->
+      <mat-tab label="Documents">
+        <ng-template matTabContent>
+          <div class="tab-placeholder">
+            <mat-icon>folder</mat-icon>
+            <p>Documents management coming soon</p>
+          </div>
+        </ng-template>
+      </mat-tab>
+
+      <!-- Expenses Tab (To be implemented) -->
+      <mat-tab label="Expenses">
+        <ng-template matTabContent>
+          <div class="tab-placeholder">
+            <mat-icon>attach_money</mat-icon>
+            <p>Expenses management coming soon</p>
+          </div>
+        </ng-template>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div> 

@@ -13,12 +13,12 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './stats-card.component.scss'
 })
 export class StatsCardComponent {
-  @Input() title: string = '';
+  @Input() title = '';
   @Input() value: string | number = 0;
-  @Input() icon: string = 'trending_up';
+  @Input() icon = 'trending_up';
   @Input() cardColor: 'primary' | 'success' | 'warning' | 'error' = 'primary';
-  @Input() trend: number = 0;
-  @Input() trendLabel: string = 'vs last period';
-  @Input() valuePrefix: string = '';
-  @Input() valueSuffix: string = '';
+  @Input() trend = 0;
+  @Input() trendLabel = 'vs last period';
+  @Input() valuePrefix = '';
+  @Input() valueSuffix = '';
 }

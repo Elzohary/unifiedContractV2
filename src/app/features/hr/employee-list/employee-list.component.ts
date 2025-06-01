@@ -41,8 +41,8 @@ import { EmployeeService } from '../../../shared/services/employee.service';
 export class EmployeeListComponent implements OnInit, AfterViewInit {
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
-  searchQuery: string = '';
-  isLoading: boolean = true;
+  searchQuery = '';
+  isLoading = true;
   
   displayedColumns: string[] = [
     'photo', 'name', 'jobTitle', 'badgeNumber', 'workLocation', 

@@ -1,0 +1,163 @@
+<div class="overview-container">
+  <div class="overview-grid">
+    <!-- Description Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>description</mat-icon>
+          Description
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <p>{{ workOrder.details.description || 'No description provided' }}</p>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Progress Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>trending_up</mat-icon>
+          Progress
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="progress-info">
+          <span class="progress-label">Completion</span>
+          <span class="progress-value">{{ workOrder.details.completionPercentage }}%</span>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="workOrder.details.completionPercentage"
+          [color]="getProgressColor()">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Dates Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>calendar_today</mat-icon>
+          Important Dates
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>Created</span>
+            <span matListItemLine>{{ formatDate(workOrder.details.createdDate) }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Start Date</span>
+            <span matListItemLine>{{ formatDate(workOrder.details.startDate) }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Due Date</span>
+            <span matListItemLine>{{ formatDate(workOrder.details.dueDate) }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Target End Date</span>
+            <span matListItemLine>{{ formatDate(workOrder.details.targetEndDate) }}</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Engineer Card -->
+    <mat-card *ngIf="workOrder.engineerInCharge">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>engineering</mat-icon>
+          Engineer in Charge
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="engineer-info">
+          <mat-icon class="person-icon">person</mat-icon>
+          <div>
+            <div class="engineer-name">{{ workOrder.engineerInCharge.name }}</div>
+            <div class="engineer-id">ID: {{ workOrder.engineerInCharge.id }}</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Work Order Info Card -->
+    <mat-card>
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>info</mat-icon>
+          Work Order Information
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>Internal Order Number</span>
+            <span matListItemLine>{{ workOrder.details.internalOrderNumber }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Category</span>
+            <span matListItemLine>{{ workOrder.details.category }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Created By</span>
+            <span matListItemLine>{{ workOrder.details.createdBy }}</span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Last Updated</span>
+            <span matListItemLine>{{ formatDate(workOrder.details.lastUpdated) }}</span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Expense Breakdown Card -->
+    <mat-card *ngIf="workOrder.expenseBreakdown">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>attach_money</mat-icon>
+          Expense Breakdown
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>Materials</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.materials | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Labor</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.labor | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Other</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.other | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item class="total-row">
+            <span matListItemTitle><strong>Total</strong></span>
+            <span matListItemLine class="expense-amount total">
+              <strong>${{ getTotalExpense() | number:'1.2-2' }}</strong>
+            </span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div> 

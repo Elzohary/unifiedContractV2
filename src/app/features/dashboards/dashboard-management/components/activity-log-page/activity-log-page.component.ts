@@ -520,7 +520,7 @@ export class ActivityLogPageComponent implements OnInit, OnDestroy {
   }
   
   getActivityIconClass(log: ActivityLog): string {
-    const actionClasses: { [key: string]: string } = {
+    const actionClasses: Record<string, string> = {
       'create': 'action-create',
       'update': 'action-update',
       'delete': 'action-delete'
@@ -530,13 +530,13 @@ export class ActivityLogPageComponent implements OnInit, OnDestroy {
   }
   
   getActivityIcon(log: ActivityLog): string {
-    const actionIcons: { [key: string]: string } = {
+    const actionIcons: Record<string, string> = {
       'create': 'add_circle',
       'update': 'edit',
       'delete': 'delete'
     };
     
-    const entityIcons: { [key: string]: string } = {
+    const entityIcons: Record<string, string> = {
       'workOrder': 'engineering',
       'remark': 'comment',
       'issue': 'error',

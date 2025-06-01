@@ -1,0 +1,112 @@
+<h2 mat-dialog-title>
+  <mat-icon>{{ isEditMode ? 'edit' : 'add_circle' }}</mat-icon>
+  {{ isEditMode ? 'Edit Issue' : 'Report New Issue' }}
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="issueForm" class="issue-form">
+    <!-- Title -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput formControlName="title" placeholder="Brief description of the issue">
+      <mat-error *ngIf="issueForm.get('title')?.hasError('required')">
+        {{ getErrorMessage('title') }}
+      </mat-error>
+      <mat-error *ngIf="issueForm.get('title')?.hasError('maxlength')">
+        {{ getErrorMessage('title') }}
+      </mat-error>
+    </mat-form-field>
+
+    <!-- Description -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" 
+                placeholder="Detailed description of the issue"
+                rows="4"></textarea>
+      <mat-error *ngIf="issueForm.get('description')?.hasError('required')">
+        {{ getErrorMessage('description') }}
+      </mat-error>
+      <mat-error *ngIf="issueForm.get('description')?.hasError('maxlength')">
+        {{ getErrorMessage('description') }}
+      </mat-error>
+    </mat-form-field>
+
+    <div class="form-row">
+      <!-- Priority -->
+      <mat-form-field appearance="outline">
+        <mat-label>Priority</mat-label>
+        <mat-select formControlName="priority">
+          <mat-option *ngFor="let priority of priorities" [value]="priority.value">
+            <mat-icon [color]="priority.color">{{ priority.icon }}</mat-icon>
+            {{ priority.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="issueForm.get('priority')?.hasError('required')">
+          {{ getErrorMessage('priority') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Severity -->
+      <mat-form-field appearance="outline">
+        <mat-label>Severity</mat-label>
+        <mat-select formControlName="severity">
+          <mat-option *ngFor="let severity of severities" [value]="severity.value">
+            {{ severity.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="issueForm.get('severity')?.hasError('required')">
+          {{ getErrorMessage('severity') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <!-- Status -->
+      <mat-form-field appearance="outline" *ngIf="isEditMode">
+        <mat-label>Status</mat-label>
+        <mat-select formControlName="status">
+          <mat-option *ngFor="let status of statuses" [value]="status.value">
+            {{ status.label }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="issueForm.get('status')?.hasError('required')">
+          {{ getErrorMessage('status') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+
+    <div class="form-row">
+      <!-- Reported By -->
+      <mat-form-field appearance="outline">
+        <mat-label>Reported By</mat-label>
+        <input matInput formControlName="reportedBy" placeholder="Name of person reporting">
+        <mat-icon matPrefix>person</mat-icon>
+        <mat-error *ngIf="issueForm.get('reportedBy')?.hasError('required')">
+          {{ getErrorMessage('reportedBy') }}
+        </mat-error>
+        <mat-error *ngIf="issueForm.get('reportedBy')?.hasError('maxlength')">
+          {{ getErrorMessage('reportedBy') }}
+        </mat-error>
+      </mat-form-field>
+
+      <!-- Assigned To -->
+      <mat-form-field appearance="outline">
+        <mat-label>Assigned To (Optional)</mat-label>
+        <input matInput formControlName="assignedTo" placeholder="Name of person assigned">
+        <mat-icon matPrefix>assignment_ind</mat-icon>
+        <mat-error *ngIf="issueForm.get('assignedTo')?.hasError('maxlength')">
+          {{ getErrorMessage('assignedTo') }}
+        </mat-error>
+      </mat-form-field>
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" 
+          (click)="onSubmit()" 
+          [disabled]="!issueForm.valid">
+    {{ isEditMode ? 'Update' : 'Create' }} Issue
+  </button>
+</mat-dialog-actions> 

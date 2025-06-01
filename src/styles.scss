@@ -81,7 +81,53 @@ body {
 
 /* Global Material overrides */
 
+/* Dialog Layout Fixes */
+.mat-mdc-dialog-container {
+  .mdc-dialog__surface {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .mat-mdc-dialog-content {
+    max-height: none !important;
+    padding: 0 !important;
+  }
+}
 
+/* Material Form Field Prefix/Suffix Padding Only */
+.mat-mdc-form-field {
+  // Only style prefix/suffix for better alignment
+  .mat-mdc-form-field-prefix,
+  .mat-mdc-form-field-suffix {
+    padding: 0 8px;
+  }
+}
+
+/* Custom scrollbar styles for dialogs */
+.custom-scrollbar {
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  
+  &::-webkit-scrollbar-track {
+    background: #f5f5f5;
+    border-radius: 5px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+    background: #d0d0d0;
+    border-radius: 5px;
+    
+    &:hover {
+      background: #b0b0b0;
+    }
+  }
+  
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+}
 
 // Include density styles (optional, default is 0)
 @include mat.core-density(-1); // Example: Make components slightly smaller

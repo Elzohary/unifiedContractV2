@@ -42,10 +42,10 @@ import { Subject, takeUntil, timeout, catchError, EMPTY, finalize, first } from 
 export class EmployeeListComponent implements OnInit, AfterViewInit, OnDestroy {
   employees: Employee[] = [];
   filteredEmployees: Employee[] = [];
-  searchQuery: string = '';
-  isLoading: boolean = true;
-  hasError: boolean = false;
-  errorMessage: string = '';
+  searchQuery = '';
+  isLoading = true;
+  hasError = false;
+  errorMessage = '';
   private destroy$ = new Subject<void>();
   
   displayedColumns: string[] = [

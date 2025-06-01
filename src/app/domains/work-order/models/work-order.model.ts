@@ -65,43 +65,202 @@ export interface equipmentAssignment {
 export interface materialAssignment {
   id: string;
   materialType: 'purchasable' | 'receivable';
-  purchasableMaterial?: purchasableMaterial;
-  receivableMaterial?: receivableMaterial;
-  workOrderNumber?: string;
-  assignDate: string | Date;
+  purchasableMaterial?: PurchasableMaterial;
+  receivableMaterial?: ReceivableMaterial;
+  workOrderNumber: string;
+  assignDate: Date | string;
   assignedBy: string;
   storingLocation?: string;
 }
 
-export interface purchasableMaterial {
+export interface PurchasableMaterial {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   quantity: number;
   unit: string;
-  unitCost?: number;
-  totalCost?: number;
-  status: string;
+  unitCost: number;
+  totalCost: number;
+  status: 'pending' | 'ordered' | 'delivered' | 'in-use' | 'used';
   supplier?: string;
-  orderDate?: string | Date;
-  deliveryDate?: string | Date;
+  orderDate?: Date | string;
+  deliveryDate?: Date | string;
+  
+  // Invoice management
+  invoice?: {
+    id: string;
+    fileName: string;
+    fileUrl: string;
+    uploadedDate: Date | string;
+    uploadedBy: string;
+    documentType: 'pdf' | 'image';
+  };
+  
+  // Delivery details
+  delivery?: {
+    receivedDate: Date | string;
+    receivedBy: string; // Badge number or ID
+    receivedByName: string;
+    storageLocation: 'warehouse' | 'site-direct';
+    warehouseDetails?: {
+      warehouseId: string;
+      warehouseName: string;
+      binLocation?: string;
+    };
+    deliveryNote?: string;
+    deliveryPhotos?: Array<{
+      id: string;
+      fileUrl: string;
+      uploadedDate: Date | string;
+    }>;
+  };
+  
+  // Site usage tracking - Changed to array for multiple usage records
+  siteUsageRecords?: SiteUsageRecord[];
+  
+  // Keep legacy field for backward compatibility
+  siteUsage?: {
+    issuedToSite: boolean;
+    issuedDate?: Date | string;
+    issuedBy?: string; // System user who recorded the issue
+    releasedBy?: string; // Warehouse keeper badge number
+    releasedByName?: string; // Warehouse keeper name
+    receivedBySite?: string; // Manpower ID who received at site
+    receivedBySiteName?: string;
+    actualQuantityUsed?: number;
+    usagePercentage?: number;
+    usageCompletedDate?: Date | string;
+    usageNotes?: string;
+    usagePhotos?: Array<{
+      id: string;
+      fileUrl: string;
+      description: string;
+      uploadedDate: Date | string;
+      uploadedBy: string;
+    }>;
+  };
 }
 
-export interface receivableMaterial {
+// New interface for tracking individual usage records
+export interface SiteUsageRecord {
+  id: string;
+  recordType: 'site-issue' | 'usage-update' | 'return' | 'waste';
+  recordDate: Date | string;
+  recordedBy: string;
+  recordedByName?: string;
+  
+  // For site issue
+  issuedToSite?: boolean;
+  issuedDate?: Date | string;
+  issuedBy?: string;
+  releasedBy?: string; // Warehouse keeper badge number
+  releasedByName?: string; // Warehouse keeper name
+  receivedBySite?: string;
+  receivedBySiteName?: string;
+  
+  // For usage update
+  quantityUsed?: number;
+  cumulativeQuantityUsed?: number;
+  usagePercentage?: number;
+  remainingQuantity?: number;
+  usageNotes?: string;
+  
+  // For returns/waste
+  quantityReturned?: number;
+  quantityWasted?: number;
+  wasteReason?: string;
+  reservedForWorkOrder?: boolean; // For returns - whether to reserve for same work order
+  
+  // Photos for any record type
+  photos?: Array<{
+    id: string;
+    fileUrl: string;
+    description: string;
+    uploadedDate: Date | string;
+    uploadedBy: string;
+  }>;
+}
+
+export interface ReceivableMaterial {
   id: string;
   name: string;
-  description?: string;
+  description: string;
   unit: string;
   estimatedQuantity: number;
   receivedQuantity?: number;
   actualQuantity?: number;
   remainingQuantity?: number;
-  returnedQuantity?: number;
   status: 'pending' | 'ordered' | 'received' | 'used';
   receivedDate?: string;
-  returnedDate?: string;
+  
+  // Usage tracking records
+  usageRecords?: UsageRecord[];
+  
+  // Enhanced receiving details
+  receiving?: {
+    materialMan: string; // Badge number
+    materialManName: string;
+    receivedDate: Date | string;
+    storageLocation: string;
+    storageDetails?: string;
+    receivingPhotos?: Array<{
+      id: string;
+      fileUrl: string;
+      uploadedDate: Date | string;
+    }>;
+  };
+  
+  // Installation tracking
+  installation?: {
+    installedBy: string; // Manpower ID
+    installedByName: string;
+    installationStartDate?: Date | string;
+    installationEndDate?: Date | string;
+    actualQuantityInstalled: number;
+    remainingQuantity: number;
+    installationNotes?: string;
+    installationPhotos?: Array<{
+      id: string;
+      fileUrl: string;
+      description: string;
+      uploadedDate: Date | string;
+    }>;
+  };
+  
   receivedBy?: ManpowerAssignment;
-  returnedBy?: ManpowerAssignment;
+}
+
+// Interface for receivable material usage records
+export interface UsageRecord {
+  id: string;
+  recordType: 'usage-update' | 'return-to-client' | 'reserve-for-later';
+  recordDate: Date | string;
+  recordedBy: string;
+  recordedByName?: string;
+  
+  // Usage details
+  quantityUsed?: number;
+  cumulativeQuantityUsed?: number;
+  usagePercentage?: number;
+  remainingQuantity?: number;
+  usageNotes?: string;
+  
+  // For returns to client
+  quantityReturned?: number;
+  returnReason?: string;
+  
+  // For reservations
+  reservedForWorkOrder?: boolean; // true = same WO, false = available for others
+  reservationNotes?: string;
+  
+  // Photos
+  photos?: Array<{
+    id: string;
+    fileUrl: string;
+    description: string;
+    uploadedDate: Date | string;
+    uploadedBy: string;
+  }>;
 }
 
 export interface Issue {

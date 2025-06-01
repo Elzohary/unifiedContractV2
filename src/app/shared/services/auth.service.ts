@@ -1,13 +1,19 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, tap } from 'rxjs/operators';
-import { User } from '../models/work-order.model';
+import { User } from '../../domains/work-order/models/work-order.model';
 
-export interface AuthUser extends User {
+export interface AuthUser {
+  id: string;
+  name: string;
   email: string;
+  role: 'administrator' | 'engineer' | 'foreman' | 'worker' | 'client' | 'coordinator';
+  avatar?: string;
   permissions: string[];
   lastLogin?: Date;
   isActive: boolean;
+  isEmployee: boolean;
+  employeeId?: string;
 }
 
 @Injectable({
@@ -27,7 +33,9 @@ export class AuthService {
       avatar: 'assets/avatars/user1.jpg',
       permissions: ['work-orders.view', 'work-orders.edit', 'remarks.view', 'remarks.add'],
       isActive: true,
-      lastLogin: new Date()
+      lastLogin: new Date(),
+      isEmployee: true,
+      employeeId: 'emp1'
     },
     {
       id: 'user2',
@@ -37,7 +45,9 @@ export class AuthService {
       avatar: 'assets/avatars/user2.jpg',
       permissions: ['work-orders.view', 'work-orders.edit', 'work-orders.delete', 'admin.users', 'admin.settings'],
       isActive: true,
-      lastLogin: new Date()
+      lastLogin: new Date(),
+      isEmployee: true,
+      employeeId: 'emp2'
     }
   ];
 
@@ -139,7 +149,9 @@ export class AuthService {
       avatar: userData.avatar || 'assets/avatars/default.jpg',
       permissions: userData.permissions || ['work-orders.view'],
       isActive: true,
-      lastLogin: new Date()
+      lastLogin: new Date(),
+      isEmployee: true,
+      employeeId: userData.employeeId || 'emp' + (this.mockUsers.length + 1)
     };
     
     // Add to mock users

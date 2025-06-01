@@ -9,7 +9,9 @@ import {
   WorkOrderStatus,
   WorkOrderPriority,
   WorkOrderRemark,
-  Task
+  Task,
+  WorkOrderIssue,
+  materialAssignment
 } from '../models/work-order.model';
 
 export interface WorkOrderStatusResponse {
@@ -146,8 +148,113 @@ export class WorkOrderService {
         }
       ],
       remarks: [],
-      issues: [],
-      materials: [],
+      issues: [
+        {
+          id: 'issue1',
+          title: 'Electrical wiring needs inspection',
+          description: 'The electrical wiring in the northeast corner of the 3rd floor needs inspection before we can proceed with the renovation.',
+          priority: 'high',
+          severity: 'high',
+          status: 'open',
+          reportedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+          reportedBy: 'John Smith',
+          assignedTo: 'Mike Johnson'
+        },
+        {
+          id: 'issue2',
+          title: 'Material shortage - drywall',
+          description: 'We are running low on drywall materials. Need to order additional 50 sheets to complete the project.',
+          priority: 'medium',
+          severity: 'medium',
+          status: 'in-progress',
+          reportedDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+          reportedBy: 'Sarah Davis',
+          assignedTo: 'Tom Wilson'
+        },
+        {
+          id: 'issue3',
+          title: 'Water damage found behind wall',
+          description: 'During demolition, we discovered water damage behind the south wall. This needs to be addressed before continuing.',
+          priority: 'high',
+          severity: 'high',
+          status: 'resolved',
+          reportedDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          reportedBy: 'Mike Johnson',
+          resolutionDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          resolutionNotes: 'Water damage has been repaired. Source was a leaking pipe that has been replaced. Area has been dried and treated.'
+        }
+      ],
+      materials: [
+        {
+          id: 'mat1',
+          materialType: 'purchasable',
+          purchasableMaterial: {
+            id: 'pmat1',
+            name: 'Electrical Cable 2.5mm',
+            description: 'High-quality copper electrical cable for main wiring',
+            quantity: 500,
+            unit: 'meters',
+            unitCost: 15,
+            totalCost: 7500,
+            status: 'ordered',
+            supplier: 'Saudi Cables Company',
+            orderDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+            deliveryDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000)
+          },
+          workOrderNumber: 'wo1',
+          assignDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+          assignedBy: 'Ahmed Hassan',
+          storingLocation: 'Warehouse A - Section 3'
+        },
+        {
+          id: 'mat2',
+          materialType: 'purchasable',
+          purchasableMaterial: {
+            id: 'pmat2',
+            name: 'Drywall Sheets',
+            description: 'Standard 12mm drywall sheets for interior walls',
+            quantity: 100,
+            unit: 'sheets',
+            unitCost: 45,
+            totalCost: 4500,
+            status: 'delivered',
+            supplier: 'Building Materials Co.',
+            orderDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+            deliveryDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
+          },
+          workOrderNumber: 'wo1',
+          assignDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
+          assignedBy: 'Mohammed Ali'
+        },
+        {
+          id: 'mat3',
+          materialType: 'receivable',
+          receivableMaterial: {
+            id: 'rmat1',
+            name: 'SEC Standard Circuit Breakers',
+            description: 'Standard circuit breakers provided by Saudi Electricity Company',
+            unit: 'pieces',
+            estimatedQuantity: 20,
+            receivedQuantity: 15,
+            actualQuantity: 0,
+            remainingQuantity: 15,
+            status: 'received',
+            receivedDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+            usageRecords: [],
+            receivedBy: {
+              id: 'mp1',
+              badgeNumber: 'B12345',
+              name: 'Ali Ahmed',
+              hoursAssigned: 8,
+              startDate: new Date().toISOString(),
+              workOrderNumber: 'wo1'
+            }
+          },
+          workOrderNumber: 'wo1',
+          assignDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+          assignedBy: 'SEC Representative'
+        }
+      ],
       permits: [],
       tasks: [
         {
@@ -854,5 +961,302 @@ export class WorkOrderService {
     this.workOrdersSubject.next(workOrders);
 
     return this.simulateNetwork(workOrder);
+  }
+
+  /**
+   * Add an issue to a work order
+   */
+  addIssue(workOrderId: string, issue: WorkOrderIssue): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          issues: [...(workOrder.issues || []), issue]
+        };
+
+        // Log activity
+        this.activityLogService.logActivity({
+          action: 'create',
+          description: `Issue "${issue.title}" added with ${issue.priority} priority`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        // Update the work order with the new issue
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error adding issue:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Update an issue in a work order
+   */
+  updateIssue(workOrderId: string, issueId: string, updates: Partial<WorkOrderIssue>): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const issueIndex = workOrder.issues?.findIndex(issue => issue.id === issueId) ?? -1;
+        if (issueIndex === -1) {
+          return throwError(() => new Error('Issue not found'));
+        }
+
+        const updatedIssues = [...(workOrder.issues || [])];
+        updatedIssues[issueIndex] = { ...updatedIssues[issueIndex], ...updates };
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          issues: updatedIssues
+        };
+
+        // Log activity
+        this.activityLogService.logActivity({
+          action: 'update',
+          description: `Issue "${updatedIssues[issueIndex].title}" updated`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error updating issue:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Delete an issue from a work order
+   */
+  deleteIssue(workOrderId: string, issueId: string): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const issueToDelete = workOrder.issues?.find(issue => issue.id === issueId);
+        if (!issueToDelete) {
+          return throwError(() => new Error('Issue not found'));
+        }
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          issues: workOrder.issues?.filter(issue => issue.id !== issueId) || []
+        };
+
+        // Log activity
+        this.activityLogService.logActivity({
+          action: 'delete',
+          description: `Issue "${issueToDelete.title}" deleted`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error deleting issue:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Helper method to update work order in memory
+   */
+  private updateWorkOrderInMemory(id: string, workOrderData: Partial<WorkOrder>): Observable<WorkOrder> {
+    const currentWorkOrders = this.workOrdersSubject.value;
+    const index = currentWorkOrders.findIndex(wo => wo.id === id);
+    
+    if (index === -1) {
+      return throwError(() => new Error('Work order not found'));
+    }
+
+    const updatedWorkOrder = { ...currentWorkOrders[index], ...workOrderData };
+    const updatedWorkOrders = [...currentWorkOrders];
+    updatedWorkOrders[index] = updatedWorkOrder;
+    
+    this.workOrdersSubject.next(updatedWorkOrders);
+    return of(updatedWorkOrder);
+  }
+
+  /**
+   * Assign a material to a work order
+   */
+  assignMaterial(workOrderId: string, material: materialAssignment): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          materials: [...(workOrder.materials || []), material]
+        };
+
+        // Log activity
+        const materialName = material.purchasableMaterial?.name || material.receivableMaterial?.name || 'Unknown';
+        this.activityLogService.logActivity({
+          action: 'create',
+          description: `Material "${materialName}" assigned to work order`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error assigning material:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Update material assignment in a work order
+   */
+  updateMaterialAssignment(workOrderId: string, assignmentId: string, updates: Partial<materialAssignment>): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const materialIndex = workOrder.materials?.findIndex(m => m.id === assignmentId) ?? -1;
+        if (materialIndex === -1) {
+          return throwError(() => new Error('Material assignment not found'));
+        }
+
+        const updatedMaterials = [...(workOrder.materials || [])];
+        updatedMaterials[materialIndex] = { ...updatedMaterials[materialIndex], ...updates };
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          materials: updatedMaterials
+        };
+
+        // Log activity
+        const materialName = updatedMaterials[materialIndex].purchasableMaterial?.name || 
+                           updatedMaterials[materialIndex].receivableMaterial?.name || 'Unknown';
+        this.activityLogService.logActivity({
+          action: 'update',
+          description: `Material assignment "${materialName}" updated`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error updating material assignment:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
+  }
+
+  /**
+   * Remove material assignment from a work order
+   */
+  removeMaterialAssignment(workOrderId: string, assignmentId: string): Observable<boolean> {
+    return this.getWorkOrderById(workOrderId).pipe(
+      switchMap(workOrder => {
+        if (!workOrder) {
+          return throwError(() => new Error('Work order not found'));
+        }
+
+        const materialToRemove = workOrder.materials?.find(m => m.id === assignmentId);
+        if (!materialToRemove) {
+          return throwError(() => new Error('Material assignment not found'));
+        }
+
+        const updatedWorkOrder = {
+          ...workOrder,
+          materials: workOrder.materials?.filter(m => m.id !== assignmentId) || []
+        };
+
+        // Log activity
+        const materialName = materialToRemove.purchasableMaterial?.name || 
+                           materialToRemove.receivableMaterial?.name || 'Unknown';
+        this.activityLogService.logActivity({
+          action: 'delete',
+          description: `Material assignment "${materialName}" removed`,
+          entityId: workOrderId,
+          entityType: 'workOrder',
+          userId: 'system',
+          userName: 'System',
+          systemGenerated: true
+        });
+
+        return this.updateWorkOrderInMemory(workOrderId, updatedWorkOrder).pipe(
+          map(() => true),
+          catchError(error => {
+            console.error('Error removing material assignment:', error);
+            return of(false);
+          })
+        );
+      }),
+      catchError(error => {
+        console.error('Error finding work order:', error);
+        return of(false);
+      })
+    );
   }
 }

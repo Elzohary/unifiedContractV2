@@ -4,11 +4,11 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class CacheService {
-  private cache: Map<string, {
+  private cache = new Map<string, {
     data: any,
     timestamp: number,
     expiry: number
-  }> = new Map();
+  }>();
 
   constructor() { }
 
@@ -40,7 +40,7 @@ export class CacheService {
    * @param data Data to cache
    * @param expiryMs Optional expiry time in milliseconds (0 for no expiry)
    */
-  set(key: string, data: any, expiryMs: number = 0): void {
+  set(key: string, data: any, expiryMs = 0): void {
     this.cache.set(key, {
       data,
       timestamp: Date.now(),

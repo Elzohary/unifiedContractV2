@@ -448,7 +448,7 @@ export class AttendanceManagementComponent implements OnInit {
     
     // Keep track of successful records
     let successCount = 0;
-    let totalCount = employeesToProcess.length;
+    const totalCount = employeesToProcess.length;
     let errorMessage = '';
     
     // Process each employee

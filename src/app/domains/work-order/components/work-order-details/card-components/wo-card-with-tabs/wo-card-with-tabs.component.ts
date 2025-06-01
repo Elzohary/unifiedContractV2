@@ -43,11 +43,11 @@ import {
   ]
 })
 export class WoCardWithTabsComponent implements OnInit {
-  @Input() cardTitle: string = 'Card Title';
-  @Input() cardIcon: string = 'info';
+  @Input() cardTitle = 'Card Title';
+  @Input() cardIcon = 'info';
   @Input() tasks: Task[] = [];
-  @Input() workOrderId: string = '';
-  @Input() loading: boolean = false;
+  @Input() workOrderId = '';
+  @Input() loading = false;
 
   // Events
   @Output() addTask = new EventEmitter<void>();

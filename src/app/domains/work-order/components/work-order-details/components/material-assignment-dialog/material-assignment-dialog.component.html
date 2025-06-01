@@ -1,0 +1,114 @@
+<h2 mat-dialog-title>Assign Material to Work Order</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="assignment-form">
+    <!-- Material Type Selection -->
+    <mat-radio-group formControlName="materialType" class="material-type-group">
+      <mat-radio-button value="purchasable">Purchasable Material</mat-radio-button>
+      <mat-radio-button value="receivable">Receivable Material</mat-radio-button>
+    </mat-radio-group>
+    
+    <!-- Material Selection with Autocomplete -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Select Material</mat-label>
+      <input matInput
+             formControlName="material"
+             [matAutocomplete]="auto"
+             placeholder="Search for a material">
+      <mat-icon matSuffix>search</mat-icon>
+      <mat-autocomplete #auto="matAutocomplete" 
+                        [displayWith]="displayMaterial"
+                        (optionSelected)="onMaterialSelected($event)">
+        <mat-option *ngFor="let material of filteredMaterials$ | async" [value]="material">
+          <div class="material-option">
+            <span class="material-code" *ngIf="material.code">{{ material.code }} - </span>
+            <span class="material-description">{{ material.description }}</span>
+          </div>
+        </mat-option>
+        <mat-option *ngIf="(filteredMaterials$ | async)?.length === 0">
+          <div class="material-option">
+            <span style="color: #999;">No materials found for selected type</span>
+          </div>
+        </mat-option>
+      </mat-autocomplete>
+      <mat-error *ngIf="form.get('material')?.hasError('required')">
+        Please select a material
+      </mat-error>
+    </mat-form-field>
+    
+    <!-- Quantity -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Quantity</mat-label>
+      <input matInput type="number" formControlName="quantity" min="1">
+      <span matTextSuffix>&nbsp;{{ selectedMaterial?.unit || 'units' }}</span>
+      <mat-error *ngIf="form.get('quantity')?.hasError('required')">
+        Quantity is required
+      </mat-error>
+      <mat-error *ngIf="form.get('quantity')?.hasError('min')">
+        Quantity must be at least 1
+      </mat-error>
+    </mat-form-field>
+    
+    <!-- Purchasable Material Fields -->
+    <ng-container *ngIf="materialType === 'purchasable'">
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Unit Cost</mat-label>
+          <span matTextPrefix>SAR&nbsp;</span>
+          <input matInput type="number" formControlName="unitCost" min="0">
+          <mat-error *ngIf="form.get('unitCost')?.hasError('required')">
+            Unit cost is required
+          </mat-error>
+          <mat-error *ngIf="form.get('unitCost')?.hasError('min')">
+            Unit cost cannot be negative
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Supplier</mat-label>
+          <input matInput formControlName="supplier">
+          <mat-error *ngIf="form.get('supplier')?.hasError('required')">
+            Supplier is required
+          </mat-error>
+        </mat-form-field>
+      </div>
+      
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Order Date</mat-label>
+          <input matInput [matDatepicker]="orderPicker" formControlName="orderDate">
+          <mat-datepicker-toggle matIconSuffix [for]="orderPicker"></mat-datepicker-toggle>
+          <mat-datepicker #orderPicker></mat-datepicker>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Expected Delivery Date</mat-label>
+          <input matInput [matDatepicker]="deliveryPicker" formControlName="deliveryDate">
+          <mat-datepicker-toggle matIconSuffix [for]="deliveryPicker"></mat-datepicker-toggle>
+          <mat-datepicker #deliveryPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+    </ng-container>
+    
+    <!-- Notes -->
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Notes (Optional)</mat-label>
+      <textarea matInput formControlName="notes" rows="3"></textarea>
+    </mat-form-field>
+    
+    <!-- Total Cost Display for Purchasable Materials -->
+    <div class="total-cost" *ngIf="materialType === 'purchasable' && form.get('quantity')?.value && form.get('unitCost')?.value">
+      <strong>Total Cost:</strong> SAR {{ (form.get('quantity')?.value * form.get('unitCost')?.value).toFixed(2) }}
+    </div>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()"
+          [disabled]="form.invalid || !selectedMaterial">
+    Assign Material
+  </button>
+</mat-dialog-actions> 

@@ -1,0 +1,48 @@
+<h2 mat-dialog-title>
+  <mat-icon>check_circle</mat-icon>
+  Resolve Issue
+</h2>
+
+<mat-dialog-content>
+  <div class="issue-info">
+    <h3>{{ data.issue.title }}</h3>
+    <p>{{ data.issue.description }}</p>
+    <div class="issue-meta">
+      <span>
+        <mat-icon>priority_high</mat-icon>
+        Priority: {{ data.issue.priority }}
+      </span>
+      <span>
+        <mat-icon>person</mat-icon>
+        Reported by: {{ data.issue.reportedBy }}
+      </span>
+    </div>
+  </div>
+
+  <form [formGroup]="resolveForm" class="resolve-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Resolution Notes</mat-label>
+      <textarea matInput 
+                formControlName="resolutionNotes" 
+                placeholder="Describe how this issue was resolved..."
+                rows="6"></textarea>
+      <mat-hint align="end">{{ resolveForm.get('resolutionNotes')?.value?.length || 0 }} / 1000</mat-hint>
+      <mat-error *ngIf="resolveForm.get('resolutionNotes')?.hasError('required')">
+        {{ getErrorMessage() }}
+      </mat-error>
+      <mat-error *ngIf="resolveForm.get('resolutionNotes')?.hasError('maxlength')">
+        {{ getErrorMessage() }}
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" 
+          (click)="onSubmit()" 
+          [disabled]="!resolveForm.valid">
+    <mat-icon>check_circle</mat-icon>
+    Mark as Resolved
+  </button>
+</mat-dialog-actions> 

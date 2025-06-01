@@ -1,0 +1,131 @@
+<div class="issues-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <span>Issues</span>
+        <mat-chip class="issues-count" *ngIf="(openIssuesCount$ | async) as count">
+          {{ count }} Open
+        </mat-chip>
+      </mat-card-title>
+      <button mat-raised-button color="primary" (click)="addIssue()">
+        <mat-icon>add</mat-icon> Report Issue
+      </button>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <!-- Filter controls -->
+      <div class="filters">
+        <mat-form-field appearance="outline">
+          <mat-label>Filter by status</mat-label>
+          <mat-select (selectionChange)="onFilterStatusChange($event.value)">
+            <mat-option value="">All Status</mat-option>
+            <mat-option value="open">Open</mat-option>
+            <mat-option value="in-progress">In Progress</mat-option>
+            <mat-option value="resolved">Resolved</mat-option>
+            <mat-option value="closed">Closed</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Filter by priority</mat-label>
+          <mat-select (selectionChange)="onFilterPriorityChange($event.value)">
+            <mat-option value="">All Priorities</mat-option>
+            <mat-option value="high">High</mat-option>
+            <mat-option value="medium">Medium</mat-option>
+            <mat-option value="low">Low</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline">
+          <mat-label>Search issues</mat-label>
+          <input matInput (input)="onSearchChange($event)" placeholder="Search by title or description">
+          <mat-icon matSuffix>search</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <!-- Loading state -->
+      <div class="loading-container" *ngIf="loading$ | async">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+      
+      <!-- Issues list -->
+      <div class="issues-list" *ngIf="(issues$ | async) as issues">
+        <div *ngIf="issues.length === 0" class="empty-state">
+          <mat-icon>check_circle</mat-icon>
+          <p>No issues found</p>
+        </div>
+        
+        <div class="issue-card" *ngFor="let issue of issues">
+          <div class="issue-header">
+            <div class="issue-title-row">
+              <h3>{{ issue.title }}</h3>
+              <div class="issue-badges">
+                <mat-chip [color]="getPriorityColor(issue.priority)" selected>
+                  <mat-icon>{{ getPriorityIcon(issue.priority) }}</mat-icon>
+                  {{ issue.priority }}
+                </mat-chip>
+                <mat-chip [ngClass]="getStatusClass(issue.status)">
+                  {{ issue.status | titlecase }}
+                </mat-chip>
+              </div>
+            </div>
+            
+            <button mat-icon-button [matMenuTriggerFor]="menu">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="editIssue(issue)" *ngIf="issue.status !== 'closed'">
+                <mat-icon>edit</mat-icon>
+                <span>Edit</span>
+              </button>
+              <button mat-menu-item (click)="resolveIssue(issue)" 
+                      *ngIf="issue.status === 'open' || issue.status === 'in-progress'">
+                <mat-icon>check_circle</mat-icon>
+                <span>Resolve</span>
+              </button>
+              <button mat-menu-item (click)="closeIssue(issue)" *ngIf="issue.status === 'resolved'">
+                <mat-icon>close</mat-icon>
+                <span>Close</span>
+              </button>
+              <button mat-menu-item (click)="deleteIssue(issue.id)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete</span>
+              </button>
+            </mat-menu>
+          </div>
+          
+          <div class="issue-content">
+            <p class="issue-description">{{ issue.description }}</p>
+            
+            <div class="issue-meta">
+              <span>
+                <mat-icon>person</mat-icon>
+                Reported by {{ issue.reportedBy }}
+              </span>
+              <span>
+                <mat-icon>calendar_today</mat-icon>
+                {{ formatDate(issue.reportedDate) }}
+              </span>
+              <span *ngIf="issue.assignedTo">
+                <mat-icon>assignment_ind</mat-icon>
+                Assigned to {{ issue.assignedTo }}
+              </span>
+            </div>
+            
+            <div class="resolution-info" *ngIf="issue.resolutionDate">
+              <mat-divider></mat-divider>
+              <div class="resolution-details">
+                <strong>Resolution:</strong>
+                <p>{{ issue.resolutionNotes }}</p>
+                <span class="resolution-date">
+                  Resolved on {{ formatDate(issue.resolutionDate) }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

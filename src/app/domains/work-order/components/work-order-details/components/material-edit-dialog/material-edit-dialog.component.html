@@ -1,0 +1,89 @@
+<h2 mat-dialog-title>Edit Material Details</h2>
+
+<mat-dialog-content class="custom-scrollbar">
+  <form [formGroup]="form" class="edit-form">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Material Name</mat-label>
+      <input matInput formControlName="name" required>
+      <mat-error *ngIf="form.get('name')?.hasError('required')">
+        Material name is required
+      </mat-error>
+    </mat-form-field>
+    
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Description</mat-label>
+      <textarea matInput formControlName="description" rows="3"></textarea>
+    </mat-form-field>
+    
+    <div class="row">
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>{{ isPurchasable ? 'Quantity' : 'Estimated Quantity' }}</mat-label>
+        <input matInput type="number" 
+               [formControlName]="isPurchasable ? 'quantity' : 'estimatedQuantity'" 
+               min="0" required>
+        <mat-error>Quantity must be a positive number</mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="flex-1">
+        <mat-label>Unit</mat-label>
+        <input matInput formControlName="unit" required>
+        <mat-error *ngIf="form.get('unit')?.hasError('required')">
+          Unit is required
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <!-- Purchasable Material Fields -->
+    <ng-container *ngIf="isPurchasable">
+      <div class="row">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Unit Cost</mat-label>
+          <input matInput type="number" formControlName="unitCost" min="0">
+          <span matTextPrefix>SAR&nbsp;</span>
+          <mat-error>Unit cost must be a positive number</mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Supplier</mat-label>
+          <input matInput formControlName="supplier">
+        </mat-form-field>
+      </div>
+      
+      <div class="row">
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Order Date</mat-label>
+          <input matInput [matDatepicker]="orderPicker" formControlName="orderDate">
+          <mat-datepicker-toggle matIconSuffix [for]="orderPicker"></mat-datepicker-toggle>
+          <mat-datepicker #orderPicker></mat-datepicker>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="flex-1">
+          <mat-label>Expected Delivery Date</mat-label>
+          <input matInput [matDatepicker]="deliveryPicker" formControlName="deliveryDate">
+          <mat-datepicker-toggle matIconSuffix [for]="deliveryPicker"></mat-datepicker-toggle>
+          <mat-datepicker #deliveryPicker></mat-datepicker>
+        </mat-form-field>
+      </div>
+      
+      <!-- Total Cost Display -->
+      <mat-card *ngIf="form.get('quantity')?.value && form.get('unitCost')?.value" class="total-cost-card">
+        <mat-card-content>
+          <div class="total-cost-display">
+            <span class="label">Total Cost:</span>
+            <span class="value">SAR {{ (form.get('quantity')?.value * form.get('unitCost')?.value).toFixed(2) }}</span>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </ng-container>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()"
+          [disabled]="form.invalid">
+    Save Changes
+  </button>
+</mat-dialog-actions> 

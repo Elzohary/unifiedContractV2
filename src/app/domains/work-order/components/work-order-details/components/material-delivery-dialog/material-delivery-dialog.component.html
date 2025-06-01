@@ -1,0 +1,188 @@
+<h2 mat-dialog-title>Mark Material as Delivered</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="delivery-form">
+    <!-- Invoice Section -->
+    <mat-expansion-panel expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>receipt</mat-icon>
+          Invoice Information
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="section-content">
+        <div class="row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Invoice Number</mat-label>
+            <input matInput formControlName="invoiceNumber" placeholder="INV-2024-001">
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Invoice Amount</mat-label>
+            <input matInput type="number" formControlName="invoiceAmount">
+            <span matPrefix>SAR&nbsp;</span>
+          </mat-form-field>
+        </div>
+        
+        <div class="file-upload-section">
+          <label class="upload-label">Upload Invoice (PDF or Image)</label>
+          <input type="file" 
+                 #invoiceInput 
+                 (change)="onInvoiceSelect($event)" 
+                 accept=".pdf,image/*" 
+                 style="display: none">
+          
+          <button mat-stroked-button 
+                  type="button" 
+                  (click)="invoiceInput.click()"
+                  class="upload-button">
+            <mat-icon>upload_file</mat-icon>
+            {{ invoiceFile ? 'Change Invoice' : 'Upload Invoice' }}
+          </button>
+          
+          <mat-chip *ngIf="invoiceFile" removable (removed)="invoiceFile = null">
+            <mat-icon>description</mat-icon>
+            {{ invoiceFile.name }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </div>
+      </div>
+    </mat-expansion-panel>
+    
+    <!-- Delivery Details Section -->
+    <mat-expansion-panel expanded>
+      <mat-expansion-panel-header>
+        <mat-panel-title>
+          <mat-icon>local_shipping</mat-icon>
+          Delivery Details
+        </mat-panel-title>
+      </mat-expansion-panel-header>
+      
+      <div class="section-content">
+        <div class="row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Delivery Date</mat-label>
+            <input matInput [matDatepicker]="deliveryPicker" formControlName="deliveryDate" required>
+            <mat-datepicker-toggle matSuffix [for]="deliveryPicker"></mat-datepicker-toggle>
+            <mat-datepicker #deliveryPicker></mat-datepicker>
+            <mat-error *ngIf="form.get('deliveryDate')?.hasError('required')">
+              Delivery date is required
+            </mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Received By</mat-label>
+            <mat-select formControlName="receivedBy" required>
+              <mat-option *ngFor="let person of mockManpower" [value]="person.badgeNumber">
+                {{ person.name }} ({{ person.badgeNumber }})
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('receivedBy')?.hasError('required')">
+              Please select who received the material
+            </mat-error>
+          </mat-form-field>
+        </div>
+        
+        <!-- Storage Location -->
+        <mat-radio-group formControlName="storageLocation" 
+                         (change)="onStorageLocationChange($event.value)"
+                         class="storage-location-group">
+          <mat-radio-button value="warehouse">Warehouse Storage</mat-radio-button>
+          <mat-radio-button value="site-direct">Direct to Site</mat-radio-button>
+        </mat-radio-group>
+        
+        <!-- Warehouse Details (shown when warehouse is selected) -->
+        <div class="row" *ngIf="form.get('storageLocation')?.value === 'warehouse'">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Warehouse</mat-label>
+            <mat-select formControlName="warehouseId">
+              <mat-option *ngFor="let warehouse of mockWarehouses" [value]="warehouse.id">
+                {{ warehouse.name }} - {{ warehouse.location }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('warehouseId')?.hasError('required')">
+              Please select warehouse
+            </mat-error>
+          </mat-form-field>
+          
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Bin/Location</mat-label>
+            <input matInput formControlName="binLocation" placeholder="e.g., A-12-3">
+          </mat-form-field>
+        </div>
+        
+        <!-- Site Direct Details (shown when site-direct is selected) -->
+        <div *ngIf="form.get('storageLocation')?.value === 'site-direct'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Site Receiver</mat-label>
+            <mat-select formControlName="siteReceivedBy">
+              <mat-option *ngFor="let person of mockManpower" [value]="person.badgeNumber">
+                {{ person.name }} ({{ person.badgeNumber }})
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('siteReceivedBy')?.hasError('required')">
+              Please select who received the material at site
+            </mat-error>
+          </mat-form-field>
+        </div>
+        
+        <!-- Delivery Photos -->
+        <div class="file-upload-section">
+          <label class="upload-label">Delivery Photos (Optional)</label>
+          <input type="file" 
+                 #photoInput 
+                 (change)="onPhotosSelect($event)" 
+                 accept="image/*" 
+                 multiple
+                 style="display: none">
+          
+          <button mat-stroked-button 
+                  type="button" 
+                  (click)="photoInput.click()"
+                  class="upload-button">
+            <mat-icon>add_photo_alternate</mat-icon>
+            Add Photos
+          </button>
+          
+          <div class="photo-chips">
+            <mat-chip *ngFor="let photo of deliveryPhotos; let i = index" 
+                      removable 
+                      (removed)="removePhoto(i)">
+              <mat-icon>image</mat-icon>
+              {{ photo.name }}
+              <mat-icon matChipRemove>cancel</mat-icon>
+            </mat-chip>
+          </div>
+        </div>
+        
+        <!-- Delivery Notes -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Delivery Notes (Optional)</mat-label>
+          <textarea matInput formControlName="deliveryNote" rows="3"></textarea>
+        </mat-form-field>
+      </div>
+    </mat-expansion-panel>
+  </form>
+  
+  <!-- Upload Progress -->
+  <mat-progress-bar *ngIf="isUploading" 
+                    mode="determinate" 
+                    [value]="uploadProgress"
+                    class="upload-progress">
+  </mat-progress-bar>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isUploading">Cancel</button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()"
+          [disabled]="form.invalid || isUploading">
+    <mat-icon *ngIf="!isUploading">check</mat-icon>
+    <mat-icon *ngIf="isUploading">
+      <mat-spinner diameter="20"></mat-spinner>
+    </mat-icon>
+    {{ isUploading ? 'Processing...' : 'Mark as Delivered' }}
+  </button>
+</mat-dialog-actions> 

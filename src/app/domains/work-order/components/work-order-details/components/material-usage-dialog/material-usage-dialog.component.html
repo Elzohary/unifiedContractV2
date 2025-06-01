@@ -1,0 +1,237 @@
+<h2 mat-dialog-title>{{ dialogTitle }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="form" class="usage-form">
+    <!-- Material Info Display -->
+    <div class="material-info">
+      <mat-icon>inventory_2</mat-icon>
+      <div class="info-text">
+        <strong>{{ materialName }}</strong>
+        <span>Total Quantity: {{ availableQuantity }} {{ materialUnit }}</span>
+        <span *ngIf="usedQuantity > 0">Previously Used: {{ usedQuantity }} {{ materialUnit }}</span>
+        <span *ngIf="usedQuantity > 0">Currently Remaining: {{ remainingQuantity }} {{ materialUnit }}</span>
+      </div>
+    </div>
+    
+    <!-- Issue to Site Section -->
+    <div *ngIf="data.action === 'issue-to-site'" class="section">
+      <h3>Issue Details</h3>
+      
+      <div class="row">
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Issue Date</mat-label>
+          <input matInput [matDatepicker]="issuePicker" formControlName="issuedDate" required>
+          <mat-datepicker-toggle matSuffix [for]="issuePicker"></mat-datepicker-toggle>
+          <mat-datepicker #issuePicker></mat-datepicker>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="half-width">
+          <mat-label>Issued By (System)</mat-label>
+          <input matInput formControlName="issuedBy" readonly>
+          <mat-icon matSuffix>lock</mat-icon>
+        </mat-form-field>
+      </div>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Released By (Warehouse Keeper)</mat-label>
+        <mat-select formControlName="releasedBy" required>
+          <mat-option *ngFor="let person of mockManpower" [value]="person.badgeNumber">
+            {{ person.name }} ({{ person.badgeNumber }}) - {{ person.role }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('releasedBy')?.hasError('required')">
+          Please select who released the material from warehouse
+        </mat-error>
+      </mat-form-field>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Received By (At Site)</mat-label>
+        <mat-select formControlName="receivedBySite" required>
+          <mat-option *ngFor="let person of mockManpower" [value]="person.badgeNumber">
+            {{ person.name }} ({{ person.badgeNumber }}) - {{ person.role }}
+          </mat-option>
+        </mat-select>
+        <mat-error *ngIf="form.get('receivedBySite')?.hasError('required')">
+          Please select who received the material at site
+        </mat-error>
+      </mat-form-field>
+    </div>
+    
+    <!-- Usage Update Section -->
+    <div *ngIf="data.action === 'update-usage'" class="section">
+      <h3>Usage Details</h3>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Quantity Used</mat-label>
+        <input matInput type="number" formControlName="actualQuantityUsed" min="0" [max]="availableQuantity">
+        <span matSuffix>{{ materialUnit }}</span>
+        <mat-hint *ngIf="formUsedQuantity > 0">
+          Remaining after this usage: {{ formRemainingQuantity }} {{ materialUnit }}
+        </mat-hint>
+        <mat-error *ngIf="form.get('actualQuantityUsed')?.hasError('required')">
+          Quantity used is required
+        </mat-error>
+        <mat-error *ngIf="form.get('actualQuantityUsed')?.hasError('min')">
+          Quantity cannot be negative
+        </mat-error>
+        <mat-error *ngIf="form.get('actualQuantityUsed')?.hasError('max')">
+          Quantity cannot exceed available quantity ({{ availableQuantity }})
+        </mat-error>
+      </mat-form-field>
+      
+      <!-- Usage Percentage Display -->
+      <div class="usage-percentage">
+        <label>Usage Percentage</label>
+        <div class="percentage-display">
+          <mat-progress-bar 
+            mode="determinate" 
+            [value]="form.get('usagePercentage')?.value"
+            class="percentage-bar">
+          </mat-progress-bar>
+          <span class="percentage-value">{{ form.get('usagePercentage')?.value }}%</span>
+        </div>
+      </div>
+      
+      <mat-form-field appearance="outline" class="full-width">
+        <mat-label>Usage Completion Date</mat-label>
+        <input matInput [matDatepicker]="completePicker" formControlName="usageCompletedDate">
+        <mat-datepicker-toggle matSuffix [for]="completePicker"></mat-datepicker-toggle>
+        <mat-datepicker #completePicker></mat-datepicker>
+      </mat-form-field>
+    </div>
+    
+    <!-- Common Fields Section -->
+    <div class="section">
+      <!-- Usage Photos -->
+      <div class="file-upload-section">
+        <label class="upload-label">
+          {{ data.action === 'update-usage' ? 'Usage Photos' : 'Site Receiving Photos' }} (Required)
+        </label>
+        <input type="file" 
+               #photoInput 
+               (change)="onPhotosSelect($event)"
+               accept="image/*" 
+               multiple
+               style="display: none">
+        
+        <button mat-stroked-button 
+                type="button" 
+                (click)="photoInput.click()"
+                class="upload-button">
+          <mat-icon>add_photo_alternate</mat-icon>
+          Add Photos
+        </button>
+        
+        <div class="photo-chips">
+          <mat-chip *ngFor="let photo of usagePhotos; let i = index" 
+                    removable 
+                    (removed)="removePhoto(i)">
+            <mat-icon>image</mat-icon>
+            {{ photo.name }}
+            <mat-icon matChipRemove>cancel</mat-icon>
+          </mat-chip>
+        </div>
+      </div>
+      
+      <!-- Notes -->
+      <mat-form-field appearance="outline" class="full-width" *ngIf="data.action === 'update-usage'">
+        <mat-label>Usage Notes</mat-label>
+        <textarea matInput formControlName="usageNotes" rows="3" 
+                  placeholder="Describe how the material was used, any issues, or additional information"></textarea>
+      </mat-form-field>
+      
+      <!-- Remaining Quantity Handling -->
+      <div class="remaining-quantity-section" 
+           *ngIf="data.action === 'update-usage' && formUsedQuantity > 0 && formRemainingQuantity > 0">
+        <mat-divider class="section-divider"></mat-divider>
+        
+        <h3>Remaining Quantity: {{ formRemainingQuantity }} {{ materialUnit }}</h3>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>What happens to the remaining quantity?</mat-label>
+          <mat-select formControlName="remainingAction" required>
+            <mat-option value="return" *ngIf="data.material.materialType === 'purchasable'">
+              <mat-icon>undo</mat-icon>
+              Return to warehouse
+            </mat-option>
+            <mat-option value="waste" *ngIf="data.material.materialType === 'purchasable'">
+              <mat-icon>delete_sweep</mat-icon>
+              Consider as waste
+            </mat-option>
+            <mat-option value="return-to-client" *ngIf="data.material.materialType === 'receivable'">
+              <mat-icon>assignment_return</mat-icon>
+              Return to client (extra material)
+            </mat-option>
+            <mat-option value="reserve-for-later" *ngIf="data.material.materialType === 'receivable'">
+              <mat-icon>schedule</mat-icon>
+              Will be used later
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('remainingAction')?.hasError('required')">
+            Please specify what happens to the remaining material
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- Waste Reason (Purchasable) -->
+        <mat-form-field appearance="outline" class="full-width" 
+                        *ngIf="form.get('remainingAction')?.value === 'waste'">
+          <mat-label>Waste Reason</mat-label>
+          <textarea matInput formControlName="wasteReason" rows="2" 
+                    placeholder="Explain why the material is being wasted"></textarea>
+          <mat-error *ngIf="form.get('wasteReason')?.hasError('required')">
+            Please provide a reason for the waste
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- Return to Client Reason (Receivable) -->
+        <mat-form-field appearance="outline" class="full-width" 
+                        *ngIf="form.get('remainingAction')?.value === 'return-to-client'">
+          <mat-label>Return Reason</mat-label>
+          <textarea matInput formControlName="wasteReason" rows="2" 
+                    placeholder="Explain why the material is being returned to client"></textarea>
+        </mat-form-field>
+        
+        <!-- Reserve Options (Both Material Types) -->
+        <div class="return-options" *ngIf="form.get('remainingAction')?.value === 'return' || form.get('remainingAction')?.value === 'reserve-for-later'">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Reserve material for</mat-label>
+            <mat-select formControlName="reserveForWorkOrder" required>
+              <mat-option [value]="true">
+                <mat-icon>lock</mat-icon>
+                Reserve for this work order only
+              </mat-option>
+              <mat-option [value]="false">
+                <mat-icon>lock_open</mat-icon>
+                Available for any work order
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="form.get('reserveForWorkOrder')?.hasError('required')">
+              Please specify reservation preference
+            </mat-error>
+          </mat-form-field>
+        </div>
+      </div>
+    </div>
+  </form>
+  
+  <!-- Upload Progress -->
+  <mat-progress-bar *ngIf="isUploading" 
+                    mode="determinate" 
+                    [value]="uploadProgress"
+                    class="upload-progress">
+  </mat-progress-bar>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="isUploading">Cancel</button>
+  <button mat-raised-button 
+          color="primary" 
+          (click)="onSubmit()"
+          [disabled]="form.invalid || isUploading || usagePhotos.length === 0">
+    <mat-icon *ngIf="!isUploading">check</mat-icon>
+    <mat-icon *ngIf="isUploading">
+      <mat-spinner diameter="20"></mat-spinner>
+    </mat-icon>
+    {{ isUploading ? 'Processing...' : (data.action === 'issue-to-site' ? 'Issue to Site' : 'Update Usage') }}
+  </button>
+</mat-dialog-actions> 

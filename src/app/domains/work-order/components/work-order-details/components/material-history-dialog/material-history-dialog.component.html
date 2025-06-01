@@ -1,0 +1,120 @@
+<div class="material-history-dialog">
+  <!-- Header -->
+  <div class="dialog-header">
+    <div class="header-content">
+      <h1 mat-dialog-title>Material History Timeline</h1>
+      <div class="material-info">
+        <h2>{{ materialName }}</h2>
+        <div class="status-badges">
+          <mat-chip [color]="materialType === 'purchasable' ? 'primary' : 'accent'" selected>
+            {{ materialType | titlecase }}
+          </mat-chip>
+          <mat-chip [color]="currentStatus === 'used' || currentStatus === 'received' ? 'success' : 
+                           currentStatus === 'in-use' || currentStatus === 'ordered' ? 'warn' : 'basic'" selected>
+            Current Status: {{ currentStatus | titlecase }}
+          </mat-chip>
+        </div>
+      </div>
+    </div>
+    <button mat-icon-button (click)="onClose()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <!-- Timeline Content -->
+  <mat-dialog-content>
+    <div class="timeline-container">
+      <div class="timeline-line"></div>
+      
+      <div *ngFor="let event of historyEvents; let i = index" 
+           class="timeline-event"
+           [class.first-event]="i === 0">
+        
+        <!-- Event Marker -->
+        <div class="event-marker" [style.background-color]="event.color === 'primary' ? '#3f51b5' :
+                                                            event.color === 'accent' ? '#ff4081' :
+                                                            event.color === 'warn' ? '#ff9800' :
+                                                            event.color === 'success' ? '#4caf50' : '#9e9e9e'">
+          <mat-icon>{{ getEventIcon(event) }}</mat-icon>
+        </div>
+        
+        <!-- Event Card -->
+        <mat-card class="event-card">
+          <mat-card-header>
+            <mat-card-title>
+              {{ event.title }}
+              <span class="event-date">{{ formatDate(event.date) }}</span>
+            </mat-card-title>
+            <mat-card-subtitle>
+              {{ event.description }}
+              <span *ngIf="event.user" class="event-user">
+                <mat-icon inline>person</mat-icon> {{ event.user }}
+              </span>
+            </mat-card-subtitle>
+          </mat-card-header>
+          
+          <mat-card-content>
+            <!-- Event Details -->
+            <div class="event-details">
+              <div class="detail-grid">
+                <div *ngFor="let detail of event.details | keyvalue" class="detail-item">
+                  <span class="detail-label">{{ detail.key }}:</span>
+                  <span class="detail-value">{{ detail.value }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Documents and Photos -->
+            <div class="attachments" *ngIf="(event.documents && event.documents.length > 0) || (event.photos && event.photos.length > 0)">
+              <mat-divider class="attachments-divider"></mat-divider>
+              
+              <div class="attachment-section" *ngIf="event.documents && event.documents.length > 0">
+                <h4>
+                  <mat-icon>description</mat-icon>
+                  Documents
+                </h4>
+                <div class="attachment-list">
+                  <mat-chip *ngFor="let doc of event.documents" color="primary">
+                    <mat-icon>insert_drive_file</mat-icon>
+                    {{ doc }}
+                  </mat-chip>
+                </div>
+              </div>
+              
+              <div class="attachment-section" *ngIf="event.photos && event.photos.length > 0">
+                <h4>
+                  <mat-icon>photo_library</mat-icon>
+                  Photos ({{ event.photos.length }})
+                </h4>
+                <div class="photo-grid">
+                  <div *ngFor="let photo of event.photos | slice:0:4" class="photo-thumbnail">
+                    <mat-icon>image</mat-icon>
+                  </div>
+                  <div *ngIf="event.photos.length > 4" class="photo-more">
+                    +{{ event.photos.length - 4 }} more
+                  </div>
+                </div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+      <!-- Empty State -->
+      <div *ngIf="historyEvents.length === 0" class="empty-timeline">
+        <mat-icon>history</mat-icon>
+        <p>No history events recorded for this material</p>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <!-- Actions -->
+  <mat-dialog-actions>
+    <button mat-stroked-button color="primary" class="print-button">
+      <mat-icon>print</mat-icon>
+      Print Timeline
+    </button>
+    <span class="spacer"></span>
+    <button mat-raised-button (click)="onClose()">Close</button>
+  </mat-dialog-actions>
+</div> 

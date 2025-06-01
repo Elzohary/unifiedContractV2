@@ -93,9 +93,9 @@ export class EmployeeRequestsComponent implements OnInit {
   ];
   
   // Current selected filters
-  statusFilter: string = 'all';
-  employeeFilter: string = 'all';
-  typeFilter: string = 'all';
+  statusFilter = 'all';
+  employeeFilter = 'all';
+  typeFilter = 'all';
 
   constructor(
     private fb: FormBuilder,

@@ -48,11 +48,11 @@ export class StateService {
   activityLogs$ = computed(() => this.activityLogs());
 
   // Loading States
-  private loadingStates = signal<{ [key: string]: boolean }>({});
+  private loadingStates = signal<Record<string, boolean>>({});
   loadingStates$ = computed(() => this.loadingStates());
 
   // Error States
-  private errorStates = signal<{ [key: string]: string | null }>({});
+  private errorStates = signal<Record<string, string | null>>({});
   errorStates$ = computed(() => this.errorStates());
 
   private state = signal<AppState>({

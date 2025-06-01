@@ -39,7 +39,7 @@ export class UserListComponent implements OnInit {
   users: User[] = [];
   filteredUsers$!: Observable<User[]>;
   displayedColumns: string[] = ['avatar', 'id', 'name', 'email', 'role', 'actions'];
-  searchText: string = '';
+  searchText = '';
   private usersSubject = new BehaviorSubject<User[]>([]);
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;

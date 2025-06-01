@@ -136,8 +136,8 @@ export class ActivityDashboardComponent implements OnInit {
   /**
    * Generate random changes object
    */
-  private generateRandomChanges(entityType: string): { [key: string]: { oldValue: any, newValue: any } } {
-    const changes: { [key: string]: { oldValue: any, newValue: any } } = {};
+  private generateRandomChanges(entityType: string): Record<string, { oldValue: any, newValue: any }> {
+    const changes: Record<string, { oldValue: any, newValue: any }> = {};
     
     // Field names based on entity type
     let fieldNames: string[] = [];

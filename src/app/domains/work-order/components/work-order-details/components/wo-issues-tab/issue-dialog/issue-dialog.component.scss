@@ -1,0 +1,60 @@
+mat-dialog-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 0 !important;
+
+  mat-icon {
+    color: rgba(0, 0, 0, 0.54);
+  }
+}
+
+mat-dialog-content {
+  padding-top: 20px !important;
+  min-width: 500px;
+  
+  @media (max-width: 600px) {
+    min-width: unset;
+    width: 100%;
+  }
+}
+
+.issue-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+mat-form-field {
+  mat-icon {
+    &[matPrefix] {
+      margin-right: 8px;
+    }
+  }
+}
+
+mat-option {
+  mat-icon {
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px !important;
+  margin: 0 !important;
+} 

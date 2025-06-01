@@ -16,8 +16,8 @@ import { ActivatedRoute } from '@angular/router';
   styleUrl: './under-construction.component.scss'
 })
 export class UnderConstructionComponent implements OnInit {
-  @Input() title: string = 'Feature Under Construction';
-  @Input() message: string = 'This feature is currently being developed and will be available soon. Thank you for your patience.';
+  @Input() title = 'Feature Under Construction';
+  @Input() message = 'This feature is currently being developed and will be available soon. Thank you for your patience.';
 
   constructor(private route: ActivatedRoute) {}
 

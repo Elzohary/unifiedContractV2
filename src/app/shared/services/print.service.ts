@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { WorkOrder, WorkOrderRemark, materialAssignment, purchasableMaterial, receivableMaterial } from '../../domains/work-order/models/work-order.model';
+import { WorkOrder, WorkOrderRemark, materialAssignment, PurchasableMaterial, ReceivableMaterial } from '../../domains/work-order/models/work-order.model';
 import { ActivityLogService } from './activity-log.service';
 
 @Injectable({
@@ -382,8 +382,8 @@ export class PrintService {
               ${workOrder.materials.map((material: materialAssignment) => {
                 const materialData = material.materialType === 'purchasable' ? material.purchasableMaterial : material.receivableMaterial;
                 const quantity = material.materialType === 'purchasable'
-                  ? (materialData as purchasableMaterial).quantity
-                  : (materialData as receivableMaterial).estimatedQuantity;
+                  ? (materialData as PurchasableMaterial).quantity
+                  : (materialData as ReceivableMaterial).estimatedQuantity;
                 return `
                   <tr>
                     <td>${materialData?.name || 'N/A'}</td>

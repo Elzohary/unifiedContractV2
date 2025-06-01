@@ -381,7 +381,7 @@ export class ActivityLogService {
   /**
    * Get a summary of recent activity
    */
-  getActivitySummary(days: number = 30): Observable<Record<string, number>> {
+  getActivitySummary(days = 30): Observable<Record<string, number>> {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
     

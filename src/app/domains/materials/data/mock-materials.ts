@@ -65,6 +65,46 @@ export const mockPurchasableMaterials: BaseMaterial[] = [
     unit: 'M3',
     materialType: MaterialType.PURCHASABLE,
     clientType: ClientType.OTHER
+  },
+  {
+    id: '7',
+    code: 'STL-001',
+    description: 'Steel Reinforcement Bar 12mm',
+    unit: 'TON',
+    materialType: MaterialType.PURCHASABLE,
+    clientType: ClientType.OTHER
+  },
+  {
+    id: '8',
+    code: 'PNT-001',
+    description: 'Road Marking Paint - White',
+    unit: 'LTR',
+    materialType: MaterialType.PURCHASABLE,
+    clientType: ClientType.OTHER
+  },
+  {
+    id: '9',
+    code: 'PIP-001',
+    description: 'PVC Pipe 100mm',
+    unit: 'M',
+    materialType: MaterialType.PURCHASABLE,
+    clientType: ClientType.OTHER
+  },
+  {
+    id: '10',
+    code: 'BRK-001',
+    description: 'Concrete Blocks 20cm',
+    unit: 'PCS',
+    materialType: MaterialType.PURCHASABLE,
+    clientType: ClientType.OTHER
+  },
+  {
+    id: '11',
+    code: 'CEM-001',
+    description: 'Portland Cement Type I',
+    unit: 'BAG',
+    materialType: MaterialType.PURCHASABLE,
+    clientType: ClientType.OTHER
   }
 ];
 

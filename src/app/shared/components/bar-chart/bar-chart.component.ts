@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, ViewChild, PLATFORM_ID, Inject, Input, OnDestroy, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild, PLATFORM_ID, Inject, Input, OnDestroy, OnChanges, SimpleChanges, AfterViewInit } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import Chart from 'chart.js/auto';
 import { ChartConfiguration, ChartType } from 'chart.js';
@@ -10,7 +10,7 @@ import { ChartConfiguration, ChartType } from 'chart.js';
   templateUrl: './bar-chart.component.html',
   styleUrls: ['./bar-chart.component.scss']
 })
-export class BarChartComponent implements OnInit, OnDestroy, OnChanges {
+export class BarChartComponent implements OnInit, OnDestroy, OnChanges, AfterViewInit {
   @ViewChild('chartCanvas') chartCanvas!: ElementRef;
   public chart: Chart | undefined;
   private isBrowser: boolean;

@@ -39,7 +39,7 @@ export class DashboardEmployeeComponent implements OnInit {
   isDrawerOpen = signal(true);
   isMobile = signal(false);
 
-  constructor(@Inject(PLATFORM_ID) platformId: Object) {
+  constructor(@Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
   }
 

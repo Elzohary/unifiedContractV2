@@ -1,0 +1,127 @@
+.materials-container {
+  padding: 16px;
+}
+
+.materials-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 16px;
+
+  .search-field {
+    flex: 1;
+    max-width: 400px;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+}
+
+.tab-content {
+  padding: 16px 0;
+}
+
+mat-card-header {
+  margin-bottom: 16px;
+}
+
+mat-card-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 18px;
+
+  .cost-chip {
+    background-color: #4caf50 !important;
+    color: white !important;
+    font-size: 14px;
+    padding: 4px 12px;
+  }
+
+  .client-info {
+    font-size: 14px;
+    color: rgba(0, 0, 0, 0.6);
+    font-weight: normal;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: rgba(0, 0, 0, 0.54);
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    font-size: 16px;
+    margin: 0;
+  }
+}
+
+.table-container {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+
+  th {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  td {
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+  }
+
+  .material-description {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.6);
+    margin-top: 4px;
+  }
+}
+
+mat-chip {
+  font-size: 12px;
+  height: 24px;
+  line-height: 24px;
+  padding: 0 12px;
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .materials-header {
+    flex-direction: column;
+    align-items: stretch;
+
+    .search-field {
+      max-width: none;
+    }
+  }
+
+  table {
+    th, td {
+      font-size: 12px;
+      padding: 8px !important;
+    }
+  }
+}
+
+// Material tabs customization
+::ng-deep {
+  .mat-mdc-tab-group {
+    .mat-mdc-tab-header {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+  }
+} 
