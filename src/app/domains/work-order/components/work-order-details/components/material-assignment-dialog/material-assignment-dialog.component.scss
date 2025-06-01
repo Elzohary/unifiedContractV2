@@ -1,8 +1,7 @@
 ::ng-deep .mat-mdc-dialog-container {
   max-height: 90vh !important;
   height: 85vh !important;
-  width: 100vw !important;
-  max-width: 1100px !important;
+  width: 35vw !important;
   display: flex;
   flex-direction: column;
 }
@@ -32,7 +31,7 @@ mat-dialog-content {
   margin: 0 !important;
 
   &::-webkit-scrollbar {
-    width: 10px;
+    width: 3px;
   }
 
   &::-webkit-scrollbar-track {

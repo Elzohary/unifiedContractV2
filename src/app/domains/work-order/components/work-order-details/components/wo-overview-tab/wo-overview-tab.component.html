@@ -31,6 +31,47 @@
       </mat-card-content>
     </mat-card>
 
+    <!-- Expense Breakdown Card -->
+    <mat-card *ngIf="workOrder.expenseBreakdown" class="expense-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>attach_money</mat-icon>
+          Expense Breakdown
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <mat-list>
+          <mat-list-item>
+            <span matListItemTitle>Materials</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.materials | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Labor</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.labor | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item>
+            <span matListItemTitle>Other</span>
+            <span matListItemLine class="expense-amount">
+              ${{ workOrder.expenseBreakdown.other | number:'1.2-2' }}
+            </span>
+          </mat-list-item>
+          <mat-divider></mat-divider>
+          <mat-list-item class="total-row">
+            <span matListItemTitle><strong>Total</strong></span>
+            <span matListItemLine class="expense-amount total">
+              <strong>${{ getTotalExpense() | number:'1.2-2' }}</strong>
+            </span>
+          </mat-list-item>
+        </mat-list>
+      </mat-card-content>
+    </mat-card>
+
     <!-- Progress Card -->
     <mat-card class="progress-card">
       <mat-card-header>
@@ -112,46 +153,6 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Expense Breakdown Card -->
-    <mat-card *ngIf="workOrder.expenseBreakdown" class="expense-card">
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>attach_money</mat-icon>
-          Expense Breakdown
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-list>
-          <mat-list-item>
-            <span matListItemTitle>Materials</span>
-            <span matListItemLine class="expense-amount">
-              ${{ workOrder.expenseBreakdown.materials | number:'1.2-2' }}
-            </span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Labor</span>
-            <span matListItemLine class="expense-amount">
-              ${{ workOrder.expenseBreakdown.labor | number:'1.2-2' }}
-            </span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Other</span>
-            <span matListItemLine class="expense-amount">
-              ${{ workOrder.expenseBreakdown.other | number:'1.2-2' }}
-            </span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item class="total-row">
-            <span matListItemTitle><strong>Total</strong></span>
-            <span matListItemLine class="expense-amount total">
-              <strong>${{ getTotalExpense() | number:'1.2-2' }}</strong>
-            </span>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
   </div>
 
   <!-- Work Order Items Section -->
