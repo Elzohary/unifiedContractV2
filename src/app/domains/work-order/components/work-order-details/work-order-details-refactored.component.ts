@@ -9,6 +9,9 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatCardModule } from '@angular/material/card';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatTableModule } from '@angular/material/table';
 
 // ViewModels
 import { WorkOrderDetailsViewModel } from '../../viewModels/work-order-details.viewmodel';
@@ -16,7 +19,7 @@ import { WorkOrderRemarksViewModel } from '../../viewModels/work-order-remarks.v
 import { WorkOrderMaterialsViewModel } from '../../viewModels/work-order-materials.viewmodel';
 
 // Models
-import { WorkOrder, WorkOrderStatus, Task } from '../../models/work-order.model';
+import { WorkOrder, WorkOrderStatus, Task, workOrderDetail } from '../../models/work-order.model';
 import { ActivityLog } from '../../../../shared/services/activity-log.service';
 
 // Sub-components
@@ -42,6 +45,9 @@ import { WoMaterialsTabComponent } from './components/wo-materials-tab/wo-materi
     MatIconModule,
     MatButtonModule,
     MatSnackBarModule,
+    MatCardModule,
+    MatProgressBarModule,
+    MatTableModule,
     // Sub-components
     WoHeaderComponent,
     WoOverviewTabComponent,
@@ -61,19 +67,28 @@ export class WorkOrderDetailsRefactoredComponent implements OnInit, OnDestroy {
   activityLogs$: Observable<ActivityLog[]>;
   tasks$: Observable<Task[]>;
 
+  // Table columns
+  displayedColumns: string[] = [
+    'itemNumber',
+    'description',
+    'uom',
+    'estimatedQty',
+    'estimatedPrice',
+    'actualQty',
+    'actualPrice'
+  ];
+
   // Component state
   selectedTabIndex = 0;
 
   // Tab mapping
   private tabIndexMap: Record<string, number> = {
     'overview': 0,
-    'remarks': 1,
-    'tasks': 2,
-    'activity': 3,
-    'issues': 4,
-    'materials': 5,
-    'documents': 6,
-    'expenses': 7
+    'tasks': 1,
+    'issues': 2,
+    'materials': 3,
+    'documents': 4,
+    'expenses': 5
   };
 
   constructor(

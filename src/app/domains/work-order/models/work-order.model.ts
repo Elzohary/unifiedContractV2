@@ -322,6 +322,7 @@ export interface WorkOrder {
 }
 
 export interface workOrderDetail {
+[x: string]: any;
   workOrderNumber: string;
   internalOrderNumber: string;
   title?: string;

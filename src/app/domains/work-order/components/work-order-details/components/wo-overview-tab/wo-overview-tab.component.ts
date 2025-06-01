@@ -5,7 +5,13 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
-import { WorkOrder } from '../../../../models/work-order.model';
+import { MatTableModule } from '@angular/material/table';
+import { WorkOrder, Permit } from '../../../../models/work-order.model';
+
+interface PermitStatus {
+  type: string;
+  isApproved: boolean;
+}
 
 @Component({
   selector: 'app-wo-overview-tab',
@@ -18,11 +24,29 @@ import { WorkOrder } from '../../../../models/work-order.model';
     MatDividerModule,
     MatIconModule,
     MatListModule,
-    MatProgressBarModule
+    MatProgressBarModule,
+    MatTableModule
   ]
 })
 export class WoOverviewTabComponent {
   @Input() workOrder!: WorkOrder;
+
+  // Table columns
+  displayedColumns: string[] = [
+    'itemNumber',
+    'description',
+    'uom',
+    'estimatedQty',
+    'estimatedPrice',
+    'actualQty',
+    'actualPrice'
+  ];
+
+  getPermitStatus(type: string): boolean {
+    if (!this.workOrder.permits) return false;
+    const permit = this.workOrder.permits.find(p => p.type === type);
+    return permit?.status === 'approved';
+  }
 
   formatDate(date?: string | Date): string {
     if (!date) return 'Not specified';

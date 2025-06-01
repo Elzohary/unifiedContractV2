@@ -1,89 +1,254 @@
 .overview-container {
-  padding: 16px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
 }
 
-.overview-grid {
+// Primary Information Grid
+.primary-info-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 16px;
+  gap: 24px;
 }
 
-mat-card {
-  height: fit-content;
+// Secondary Information Grid
+.secondary-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
 }
 
-mat-card-title {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 18px;
-}
-
-mat-card-title mat-icon {
-  color: rgba(0, 0, 0, 0.54);
-}
-
-.progress-info {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-
-.progress-label {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.progress-value {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.engineer-info {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.person-icon {
-  font-size: 48px;
-  width: 48px;
-  height: 48px;
-  color: rgba(0, 0, 0, 0.38);
-}
-
-.engineer-name {
-  font-size: 16px;
-  font-weight: 500;
-}
-
-.engineer-id {
-  font-size: 14px;
-  color: rgba(0, 0, 0, 0.6);
-}
-
-.expense-amount {
-  font-family: monospace;
-  text-align: right;
-}
-
-.total-row {
-  background-color: rgba(0, 0, 0, 0.04);
-  margin-top: 8px;
-}
-
-.total {
-  color: #1976d2;
-  font-size: 16px;
-}
-
-mat-list-item {
-  height: auto !important;
-  padding: 8px 0 !important;
-}
-
-:host ::ng-deep .mat-mdc-list-item-unscoped-content {
-  display: flex;
-  justify-content: space-between;
+// Items Section
+.items-section {
   width: 100%;
+}
+
+// Common Card Styles
+mat-card {
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  
+  mat-card-header {
+    padding: 16px 16px 0;
+    
+    mat-card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 18px;
+      margin-bottom: 0;
+      
+      mat-icon {
+        color: #1976d2;
+      }
+    }
+  }
+  
+  mat-card-content {
+    padding: 16px;
+  }
+}
+
+// Status Card
+.status-card {
+  .status-info-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    .info-item {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .info-label {
+        color: rgba(0, 0, 0, 0.6);
+        font-size: 0.875rem;
+      }
+
+      .info-value {
+        font-size: 1rem;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+// Progress Card
+.progress-card {
+  .completion-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+
+    .completion-percentage {
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 1.25rem;
+    }
+  }
+
+  mat-progress-bar {
+    height: 8px;
+    border-radius: 4px;
+  }
+}
+
+// Permits Card
+.permits-card {
+  .permits-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+
+    .permit-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: rgba(0, 0, 0, 0.04);
+      border-radius: 4px;
+
+      .permit-label {
+        font-size: 0.875rem;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      mat-icon {
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+
+        &.approved {
+          color: #4caf50;
+        }
+
+        &.pending {
+          color: #f44336;
+        }
+      }
+    }
+  }
+}
+
+// Engineer Card
+.engineer-card {
+  .engineer-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px;
+
+    .person-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: #1976d2;
+    }
+
+    .engineer-name {
+      font-size: 1rem;
+      font-weight: 500;
+      margin-bottom: 4px;
+    }
+
+    .engineer-id {
+      font-size: 0.875rem;
+      color: rgba(0, 0, 0, 0.6);
+    }
+  }
+}
+
+// Expense Card
+.expense-card {
+  mat-list-item {
+    height: auto !important;
+    padding: 12px 0 !important;
+  }
+
+  .expense-amount {
+    font-family: monospace;
+    text-align: right;
+  }
+
+  .total-row {
+    background-color: rgba(25, 118, 210, 0.05);
+    border-radius: 4px;
+    margin-top: 8px;
+  }
+
+  .total {
+    color: #1976d2;
+    font-size: 1rem;
+  }
+}
+
+// Items Table
+.items-card {
+  .items-table {
+    width: 100%;
+    margin-top: 16px;
+    
+    th {
+      background-color: #f5f5f5;
+      color: rgba(0, 0, 0, 0.87);
+      font-weight: 500;
+      white-space: nowrap;
+      font-size: 0.875rem;
+    }
+
+    td {
+      color: rgba(0, 0, 0, 0.87);
+      font-size: 0.875rem;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    tr:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+  }
+}
+
+// Deep style fixes
+:host ::ng-deep {
+  .mat-mdc-list-item-unscoped-content {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+  }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .overview-container {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .primary-info-grid,
+  .secondary-info-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .status-card .status-info-grid,
+  .permits-card .permits-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .items-card {
+    overflow-x: auto;
+
+    .items-table {
+      min-width: 800px;
+    }
+  }
 } 

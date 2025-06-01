@@ -1,20 +1,38 @@
 <div class="overview-container">
-  <div class="overview-grid">
-    <!-- Description Card -->
-    <mat-card>
+  <!-- Primary Information Section -->
+  <div class="primary-info-grid">
+    <!-- Status Card -->
+    <mat-card class="status-card">
       <mat-card-header>
         <mat-card-title>
-          <mat-icon>description</mat-icon>
-          Description
+          <mat-icon>info</mat-icon>
+          Status Information
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <p>{{ workOrder.details.description || 'No description provided' }}</p>
+        <div class="status-info-grid">
+          <div class="info-item">
+            <span class="info-label">WO Number</span>
+            <span class="info-value">{{ workOrder.details.workOrderNumber }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Type</span>
+            <span class="info-value">{{ workOrder.details['type'] || 'N/A' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Class</span>
+            <span class="info-value">{{ workOrder.details['class'] || 'N/A' }}</span>
+          </div>
+          <div class="info-item">
+            <span class="info-label">Estimated Price</span>
+            <span class="info-value">{{ workOrder.details.estimatedPrice | currency }}</span>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
 
     <!-- Progress Card -->
-    <mat-card>
+    <mat-card class="progress-card">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>trending_up</mat-icon>
@@ -22,53 +40,61 @@
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <div class="progress-info">
-          <span class="progress-label">Completion</span>
-          <span class="progress-value">{{ workOrder.details.completionPercentage }}%</span>
+        <div class="completion-row">
+          <span>Completion</span>
+          <span class="completion-percentage">{{ workOrder.details.completionPercentage }}%</span>
         </div>
         <mat-progress-bar 
           mode="determinate" 
           [value]="workOrder.details.completionPercentage"
-          [color]="getProgressColor()">
+          [color]="workOrder.details.completionPercentage < 50 ? 'warn' : 'primary'">
         </mat-progress-bar>
       </mat-card-content>
     </mat-card>
 
-    <!-- Dates Card -->
-    <mat-card>
+    <!-- Permits Card -->
+    <mat-card class="permits-card">
       <mat-card-header>
         <mat-card-title>
-          <mat-icon>calendar_today</mat-icon>
-          Important Dates
+          <mat-icon>verified</mat-icon>
+          Required Permits
         </mat-card-title>
       </mat-card-header>
       <mat-card-content>
-        <mat-list>
-          <mat-list-item>
-            <span matListItemTitle>Created</span>
-            <span matListItemLine>{{ formatDate(workOrder.details.createdDate) }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Start Date</span>
-            <span matListItemLine>{{ formatDate(workOrder.details.startDate) }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Due Date</span>
-            <span matListItemLine>{{ formatDate(workOrder.details.dueDate) }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Target End Date</span>
-            <span matListItemLine>{{ formatDate(workOrder.details.targetEndDate) }}</span>
-          </mat-list-item>
-        </mat-list>
+        <div class="permits-grid">
+          <div class="permit-item">
+            <span class="permit-label">Initial</span>
+            <mat-icon [class.approved]="getPermitStatus('Initial')" [class.pending]="!getPermitStatus('Initial')">
+              {{ getPermitStatus('Initial') ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </div>
+          <div class="permit-item">
+            <span class="permit-label">Baladya</span>
+            <mat-icon [class.approved]="getPermitStatus('Municipality')" [class.pending]="!getPermitStatus('Municipality')">
+              {{ getPermitStatus('Municipality') ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </div>
+          <div class="permit-item">
+            <span class="permit-label">Road Department</span>
+            <mat-icon [class.approved]="getPermitStatus('RoadDepartment')" [class.pending]="!getPermitStatus('RoadDepartment')">
+              {{ getPermitStatus('RoadDepartment') ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </div>
+          <div class="permit-item">
+            <span class="permit-label">Traffic</span>
+            <mat-icon [class.approved]="getPermitStatus('Traffic')" [class.pending]="!getPermitStatus('Traffic')">
+              {{ getPermitStatus('Traffic') ? 'check_circle' : 'cancel' }}
+            </mat-icon>
+          </div>
+        </div>
       </mat-card-content>
     </mat-card>
+  </div>
 
+  <!-- Secondary Information Section -->
+  <div class="secondary-info-grid">
     <!-- Engineer Card -->
-    <mat-card *ngIf="workOrder.engineerInCharge">
+    <mat-card *ngIf="workOrder.engineerInCharge" class="engineer-card">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>engineering</mat-icon>
@@ -86,41 +112,8 @@
       </mat-card-content>
     </mat-card>
 
-    <!-- Work Order Info Card -->
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>
-          <mat-icon>info</mat-icon>
-          Work Order Information
-        </mat-card-title>
-      </mat-card-header>
-      <mat-card-content>
-        <mat-list>
-          <mat-list-item>
-            <span matListItemTitle>Internal Order Number</span>
-            <span matListItemLine>{{ workOrder.details.internalOrderNumber }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Category</span>
-            <span matListItemLine>{{ workOrder.details.category }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Created By</span>
-            <span matListItemLine>{{ workOrder.details.createdBy }}</span>
-          </mat-list-item>
-          <mat-divider></mat-divider>
-          <mat-list-item>
-            <span matListItemTitle>Last Updated</span>
-            <span matListItemLine>{{ formatDate(workOrder.details.lastUpdated) }}</span>
-          </mat-list-item>
-        </mat-list>
-      </mat-card-content>
-    </mat-card>
-
     <!-- Expense Breakdown Card -->
-    <mat-card *ngIf="workOrder.expenseBreakdown">
+    <mat-card *ngIf="workOrder.expenseBreakdown" class="expense-card">
       <mat-card-header>
         <mat-card-title>
           <mat-icon>attach_money</mat-icon>
@@ -157,6 +150,66 @@
             </span>
           </mat-list-item>
         </mat-list>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Work Order Items Section -->
+  <div class="items-section">
+    <mat-card class="items-card">
+      <mat-card-header>
+        <mat-card-title>
+          <mat-icon>list_alt</mat-icon>
+          Work Order Items
+        </mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="workOrder.items" class="items-table">
+          <!-- Item Number Column -->
+          <ng-container matColumnDef="itemNumber">
+            <th mat-header-cell *matHeaderCellDef>Item No.</th>
+            <td mat-cell *matCellDef="let item">{{ item.itemDetail.itemNumber }}</td>
+          </ng-container>
+
+          <!-- Description Column -->
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let item">{{ item.itemDetail.shortDescription }}</td>
+          </ng-container>
+
+          <!-- UOM Column -->
+          <ng-container matColumnDef="uom">
+            <th mat-header-cell *matHeaderCellDef>UOM</th>
+            <td mat-cell *matCellDef="let item">{{ item.itemDetail.UOM }}</td>
+          </ng-container>
+
+          <!-- Estimated Quantity Column -->
+          <ng-container matColumnDef="estimatedQty">
+            <th mat-header-cell *matHeaderCellDef>Est. Qty</th>
+            <td mat-cell *matCellDef="let item">{{ item.estimatedQuantity }}</td>
+          </ng-container>
+
+          <!-- Estimated Price Column -->
+          <ng-container matColumnDef="estimatedPrice">
+            <th mat-header-cell *matHeaderCellDef>Est. Price</th>
+            <td mat-cell *matCellDef="let item">{{ item.estimatedPrice | currency }}</td>
+          </ng-container>
+
+          <!-- Actual Quantity Column -->
+          <ng-container matColumnDef="actualQty">
+            <th mat-header-cell *matHeaderCellDef>Act. Qty</th>
+            <td mat-cell *matCellDef="let item">{{ item.actualQuantity }}</td>
+          </ng-container>
+
+          <!-- Actual Price Column -->
+          <ng-container matColumnDef="actualPrice">
+            <th mat-header-cell *matHeaderCellDef>Act. Price</th>
+            <td mat-cell *matCellDef="let item">{{ item.actualPrice | currency }}</td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
       </mat-card-content>
     </mat-card>
   </div>
