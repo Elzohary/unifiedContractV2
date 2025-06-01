@@ -42,6 +42,15 @@ export class WoOverviewTabComponent {
     'actualPrice'
   ];
 
+  getTotalEstimatedPrice(): number {
+    if (!this.workOrder.items || this.workOrder.items.length === 0) return 0;
+    return this.workOrder.items.reduce((total, item) => {
+      const estimatedPrice = item.estimatedPrice || 0;
+      const estimatedQty = item.estimatedQuantity || 0;
+      return total + (estimatedPrice);
+    }, 0);
+  }
+
   getPermitStatus(type: string): boolean {
     if (!this.workOrder.permits) return false;
     const permit = this.workOrder.permits.find(p => p.type === type);

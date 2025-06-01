@@ -25,7 +25,7 @@
           </div>
           <div class="info-item">
             <span class="info-label">Estimated Price</span>
-            <span class="info-value">{{ workOrder.details.estimatedPrice | currency }}</span>
+            <span class="info-value">{{ getTotalEstimatedPrice() | currency }}</span>
           </div>
         </div>
       </mat-card-content>
