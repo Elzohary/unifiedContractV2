@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, ViewChild, AfterViewInit, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { MatSort, MatSortModule } from '@angular/material/sort';
@@ -40,6 +40,9 @@ import { NgCardComponent } from '../../../../shared/components/ng-card/ng-card.c
   ]
 })
 export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDestroy {
+  @Input() workOrderId!: string;
+  @Output() itemsUpdated = new EventEmitter<Iitem[]>();
+
   displayedColumns: string[] = [
     'itemNumber',
     'shortDescription',
@@ -257,5 +260,10 @@ export class WorkOrderItemsListComponent implements OnInit, AfterViewInit, OnDes
       verticalPosition: 'bottom',
       panelClass: 'error-snackbar'
     });
+  }
+
+  // Method to emit updated items
+  updateItems(items: Iitem[]): void {
+    this.itemsUpdated.emit(items);
   }
 }

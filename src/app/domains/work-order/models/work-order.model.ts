@@ -339,6 +339,7 @@ export interface workOrderDetail {
   createdDate: string | Date;
   createdBy: string;
   lastUpdated?: string | Date;
+  estimatedPrice?: number;
 }
 
 export interface workOrderItem {

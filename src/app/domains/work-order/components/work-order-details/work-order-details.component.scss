@@ -26,22 +26,150 @@
 }
 
 .work-order-details-container {
-  padding: 24px;
-  margin: 0 auto;
+  padding: 1rem;
   height: 100%;
-  min-height: calc(100vh - 64px); /* Account for header height */
-  overflow: hidden; /* Prevent nested scrollbar */
-  display: flex;
-  flex-direction: column;
+  overflow-y: auto;
+
+  .loading-container,
+  .error-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    gap: 1rem;
+  }
+
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+  }
+
+  .content-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    align-items: start;
+
+    @media (min-width: 1200px) {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    @media (min-width: 1600px) {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .detail-card {
+    height: fit-content;
+    width: 100%;
+    margin-bottom: 0;
+    
+    mat-card-header {
+      margin-bottom: 1rem;
+    }
+
+    mat-card-content {
+      padding: 0 1rem 1rem;
+    }
+  }
+
+  // Status Card Styles
+  .status-card {
+    .status-info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+
+      .info-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+
+        .info-label {
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+        }
+
+        .info-value {
+          font-size: 1rem;
+          font-weight: 500;
+        }
+      }
+    }
+  }
+
+  // Progress Card Styles
+  .progress-card {
+    .completion-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .progress-details {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-top: 1rem;
+
+      .progress-detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        .detail-label {
+          font-size: 0.875rem;
+          color: var(--text-secondary);
+        }
+
+        .detail-value {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+
+  // Items List Card Styles
+  .items-list-card {
+    mat-card-content {
+      padding: 0;
+    }
+  }
 }
 
-.work-order-details-content {
-  flex: 1;
-  overflow-y: auto; /* Only allow scrolling here */
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  @include hide-scrollbar;
+// Utility Classes
+.text-secondary {
+  color: var(--text-secondary);
+}
+
+.text-primary {
+  color: var(--primary);
+}
+
+.text-warn {
+  color: var(--warn);
+}
+
+.text-success {
+  color: var(--success);
 }
 
 /* Loading and Error States */
@@ -2502,7 +2630,7 @@ mat-tab-group {
   }
 }
 
-/* Equipment Tab Styles */
+/* Equipment tab styles */
 .equipment-tab {
   .equipment-header {
     display: flex;

@@ -19,7 +19,9 @@ import {
   WorkOrderPriority,
   WorkOrderRemark,
   WorkOrderIssue,
-  Task
+  Task,
+  workOrderItem,
+  workOrderDetail
 } from '../../models/work-order.model';
 import { catchError, finalize, of, Subject, takeUntil, forkJoin } from 'rxjs';
 import { MatDialog, MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -34,6 +36,9 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { RemarkService } from '../../../../shared/services/remark.service';
 import Chart, { TooltipItem } from 'chart.js/auto';
 import { WoCardWithTabsComponent } from "./card-components/wo-card-with-tabs/wo-card-with-tabs.component";
+import { Location } from '@angular/common';
+import { WorkOrderItemsListComponent } from '../work-order-items-list/work-order-items-list.component';
+import { Iitem } from '../../models/work-order-item.model';
 
 interface IssueDialogData {
   title: string;
@@ -106,8 +111,9 @@ class ConfirmDialogComponent {
     MatSnackBarModule,
     MatDialogModule,
     MatCheckboxModule,
-    WoCardWithTabsComponent
-]
+    WoCardWithTabsComponent,
+    WorkOrderItemsListComponent
+  ]
 })
 export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewInit {
   public workOrder: WorkOrder | null = null;
@@ -141,18 +147,16 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
     private activityLogService: ActivityLogService,
     private printService: PrintService,
     private taskService: TaskService,
-    private remarkService: RemarkService
+    private remarkService: RemarkService,
+    private location: Location
   ) {}
 
   ngOnInit(): void {
-    this.route.paramMap.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      const id = params.get('id');
-      if (id) {
-        this.loadWorkOrder(id);
-      } else {
-        this.loading = false;
-        this.error = 'Work order ID is missing';
-        this.snackBar.open('Work order ID is missing', 'Close', { duration: 3000 });
+    this.route.params.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
+      if (params['id']) {
+        this.loadWorkOrder(params['id']);
       }
     });
 
@@ -190,44 +194,41 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.loading = false),
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         catchError(err => {
-          this.error = 'Failed to load work order details';
+          this.error = err.message;
           this.snackBar.open('Failed to load work order details', 'Close', { duration: 3000 });
           return of(null);
         })
       )
-      .subscribe({
-        next: (workOrder: WorkOrder | null) => {
-          if (workOrder) {
-            this.workOrder = workOrder;
+      .subscribe(workOrder => {
+        if (workOrder) {
+          this.workOrder = workOrder;
 
-            // If the view is already initialized, create the chart
-            setTimeout(() => {
-              this.initExpensesChart();
-            }, 100);
+          // If the view is already initialized, create the chart
+          setTimeout(() => {
+            this.initExpensesChart();
+          }, 100);
 
-            // Load activity logs for this work order
-            this.loadActivityLogs(workOrder.id);
+          // Load activity logs for this work order
+          this.loadActivityLogs(workOrder.id);
 
-            // Load tasks for this work order
-            this.loadTasks(workOrder.id);
-          }
+          // Load tasks for this work order
+          this.loadTasks(workOrder.id);
         }
       });
   }
 
   getStatusClass(status: WorkOrderStatus): string {
     switch (status) {
-      case 'in-progress':
+      case WorkOrderStatus.InProgress:
         return 'status-in-progress';
-      case 'completed':
+      case WorkOrderStatus.Completed:
         return 'status-completed';
-      case 'pending':
+      case WorkOrderStatus.Pending:
         return 'status-pending';
-      case 'cancelled':
+      case WorkOrderStatus.Cancelled:
         return 'status-cancelled';
-      case 'on-hold':
+      case WorkOrderStatus.OnHold:
         return 'status-on-hold';
       default:
         return '';
@@ -254,15 +255,8 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
    * @param date The date to format
    */
   formatDate(date?: string | Date): string {
-    if (!date) return 'Not specified';
-
-    return new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (!date) return 'N/A';
+    return new Date(date).toLocaleDateString();
   }
 
   /**
@@ -277,7 +271,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
   }
 
   goBack(): void {
-    this.router.navigate(['/work-orders']);
+    this.location.back();
   }
 
   editWorkOrder(): void {
@@ -291,7 +285,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
    */
   printWorkOrder(): void {
     if (this.workOrder) {
-      this.printService.printWorkOrder(this.workOrder, true, false);
+      this.printService.printWorkOrder(this.workOrder);
       this.snackBar.open('Printing work order...', 'Close', {
         duration: 3000
       });
@@ -319,19 +313,12 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
       // Prepare data for export
       const workOrderData = {
         'Order Number': this.workOrder.details.workOrderNumber,
-        'Title': this.workOrder.details.title,
-        'Description': this.workOrder.details.description,
         'Status': this.workOrder.details.status,
-        'Priority': this.workOrder.details.priority,
         'Created Date': this.formatDate(this.workOrder.details.createdDate),
         'Start Date': this.formatDate(this.workOrder.details.startDate),
         'Due Date': this.formatDate(this.workOrder.details.dueDate),
         'Completion': `${this.workOrder.details.completionPercentage}%`,
-        'Category': this.workOrder.details.category,
-        'Estimated Cost': `$${this.workOrder.expenseBreakdown?.materials ? this.workOrder.expenseBreakdown?.materials.toLocaleString() : '0'}`,
-        'Client': this.workOrder.details.client || 'N/A',
-        'Location': this.workOrder.details.location || 'N/A',
-        'Engineer In Charge': this.workOrder.engineerInCharge?.name || 'Not Assigned'
+        'Location': this.workOrder.details.location
       };
 
       // Convert object to CSV format
@@ -1004,7 +991,8 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
    * Initialize the expenses pie chart
    */
   private initExpensesChart(): void {
-    if (!this.workOrder || !this.workOrder.expenseBreakdown) return;
+    const estimatedPrice = this.workOrder?.details?.estimatedPrice || 0;
+    if (!estimatedPrice) return;
 
     const ctx = document.getElementById('expensesChart') as HTMLCanvasElement;
     if (!ctx) return;
@@ -1014,18 +1002,14 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
       this.expensesChart.destroy();
     }
 
-    const { materials = 0, labor = 0, other = 0 } = this.workOrder.expenseBreakdown;
-
     this.expensesChart = new Chart(ctx, {
       type: 'pie',
       data: {
-        labels: ['Materials', 'Labor', 'Other'],
+        labels: ['Estimated Cost'],
         datasets: [{
-          data: [materials, labor, other],
+          data: [estimatedPrice],
           backgroundColor: [
-            '#4CAF50', // Materials - Green
-            '#2196F3', // Labor - Blue
-            '#FFC107'  // Other - Yellow
+            '#4CAF50', // Green
           ],
           borderWidth: 1
         }]
@@ -1041,8 +1025,7 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
             callbacks: {
               label: function(context: TooltipItem<'pie'>) {
                 const value = context.raw as number;
-                const total = (context.dataset.data as number[]).reduce((a, b) => a + b, 0);
-                const percentage = Math.round((value / total) * 100);
+                const percentage = Math.round((value / estimatedPrice) * 100);
                 return `${context.label}: $${value} (${percentage}%)`;
               }
             }
@@ -1056,10 +1039,28 @@ export class WorkOrderDetailsComponent implements OnInit, OnDestroy, AfterViewIn
    * Update the chart when the data changes
    */
   private updateExpensesChart(): void {
-    if (this.expensesChart && this.workOrder && this.workOrder.expenseBreakdown) {
-      const { materials = 0, labor = 0, other = 0 } = this.workOrder.expenseBreakdown;
-      this.expensesChart.data.datasets[0].data = [materials, labor, other];
-      this.expensesChart.update();
+    const estimatedPrice = this.workOrder?.details?.estimatedPrice || 0;
+    if (!this.expensesChart || !estimatedPrice) return;
+    
+    this.expensesChart.data.datasets[0].data = [estimatedPrice];
+    this.expensesChart.update();
+  }
+
+  onItemsUpdated(items: Iitem[]): void {
+    console.log('Items updated:', items);
+    // Handle the updated items
+    if (this.workOrder) {
+      this.workOrder.items = items.map(item => ({
+        id: item.id,
+        itemDetail: item,
+        estimatedQuantity: 0,
+        estimatedPrice: 0,
+        estimatedPriceWithVAT: 0,
+        actualQuantity: 0,
+        actualPrice: 0,
+        actualPriceWithVAT: 0,
+        reasonForFinalQuantity: ''
+      }));
     }
   }
 }
