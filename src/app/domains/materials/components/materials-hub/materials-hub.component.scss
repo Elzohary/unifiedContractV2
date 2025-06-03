@@ -1,0 +1,242 @@
+.materials-hub-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.header-card .mat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.quick-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+
+.stat-card {
+  min-height: 100px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &.clickable {
+    cursor: pointer;
+
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+  }
+}
+
+.stat-content {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.stat-icon {
+  font-size: 36px;
+  height: 36px;
+  width: 36px;
+
+  &.primary { color: #1976d2; }
+  &.accent { color: #ff4081; }
+  &.warn { color: #ff9800; }
+  &.success { color: #4caf50; }
+}
+
+.stat-details {
+  display: flex;
+  flex-direction: column;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 500;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.stat-label {
+  font-size: 14px;
+  color: rgba(0, 0, 0, 0.6);
+}
+
+// Work Orders Section
+.work-orders-card {
+  margin: 8px 0;
+}
+
+.work-orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.work-order-summary-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border-left: 4px solid #1976d2;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.wo-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wo-number {
+  font-weight: 500;
+  color: #1976d2;
+  font-size: 14px;
+}
+
+.wo-title {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: rgba(0, 0, 0, 0.87);
+}
+
+.wo-materials-info {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.material-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: rgba(0, 0, 0, 0.6);
+
+  mat-icon {
+    font-size: 16px;
+    height: 16px;
+    width: 16px;
+  }
+}
+
+.no-work-orders {
+  text-align: center;
+  padding: 32px;
+  color: rgba(0, 0, 0, 0.6);
+
+  mat-icon {
+    font-size: 48px;
+    height: 48px;
+    width: 48px;
+    color: #4caf50;
+    margin-bottom: 16px;
+  }
+}
+
+.view-all-action {
+  text-align: center;
+  margin-top: 16px;
+}
+
+// Urgency chips
+.urgency-low { background-color: #e8f5e8; color: #2e7d32; }
+.urgency-medium { background-color: #fff3e0; color: #ef6c00; }
+.urgency-high { background-color: #ffebee; color: #c62828; }
+.urgency-critical { background-color: #fce4ec; color: #ad1457; }
+
+// Navigation Grid
+.navigation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.nav-card {
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  min-height: 180px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.nav-card-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 32px;
+    height: 32px;
+    width: 32px;
+  }
+}
+
+.new-badge {
+  background: #ff4081;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.nav-card-action {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.nav-card-primary .nav-card-icon mat-icon { color: #1976d2; }
+.nav-card-accent .nav-card-icon mat-icon { color: #ff4081; }
+.nav-card-warn .nav-card-icon mat-icon { color: #ff9800; }
+
+// Quick Actions
+.quick-actions-card {
+  margin-top: 8px;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  button {
+    flex: 1 1 200px;
+    min-width: 200px;
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .quick-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .navigation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .work-orders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .quick-actions {
+    flex-direction: column;
+
+    button {
+      flex: none;
+      min-width: unset;
+    }
+  }
+} 

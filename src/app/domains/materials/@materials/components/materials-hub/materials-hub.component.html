@@ -1,0 +1,242 @@
+<!-- Materials Management Hub -->
+<div class="materials-hub">
+  <!-- Header -->
+  <div class="hub-header">
+    <div class="header-content">
+      <div class="title-section">
+        <h1 appHelp="materials-hub-overview">Materials Management Hub</h1>
+        <p>Your central command center for all materials operations</p>
+      </div>
+      <div class="header-actions">
+        <button mat-raised-button color="primary" (click)="openHelpCenter()">
+          <mat-icon>help_center</mat-icon>
+          Help Center
+        </button>
+        <button mat-icon-button (click)="toggleHelpMode()" 
+                [color]="(isHelpModeActive$ | async) ? 'primary' : ''"
+                matTooltip="Toggle Help Mode">
+          <mat-icon>{{(isHelpModeActive$ | async) ? 'visibility_off' : 'visibility'}}</mat-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Stats Overview -->
+  <div class="stats-section">
+    <h2>Quick Overview</h2>
+    <div class="stats-grid">
+      <mat-card class="stat-card" 
+                (click)="navigateToInventory()" 
+                appHelp="inventory-dashboard-nav">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon class="stat-icon">inventory_2</mat-icon>
+            <div class="stat-badge" *ngIf="overviewData.lowStockAlerts > 0">
+              {{overviewData.lowStockAlerts}}
+            </div>
+          </div>
+          <div class="stat-content">
+            <h3>{{overviewData.totalMaterials | number}}</h3>
+            <p>Total Materials</p>
+            <div class="stat-details">
+              <span class="detail-item">
+                <mat-icon class="small-icon">warning</mat-icon>
+                {{overviewData.lowStockAlerts}} Low Stock
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card" 
+                (click)="navigateToWorkOrderHub()" 
+                appHelp="work-order-materials-nav">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon class="stat-icon">engineering</mat-icon>
+            <div class="stat-badge" *ngIf="overviewData.pendingAllocations > 0">
+              {{overviewData.pendingAllocations}}
+            </div>
+          </div>
+          <div class="stat-content">
+            <h3>{{workOrdersRequiringMaterials.length}}</h3>
+            <p>Work Orders with Materials</p>
+            <div class="stat-details">
+              <span class="detail-item">
+                <mat-icon class="small-icon">schedule</mat-icon>
+                {{overviewData.pendingAllocations}} Pending
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon class="stat-icon">trending_up</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>${{overviewData.totalValue | number:'1.0-0'}}</h3>
+            <p>Total Inventory Value</p>
+            <div class="stat-details">
+              <span class="detail-item">
+                <mat-icon class="small-icon">attach_money</mat-icon>
+                {{overviewData.movementsToday}} Movements Today
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-content>
+          <div class="stat-header">
+            <mat-icon class="stat-icon">local_shipping</mat-icon>
+          </div>
+          <div class="stat-content">
+            <h3>{{overviewData.activePurchaseOrders}}</h3>
+            <p>Active Purchase Orders</p>
+            <div class="stat-details">
+              <span class="detail-item">
+                <mat-icon class="small-icon">schedule</mat-icon>
+                Expected This Week
+              </span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Work Orders Requiring Materials -->
+  <div class="work-orders-section" *ngIf="workOrdersRequiringMaterials.length > 0">
+    <div class="section-header">
+      <h2>Work Orders Requiring Materials</h2>
+      <button mat-button color="primary" (click)="navigateToWorkOrderHub()">
+        View All
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
+
+    <div class="work-orders-grid">
+      <mat-card *ngFor="let workOrder of workOrdersRequiringMaterials | slice:0:6" class="work-order-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar [class]="'priority-' + workOrder.details.priority">
+            engineering
+          </mat-icon>
+          <mat-card-title>{{workOrder.details.title}}</mat-card-title>
+          <mat-card-subtitle>
+            {{workOrder.details.type}} • {{workOrder.details.location}}
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="work-order-description">{{workOrder.details.description}}</p>
+          <div class="materials-needed">
+            <h4>Materials Needed:</h4>
+            <div class="material-chips">
+              <mat-chip-listbox>
+                <mat-chip *ngFor="let material of workOrder.materialsNeeded | slice:0:3">
+                  {{material.name}} ({{material.quantityNeeded}})
+                </mat-chip>
+                <mat-chip *ngIf="workOrder.materialsNeeded.length > 3" color="primary">
+                  +{{workOrder.materialsNeeded.length - 3}} more
+                </mat-chip>
+              </mat-chip-listbox>
+            </div>
+          </div>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary" (click)="allocateMaterials(workOrder.id)">
+            <mat-icon>assignment</mat-icon>
+            Allocate Materials
+          </button>
+          <button mat-button (click)="viewWorkOrder(workOrder.id)">
+            View Details
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+
+  <!-- Navigation Cards -->
+  <div class="navigation-section">
+    <h2>Materials Management Modules</h2>
+    <div class="nav-grid">
+      <mat-card class="nav-card" 
+                (click)="navigateToInventory()" 
+                appHelp="inventory-dashboard-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">dashboard</mat-icon>
+            <div class="nav-badge" *ngIf="overviewData.lowStockAlerts > 0">
+              {{overviewData.lowStockAlerts}}
+            </div>
+          </div>
+          <h3>Inventory Dashboard</h3>
+          <p>Monitor stock levels, movements, and inventory health across all locations</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" 
+                (click)="navigateToCatalog()" 
+                appHelp="material-catalog-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">library_books</mat-icon>
+          </div>
+          <h3>Material Catalog</h3>
+          <p>Manage material definitions, specifications, and properties</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" 
+                (click)="navigateToWorkOrderHub()" 
+                appHelp="work-order-materials-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">engineering</mat-icon>
+            <div class="nav-badge" *ngIf="overviewData.pendingAllocations > 0">
+              {{overviewData.pendingAllocations}}
+            </div>
+          </div>
+          <h3>Work Order Materials</h3>
+          <p>Integrate materials with work orders and track material usage</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" appHelp="warehouse-management-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">warehouse</mat-icon>
+          </div>
+          <h3>Warehouse Management</h3>
+          <p>Manage warehouse locations, storage bins, and warehouse operations</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" appHelp="purchase-orders-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">shopping_cart</mat-icon>
+            <div class="nav-badge" *ngIf="overviewData.activePurchaseOrders > 0">
+              {{overviewData.activePurchaseOrders}}
+            </div>
+          </div>
+          <h3>Purchase Orders</h3>
+          <p>Create and manage material procurement processes</p>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="nav-card" appHelp="stock-movements-nav">
+        <mat-card-content>
+          <div class="nav-icon-container">
+            <mat-icon class="nav-icon">swap_horiz</mat-icon>
+          </div>
+          <h3>Stock Movements</h3>
+          <p>Track all material movements, receipts, and issues</p>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

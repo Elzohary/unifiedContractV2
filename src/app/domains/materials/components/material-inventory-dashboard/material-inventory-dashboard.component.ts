@@ -1,6 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Subject, takeUntil, take } from 'rxjs';
+import { ActivatedRoute } from '@angular/router';
 
 // Angular Material Imports
 import { MatCardModule } from '@angular/material/card';
@@ -82,7 +83,8 @@ export class MaterialInventoryDashboardComponent implements OnInit, OnDestroy {
     private snackBar: MatSnackBar,
     private dialog: MatDialog,
     private materialManagementService: MaterialManagementService,
-    private materialService: MaterialService
+    private materialService: MaterialService,
+    private activatedRoute: ActivatedRoute
   ) {}
 
   ngOnInit(): void {
@@ -95,6 +97,33 @@ export class MaterialInventoryDashboardComponent implements OnInit, OnDestroy {
           duration: 5000,
           panelClass: ['error-snackbar']
         });
+      }
+    });
+
+    // Handle query parameters from materials hub
+    this.activatedRoute.queryParams.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(params => {
+      if (params['action']) {
+        // Delay to ensure component is fully initialized
+        setTimeout(() => {
+          switch (params['action']) {
+            case 'stock-adjustment':
+              this.createStockAdjustment();
+              break;
+            case 'requisition':
+              this.createMaterialRequisition();
+              break;
+            default:
+              break;
+          }
+          // Clear the query parameter after action
+          this.router.navigate([], {
+            relativeTo: this.activatedRoute,
+            queryParams: {},
+            replaceUrl: true
+          });
+        }, 500);
       }
     });
   }

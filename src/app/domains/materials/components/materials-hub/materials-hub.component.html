@@ -1,0 +1,176 @@
+<div class="materials-hub-container">
+  <!-- Header -->
+  <mat-card class="header-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>inventory</mat-icon>
+        Materials Management
+      </mat-card-title>
+      <mat-card-subtitle>
+        Comprehensive materials and inventory management system
+      </mat-card-subtitle>
+    </mat-card-header>
+  </mat-card>
+
+  <!-- Quick Stats -->
+  <div class="quick-stats" *ngIf="dashboardData$ | async as data">
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon primary">inventory_2</mat-icon>
+          <div class="stat-details">
+            <div class="stat-value">{{data.totalMaterials}}</div>
+            <div class="stat-label">Total Materials</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card" (click)="navigateToModule('/materials/dashboard')" [class.clickable]="data.lowStockItems > 0">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon warn">warning</mat-icon>
+          <div class="stat-details">
+            <div class="stat-value">{{data.lowStockItems}}</div>
+            <div class="stat-label">Low Stock Alerts</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card" (click)="navigateToModule('/materials/dashboard')" [class.clickable]="data.pendingRequisitions > 0">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon accent">assignment</mat-icon>
+          <div class="stat-details">
+            <div class="stat-value">{{data.pendingRequisitions}}</div>
+            <div class="stat-label">Pending Requisitions</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-card class="stat-card">
+      <mat-card-content>
+        <div class="stat-content">
+          <mat-icon class="stat-icon success">attach_money</mat-icon>
+          <div class="stat-details">
+            <div class="stat-value">{{data.totalValue | currency}}</div>
+            <div class="stat-label">Total Inventory Value</div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Active Work Orders with Material Needs -->
+  <mat-card class="work-orders-card" *ngIf="workOrdersWithMaterialNeeds$ | async as workOrders">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>engineering</mat-icon>
+        Work Orders Requiring Materials
+      </mat-card-title>
+      <mat-card-subtitle>{{workOrders.length}} work orders need material attention</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="work-orders-grid" *ngIf="workOrders.length > 0; else noWorkOrders">
+        <mat-card 
+          class="work-order-summary-card" 
+          *ngFor="let wo of workOrders.slice(0, 3)"
+          (click)="navigateToWorkOrderMaterials(wo.id)">
+          <mat-card-content>
+            <div class="wo-header">
+              <span class="wo-number">{{wo.workOrderNumber}}</span>
+              <mat-chip [class]="'urgency-' + wo.urgency">{{wo.urgency | titlecase}}</mat-chip>
+            </div>
+            <div class="wo-title">{{wo.title}}</div>
+            <div class="wo-materials-info">
+              <div class="material-stat">
+                <mat-icon>inventory_2</mat-icon>
+                <span>{{wo.materialsNeeded}} materials needed</span>
+              </div>
+              <div class="material-stat" *ngIf="wo.pendingRequisitions > 0">
+                <mat-icon>assignment</mat-icon>
+                <span>{{wo.pendingRequisitions}} pending requisitions</span>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+      
+      <ng-template #noWorkOrders>
+        <div class="no-work-orders">
+          <mat-icon>check_circle</mat-icon>
+          <p>All work orders have adequate material allocation</p>
+        </div>
+      </ng-template>
+      
+      <div class="view-all-action" *ngIf="workOrders.length > 3">
+        <button mat-stroked-button (click)="navigateToModule('/materials/work-order-hub')">
+          <mat-icon>visibility</mat-icon>
+          View All ({{workOrders.length}})
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Navigation Cards -->
+  <div class="navigation-grid">
+    <mat-card 
+      class="nav-card" 
+      *ngFor="let module of materialsModules"
+      [class]="'nav-card-' + module.color"
+      (click)="navigateToModule(module.route)">
+      
+      <mat-card-header>
+        <div class="nav-card-icon">
+          <mat-icon 
+            [matBadge]="module.badge" 
+            [matBadgeHidden]="!module.badge || module.badge === 0"
+            matBadgeColor="warn">
+            {{module.icon}}
+          </mat-icon>
+          <span class="new-badge" *ngIf="module.isNew">NEW</span>
+        </div>
+        <mat-card-title>{{module.title}}</mat-card-title>
+        <mat-card-subtitle>{{module.description}}</mat-card-subtitle>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="nav-card-action">
+          <button mat-raised-button [color]="module.color">
+            <mat-icon>arrow_forward</mat-icon>
+            Open
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Quick Actions -->
+  <mat-card class="quick-actions-card">
+    <mat-card-header>
+      <mat-card-title>Quick Actions</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="quick-actions">
+        <button mat-raised-button color="primary" (click)="createStockAdjustment()">
+          <mat-icon>tune</mat-icon>
+          Stock Adjustment
+        </button>
+        <button mat-raised-button color="accent" (click)="createRequisition()">
+          <mat-icon>assignment</mat-icon>
+          Material Requisition
+        </button>
+        <button mat-stroked-button (click)="addNewMaterial()">
+          <mat-icon>add</mat-icon>
+          Add Material
+        </button>
+        <button mat-stroked-button (click)="viewReports()">
+          <mat-icon>assessment</mat-icon>
+          View Reports
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div> 

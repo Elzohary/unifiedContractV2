@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject, combineLatest, Subject } from 'rxjs';
+import { map, takeUntil, switchMap } from 'rxjs/operators';
 
 // Angular Material
 import { MatCardModule } from '@angular/material/card';
@@ -10,10 +11,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatChipsModule } from '@angular/material/chips';
 
 // Services
 import { MaterialManagementService } from '../../services/material-management.service';
+import { WorkOrderService } from '../../../work-order/services/work-order.service';
 
+// Models
 interface MaterialsModuleCard {
   title: string;
   description: string;
@@ -22,6 +26,17 @@ interface MaterialsModuleCard {
   color: 'primary' | 'accent' | 'warn';
   badge?: number;
   isNew?: boolean;
+}
+
+interface WorkOrderWithMaterialNeeds {
+  id: string;
+  workOrderNumber: string;
+  title: string;
+  urgency: 'low' | 'medium' | 'high' | 'critical';
+  materialsNeeded: number;
+  pendingRequisitions: number;
+  assignedMaterials: number;
+  materialCompletionPercentage: number;
 }
 
 @Component({
@@ -34,279 +49,18 @@ interface MaterialsModuleCard {
     MatIconModule,
     MatGridListModule,
     MatBadgeModule,
-    MatDividerModule
+    MatDividerModule,
+    MatChipsModule
   ],
-  template: `
-    <div class="materials-hub-container">
-      <!-- Header -->
-      <mat-card class="header-card">
-        <mat-card-header>
-          <mat-card-title>
-            <mat-icon>inventory</mat-icon>
-            Materials Management
-          </mat-card-title>
-          <mat-card-subtitle>
-            Comprehensive materials and inventory management system
-          </mat-card-subtitle>
-        </mat-card-header>
-      </mat-card>
-
-      <!-- Quick Stats -->
-      <div class="quick-stats" *ngIf="dashboardData$ | async as data">
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-content">
-              <mat-icon class="stat-icon primary">inventory_2</mat-icon>
-              <div class="stat-details">
-                <div class="stat-value">{{data.totalMaterials}}</div>
-                <div class="stat-label">Total Materials</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-content">
-              <mat-icon class="stat-icon warn">warning</mat-icon>
-              <div class="stat-details">
-                <div class="stat-value">{{data.lowStockItems}}</div>
-                <div class="stat-label">Low Stock Alerts</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-content">
-              <mat-icon class="stat-icon accent">assignment</mat-icon>
-              <div class="stat-details">
-                <div class="stat-value">{{data.pendingRequisitions}}</div>
-                <div class="stat-label">Pending Requisitions</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-
-        <mat-card class="stat-card">
-          <mat-card-content>
-            <div class="stat-content">
-              <mat-icon class="stat-icon success">attach_money</mat-icon>
-              <div class="stat-details">
-                <div class="stat-value">{{data.totalValue | currency}}</div>
-                <div class="stat-label">Total Inventory Value</div>
-              </div>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <!-- Navigation Cards -->
-      <div class="navigation-grid">
-        <mat-card 
-          class="nav-card" 
-          *ngFor="let module of materialsModules"
-          [class]="'nav-card-' + module.color"
-          (click)="navigateToModule(module.route)">
-          
-          <mat-card-header>
-            <div class="nav-card-icon">
-              <mat-icon 
-                [matBadge]="module.badge" 
-                [matBadgeHidden]="!module.badge"
-                matBadgeColor="warn">
-                {{module.icon}}
-              </mat-icon>
-              <span class="new-badge" *ngIf="module.isNew">NEW</span>
-            </div>
-            <mat-card-title>{{module.title}}</mat-card-title>
-            <mat-card-subtitle>{{module.description}}</mat-card-subtitle>
-          </mat-card-header>
-
-          <mat-card-content>
-            <div class="nav-card-action">
-              <button mat-raised-button [color]="module.color">
-                <mat-icon>arrow_forward</mat-icon>
-                Open
-              </button>
-            </div>
-          </mat-card-content>
-        </mat-card>
-      </div>
-
-      <!-- Quick Actions -->
-      <mat-card class="quick-actions-card">
-        <mat-card-header>
-          <mat-card-title>Quick Actions</mat-card-title>
-        </mat-card-header>
-        <mat-card-content>
-          <div class="quick-actions">
-            <button mat-raised-button color="primary" (click)="createStockAdjustment()">
-              <mat-icon>tune</mat-icon>
-              Stock Adjustment
-            </button>
-            <button mat-raised-button color="accent" (click)="createRequisition()">
-              <mat-icon>assignment</mat-icon>
-              Material Requisition
-            </button>
-            <button mat-stroked-button (click)="addNewMaterial()">
-              <mat-icon>add</mat-icon>
-              Add Material
-            </button>
-            <button mat-stroked-button (click)="viewReports()">
-              <mat-icon>assessment</mat-icon>
-              View Reports
-            </button>
-          </div>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .materials-hub-container {
-      padding: 16px;
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .header-card .mat-card-header {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .quick-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-    }
-
-    .stat-card {
-      min-height: 100px;
-    }
-
-    .stat-content {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .stat-icon {
-      font-size: 36px;
-      height: 36px;
-      width: 36px;
-    }
-
-    .stat-icon.primary { color: #1976d2; }
-    .stat-icon.accent { color: #ff4081; }
-    .stat-icon.warn { color: #ff9800; }
-    .stat-icon.success { color: #4caf50; }
-
-    .stat-details {
-      display: flex;
-      flex-direction: column;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 500;
-      color: rgba(0, 0, 0, 0.87);
-    }
-
-    .stat-label {
-      font-size: 14px;
-      color: rgba(0, 0, 0, 0.6);
-    }
-
-    .navigation-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 16px;
-    }
-
-    .nav-card {
-      cursor: pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-      min-height: 180px;
-    }
-
-    .nav-card:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-
-    .nav-card-icon {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav-card-icon mat-icon {
-      font-size: 32px;
-      height: 32px;
-      width: 32px;
-    }
-
-    .new-badge {
-      background: #ff4081;
-      color: white;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 8px;
-      font-weight: 500;
-    }
-
-    .nav-card-action {
-      display: flex;
-      justify-content: flex-end;
-      margin-top: 16px;
-    }
-
-    .nav-card-primary .nav-card-icon mat-icon { color: #1976d2; }
-    .nav-card-accent .nav-card-icon mat-icon { color: #ff4081; }
-    .nav-card-warn .nav-card-icon mat-icon { color: #ff9800; }
-
-    .quick-actions-card {
-      margin-top: 8px;
-    }
-
-    .quick-actions {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
-
-    .quick-actions button {
-      flex: 1 1 200px;
-      min-width: 200px;
-    }
-
-    @media (max-width: 768px) {
-      .quick-stats {
-        grid-template-columns: repeat(2, 1fr);
-      }
-
-      .navigation-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .quick-actions {
-        flex-direction: column;
-      }
-
-      .quick-actions button {
-        flex: none;
-        min-width: unset;
-      }
-    }
-  `]
+  templateUrl: './materials-hub.component.html',
+  styleUrls: ['./materials-hub.component.scss']
 })
-export class MaterialsHubComponent implements OnInit {
+export class MaterialsHubComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
   
+  // Data streams
   dashboardData$ = this.materialManagementService.dashboardData$;
+  workOrdersWithMaterialNeeds$!: Observable<WorkOrderWithMaterialNeeds[]>;
 
   materialsModules: MaterialsModuleCard[] = [
     {
@@ -357,16 +111,125 @@ export class MaterialsHubComponent implements OnInit {
 
   constructor(
     private router: Router,
-    private materialManagementService: MaterialManagementService
-  ) {}
+    private materialManagementService: MaterialManagementService,
+    private workOrderService: WorkOrderService
+  ) {
+    this.initializeWorkOrdersWithMaterialNeeds();
+  }
 
   ngOnInit(): void {
     // Load dashboard data for quick stats
     this.materialManagementService.loadDashboardData().subscribe();
+    
+    // Update badges with real data
+    this.updateModuleBadges();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  private initializeWorkOrdersWithMaterialNeeds(): void {
+    // Combine work orders with material requisitions to identify work orders needing materials
+    this.workOrdersWithMaterialNeeds$ = combineLatest([
+      this.workOrderService.workOrders$,
+      this.materialManagementService.requisitions$
+    ]).pipe(
+      map(([workOrders, requisitions]) => {
+        return workOrders
+          .filter(wo => wo.details?.status === 'in-progress' || wo.details?.status === 'pending')
+          .map(wo => {
+            // Count material assignments and requisitions for this work order
+            const woRequisitions = requisitions.filter(req => req.workOrderId === wo.id);
+            const pendingRequisitions = woRequisitions.filter(req => req.status === 'pending').length;
+            
+            // Mock data for materials needed - in real app, this would come from work order material assignments
+            const materialsNeeded = this.calculateMaterialsNeeded(wo);
+            const assignedMaterials = this.calculateAssignedMaterials(wo);
+            
+            return {
+              id: wo.id,
+              workOrderNumber: wo.details?.workOrderNumber || 'Unknown',
+              title: wo.details?.title || 'No Title',
+              urgency: this.mapWorkOrderUrgency(wo.details?.priority || 'medium'),
+              materialsNeeded,
+              pendingRequisitions,
+              assignedMaterials,
+              materialCompletionPercentage: materialsNeeded > 0 ? 
+                Math.round((assignedMaterials / materialsNeeded) * 100) : 100
+            } as WorkOrderWithMaterialNeeds;
+          })
+          .filter(wo => wo.materialsNeeded > wo.assignedMaterials || wo.pendingRequisitions > 0)
+          .sort((a, b) => {
+            // Sort by urgency and material completion
+            const urgencyOrder = { critical: 4, high: 3, medium: 2, low: 1 };
+            const urgencyDiff = urgencyOrder[b.urgency] - urgencyOrder[a.urgency];
+            if (urgencyDiff !== 0) return urgencyDiff;
+            return a.materialCompletionPercentage - b.materialCompletionPercentage;
+          });
+      })
+    );
+  }
+
+  private calculateMaterialsNeeded(workOrder: any): number {
+    // Mock calculation - in real app, this would come from work order material requirements
+    // Based on work order type, complexity, etc.
+    const baseNeeds = Math.floor(Math.random() * 15) + 5; // 5-20 materials
+    return baseNeeds;
+  }
+
+  private calculateAssignedMaterials(workOrder: any): number {
+    // Mock calculation - in real app, this would come from actual material assignments
+    const materialsNeeded = this.calculateMaterialsNeeded(workOrder);
+    const assignedPercentage = Math.random() * 0.8; // 0-80% assigned
+    return Math.floor(materialsNeeded * assignedPercentage);
+  }
+
+  private mapWorkOrderUrgency(priority: string): 'low' | 'medium' | 'high' | 'critical' {
+    const mapping: Record<string, 'low' | 'medium' | 'high' | 'critical'> = {
+      'low': 'low',
+      'medium': 'medium', 
+      'high': 'high',
+      'urgent': 'critical',
+      'critical': 'critical'
+    };
+    return mapping[priority.toLowerCase()] || 'medium';
+  }
+
+  private updateModuleBadges(): void {
+    // Update badges with real-time data
+    combineLatest([
+      this.materialManagementService.dashboardData$,
+      this.materialManagementService.alerts$,
+      this.materialManagementService.pendingRequisitions$
+    ]).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(([dashboardData, alerts, pendingReqs]) => {
+      // Update Inventory Dashboard badge with critical alerts
+      const inventoryModuleIndex = this.materialsModules.findIndex(m => m.route === '/materials/dashboard');
+      if (inventoryModuleIndex >= 0) {
+        this.materialsModules[inventoryModuleIndex].badge = 
+          alerts.filter(alert => alert.severity === 'critical').length;
+      }
+
+      // Update Work Order Materials badge with pending requisitions
+      const workOrderModuleIndex = this.materialsModules.findIndex(m => m.route === '/materials/work-order-hub');
+      if (workOrderModuleIndex >= 0) {
+        this.materialsModules[workOrderModuleIndex].badge = pendingReqs.length;
+      }
+    });
+  }
+
+  // Navigation Methods
   navigateToModule(route: string): void {
     this.router.navigate([route]);
+  }
+
+  navigateToWorkOrderMaterials(workOrderId: string): void {
+    this.router.navigate(['/work-orders/details', workOrderId], {
+      fragment: 'materials'
+    });
   }
 
   // Quick Actions

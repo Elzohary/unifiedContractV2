@@ -384,7 +384,7 @@ export class MaterialManagementService {
   loadDashboardData(): Observable<MaterialDashboardData> {
     this.setLoading(true);
 
-    // Simulate API call with mock data
+    // Generate realistic mock data with work order integration
     const mockData: MaterialDashboardData = {
       totalMaterials: 1247,
       totalValue: 2456789.50,
@@ -392,10 +392,10 @@ export class MaterialManagementService {
       outOfStockItems: 5,
       pendingRequisitions: 12,
       pendingAdjustments: 3,
-      recentMovements: [],
-      stockAlerts: [],
-      topUsedMaterials: [],
-      monthlyTrends: []
+      recentMovements: this.generateMockMovements(),
+      stockAlerts: this.generateMockAlerts(),
+      topUsedMaterials: this.generateMockTopUsedMaterials(),
+      monthlyTrends: this.generateMockMonthlyTrends()
     };
 
     return of(mockData).pipe(
@@ -410,6 +410,123 @@ export class MaterialManagementService {
         return throwError(() => error);
       })
     );
+  }
+
+  // Enhanced mock data generators
+  private generateMockMovements(): MaterialMovement[] {
+    const movements: MaterialMovement[] = [
+      {
+        id: 'mov-001',
+        movementNumber: 'MOV-2024-001',
+        materialId: 'mat-001',
+        materialCode: 'CONC-001',
+        materialDescription: 'Ready Mix Concrete Grade 30',
+        movementType: 'issue',
+        quantity: 50,
+        unit: 'm³',
+        fromLocation: { type: 'warehouse', id: 'wh-001', name: 'Main Warehouse' },
+        toLocation: { type: 'work-order', id: 'wo-001', name: 'WO-2024-001: Road Maintenance' },
+        relatedEntity: {
+          type: 'work-order',
+          id: 'wo-001',
+          reference: 'WO-2024-001'
+        },
+        performedBy: 'USR001',
+        performedByName: 'Ahmed Al-Hassan',
+        performedDate: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
+        notes: 'Material issued for road maintenance project'
+      },
+      {
+        id: 'mov-002',
+        movementNumber: 'MOV-2024-002',
+        materialId: 'mat-002',
+        materialCode: 'STEEL-002',
+        materialDescription: 'Reinforcement Steel Bar 16mm',
+        movementType: 'receipt',
+        quantity: 1000,
+        unit: 'kg',
+        fromLocation: { type: 'warehouse', id: 'sup-001', name: 'External Supplier - Al-Rajhi Steel Co.' },
+        toLocation: { type: 'warehouse', id: 'wh-001', name: 'Main Warehouse' },
+        relatedEntity: {
+          type: 'purchase-order',
+          id: 'po-001',
+          reference: 'PO-2024-001'
+        },
+        performedBy: 'USR002',
+        performedByName: 'Mohammed Al-Zahra',
+        performedDate: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
+        notes: 'Steel delivery from supplier'
+      }
+    ];
+    return movements;
+  }
+
+  private generateMockAlerts(): StockAlert[] {
+    const alerts: StockAlert[] = [
+      {
+        id: 'alert-001',
+        type: 'low-stock',
+        severity: 'high',
+        materialId: 'mat-003',
+        materialCode: 'CEMENT-001',
+        materialDescription: 'Portland Cement Type I',
+        currentStock: 15,
+        thresholdValue: 50,
+        message: 'Stock level below minimum threshold',
+        actionRequired: 'Reorder required - affects 3 active work orders',
+        dateDetected: new Date(Date.now() - 24 * 60 * 60 * 1000), // 1 day ago
+        isActive: true
+      },
+      {
+        id: 'alert-002',
+        type: 'out-of-stock',
+        severity: 'critical',
+        materialId: 'mat-004',
+        materialCode: 'PIPES-003',
+        materialDescription: 'PVC Pipes 200mm Diameter',
+        currentStock: 0,
+        thresholdValue: 0,
+        message: 'Material completely out of stock',
+        actionRequired: 'URGENT: Immediate procurement needed for WO-2024-003',
+        dateDetected: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
+        isActive: true
+      }
+    ];
+    return alerts;
+  }
+
+  private generateMockTopUsedMaterials(): MaterialUsageSummary[] {
+    return [
+      {
+        materialId: 'mat-001',
+        materialCode: 'CONC-001',
+        materialDescription: 'Ready Mix Concrete Grade 30',
+        totalUsed: 850,
+        totalCost: 127500,
+        usageFrequency: 15,
+        lastUsedDate: new Date(Date.now() - 2 * 60 * 60 * 1000)
+      },
+      {
+        materialId: 'mat-002',
+        materialCode: 'STEEL-002',
+        materialDescription: 'Reinforcement Steel Bar 16mm',
+        totalUsed: 2450,
+        totalCost: 98000,
+        usageFrequency: 12,
+        lastUsedDate: new Date(Date.now() - 4 * 60 * 60 * 1000)
+      }
+    ];
+  }
+
+  private generateMockMonthlyTrends(): MaterialTrend[] {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
+    return months.map((month, index) => ({
+      month,
+      totalValue: 2200000 + (index * 50000) + Math.random() * 100000,
+      totalMovements: 150 + Math.floor(Math.random() * 50),
+      newMaterials: Math.floor(Math.random() * 10),
+      lowStockItems: Math.floor(Math.random() * 30)
+    }));
   }
 
   // Private helper methods
