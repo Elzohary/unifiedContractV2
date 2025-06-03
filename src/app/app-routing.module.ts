@@ -163,7 +163,7 @@ export const routes: Routes = [
   },
   {
     path: 'materials',
-    loadComponent: () => import('./domains/materials/@materials/components/materials-hub/materials-hub.component')
+    loadComponent: () => import('./domains/materials/components/materials-hub/materials-hub.component')
       .then(c => c.MaterialsHubComponent)
   },
   {
