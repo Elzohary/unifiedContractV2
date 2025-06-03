@@ -17,7 +17,7 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MaterialDialogComponent } from '../material-dialog/material-dialog.component';
+import { MaterialFormDialogComponent } from '../dialogs/material-form-dialog/material-form-dialog.component';
 
 @Component({
   selector: 'app-materials-management',
@@ -41,7 +41,7 @@ import { MaterialDialogComponent } from '../material-dialog/material-dialog.comp
     MatSnackBarModule,
     FormsModule,
     ReactiveFormsModule,
-    MaterialDialogComponent
+    MaterialFormDialogComponent
   ]
 })
 export class MaterialsManagementComponent implements OnInit {
@@ -96,7 +96,7 @@ export class MaterialsManagementComponent implements OnInit {
   }
 
   onAddMaterial(): void {
-    const dialogRef = this.dialog.open(MaterialDialogComponent, {
+    const dialogRef = this.dialog.open(MaterialFormDialogComponent, {
       data: { isEdit: false },
       width: '600px'
     });
@@ -117,7 +117,7 @@ export class MaterialsManagementComponent implements OnInit {
   }
 
   onEditMaterial(material: BaseMaterial): void {
-    const dialogRef = this.dialog.open(MaterialDialogComponent, {
+    const dialogRef = this.dialog.open(MaterialFormDialogComponent, {
       data: { material, isEdit: true },
       width: '600px'
     });

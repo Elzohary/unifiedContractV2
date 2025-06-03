@@ -8,7 +8,7 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatDividerModule } from '@angular/material/divider';
-import { BaseMaterial, ClientType, MaterialType, SecMaterial } from '../../models/material.model';
+import { BaseMaterial, ClientType, MaterialType, SecMaterial } from '../../../models/material.model';
 
 export interface MaterialDialogData {
   material?: BaseMaterial | SecMaterial;
@@ -16,9 +16,9 @@ export interface MaterialDialogData {
 }
 
 @Component({
-  selector: 'app-material-dialog',
-  templateUrl: './material-dialog.component.html',
-  styleUrls: ['./material-dialog.component.scss'],
+  selector: 'app-material-form-dialog',
+  templateUrl: './material-form-dialog.component.html',
+  styleUrls: ['./material-form-dialog.component.scss'],
   standalone: true,
   imports: [
     CommonModule,
@@ -33,7 +33,7 @@ export interface MaterialDialogData {
     MatDividerModule
   ]
 })
-export class MaterialDialogComponent implements OnInit {
+export class MaterialFormDialogComponent implements OnInit {
   materialForm: FormGroup;
   secSpecificForm: FormGroup;
 
@@ -50,7 +50,7 @@ export class MaterialDialogComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    public dialogRef: MatDialogRef<MaterialDialogComponent>,
+    public dialogRef: MatDialogRef<MaterialFormDialogComponent>,
     @Inject(MAT_DIALOG_DATA) public data: MaterialDialogData
   ) {
     // Initialize the forms
