@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
+import { Subject, takeUntil, take } from 'rxjs';
 
 // Angular Material Imports
 import { MatCardModule } from '@angular/material/card';
@@ -26,6 +26,12 @@ import { Router } from '@angular/router';
 // ViewModels and Services
 import { MaterialInventoryViewModel, StockAlert } from '../../viewModels/material-inventory.viewmodel';
 import { MaterialMovement } from '../../models/inventory.model';
+import { MaterialManagementService } from '../../services/material-management.service';
+import { MaterialService } from '../../services/material.service';
+
+// Dialogs
+import { StockAdjustmentDialogComponent } from '../dialogs/stock-adjustment-dialog/stock-adjustment-dialog.component';
+import { MaterialRequisitionDialogComponent } from '../dialogs/material-requisition-dialog/material-requisition-dialog.component';
 
 @Component({
   selector: 'app-material-inventory-dashboard',
@@ -74,7 +80,9 @@ export class MaterialInventoryDashboardComponent implements OnInit, OnDestroy {
     private viewModel: MaterialInventoryViewModel,
     private router: Router,
     private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private materialManagementService: MaterialManagementService,
+    private materialService: MaterialService
   ) {}
 
   ngOnInit(): void {
@@ -115,16 +123,83 @@ export class MaterialInventoryDashboardComponent implements OnInit, OnDestroy {
 
   // Action methods
   createStockAdjustment(): void {
-    // TODO: Open stock adjustment dialog
-    this.snackBar.open('Stock adjustment dialog coming soon', 'Close', {
-      duration: 3000
+    // Get available materials for the dialog
+    this.materialService.materials$.pipe(
+      take(1)
+    ).subscribe(materials => {
+      const dialogRef = this.dialog.open(StockAdjustmentDialogComponent, {
+        width: '800px',
+        maxWidth: '95vw',
+        data: {
+          availableMaterials: materials
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.materialManagementService.processStockAdjustment(result).subscribe({
+            next: (success) => {
+              if (success) {
+                this.snackBar.open('Stock adjustment processed successfully', 'Close', {
+                  duration: 3000,
+                  panelClass: ['success-snackbar']
+                });
+                this.refreshDashboard();
+              }
+            },
+            error: (error) => {
+              this.snackBar.open(`Failed to process stock adjustment: ${error.message}`, 'Close', {
+                duration: 5000,
+                panelClass: ['error-snackbar']
+              });
+            }
+          });
+        }
+      });
     });
   }
 
   createMaterialRequisition(): void {
-    // TODO: Open material requisition dialog
-    this.snackBar.open('Material requisition dialog coming soon', 'Close', {
-      duration: 3000
+    // Get available materials for the dialog
+    this.materialService.materials$.pipe(
+      take(1)
+    ).subscribe(materials => {
+      const dialogRef = this.dialog.open(MaterialRequisitionDialogComponent, {
+        width: '1000px',
+        maxWidth: '95vw',
+        height: '90vh',
+        data: {
+          availableMaterials: materials,
+          requestType: 'general'
+        }
+      });
+
+      dialogRef.afterClosed().subscribe(result => {
+        if (result) {
+          this.materialManagementService.processRequisition(result).subscribe({
+            next: (requisition) => {
+              const approvalMessage = requisition.approvalRequired ? 
+                ' (pending approval)' : ' and approved automatically';
+              
+              this.snackBar.open(
+                `Material requisition ${requisition.requestNumber} created successfully${approvalMessage}`, 
+                'Close', 
+                {
+                  duration: 4000,
+                  panelClass: ['success-snackbar']
+                }
+              );
+              this.refreshDashboard();
+            },
+            error: (error) => {
+              this.snackBar.open(`Failed to create requisition: ${error.message}`, 'Close', {
+                duration: 5000,
+                panelClass: ['error-snackbar']
+              });
+            }
+          });
+        }
+      });
     });
   }
 

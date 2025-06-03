@@ -87,14 +87,9 @@ export const projectMenuItems = [
             },
             {
               label: 'Material Dashboard',
-              link: '/materials/dashboard',
+              link: '/materials',
               icon: 'dashboard'
             },
-            {
-                label: 'Materials Catalouge',
-                link: '/resources/materials',
-                icon: 'warehouse'
-            }
         ]
     },
     {

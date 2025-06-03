@@ -162,13 +162,54 @@ export const routes: Routes = [
     component: EquipmentDashboardComponent
   },
   {
+    path: 'materials',
+    loadComponent: () => import('./domains/materials/components/materials-hub/materials-hub.component')
+      .then(c => c.MaterialsHubComponent)
+  },
+  {
     path: 'materials/dashboard',
     component: MaterialInventoryDashboardComponent,
   },
   {
-    path: 'resources/materials',
-    component: MaterialsManagementComponent,
-    pathMatch: 'full'
+    path: 'materials/catalog',
+    component: MaterialsManagementComponent
+  },
+  {
+    path: 'materials/work-order-hub',
+    loadComponent: () => import('./domains/materials/components/work-order-material-hub/work-order-material-hub.component')
+      .then(c => c.WorkOrderMaterialHubComponent)
+  },
+  {
+    path: 'materials/warehouses',
+    component: UnderConstructionComponent,
+    data: { 
+      title: 'Warehouse Management', 
+      message: 'Warehouse management functionality is coming soon.' 
+    }
+  },
+  {
+    path: 'materials/purchase-orders',
+    component: UnderConstructionComponent,
+    data: { 
+      title: 'Purchase Orders', 
+      message: 'Purchase order management functionality is coming soon.' 
+    }
+  },
+  {
+    path: 'materials/movements',
+    component: UnderConstructionComponent,
+    data: { 
+      title: 'Stock Movements', 
+      message: 'Stock movement tracking functionality is coming soon.' 
+    }
+  },
+  {
+    path: 'materials/reports',
+    component: UnderConstructionComponent,
+    data: { 
+      title: 'Material Reports', 
+      message: 'Material reporting functionality is coming soon.' 
+    }
   },
 
   // HR routes - keep lazy loading
